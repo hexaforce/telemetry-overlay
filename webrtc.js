@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id)
 const d = document.documentElement
 
-import { renderMap } from './map.js'
+import { renderMap } from './navigation-map.js'
 
 // --- ICE Handler --------------------------
 const iceCandidateHandler = (pc, ws) => {

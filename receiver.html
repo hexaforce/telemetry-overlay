@@ -5,7 +5,7 @@
     <link href="receiver.css" rel="stylesheet" />
     <script type="module" type="text/javascript">
       import { setupReceiver } from './webrtc.js'
-      import { chartBar } from './chart.js'
+      import { chartBar } from './realtime-chart.js'
       window.onload = async () => {
         setupReceiver(`ws://${window.location.hostname}:${window.location.port}/ws`)
         chartBar('#chart')
