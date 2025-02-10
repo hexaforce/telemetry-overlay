@@ -2,6 +2,7 @@ const express = require('express')
 const http = require('http')
 const WebSocket = require('ws')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 
 const PORT = 8000
@@ -45,23 +46,43 @@ wss.on('connection', (ws, req) => {
   })
 })
 
+function getLocalIPv4() {
+  const interfaces = os.networkInterfaces()
+  const ipv4Addresses = new Set()
+  for (const iface of Object.values(interfaces)) {
+    for (const details of iface) {
+      if (details.family === 'IPv4' && !details.internal) {
+        ipv4Addresses.add(details.address)
+      }
+    }
+  }
+  return [...ipv4Addresses]
+}
+
 app.use((req, res) => {
   let filePath = path.join(__dirname, req.path === '/' ? '/index.html' : req.path)
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.status(404).send('Not Found')
     } else {
-      let contentType = 'text/html; charset=utf-8'
-      if (filePath.endsWith('.css')) contentType = 'text/css; charset=utf-8'
-      if (filePath.endsWith('.js')) contentType = 'application/javascript; charset=utf-8'
-      if (filePath.endsWith('.ico')) contentType = 'image/x-icon'
-      res.setHeader('Content-Type', contentType)
+      if (filePath.endsWith('.css')) res.setHeader('Content-Type', 'text/css; charset=utf-8')
+      if (filePath.endsWith('.js')) res.setHeader('Content-Type', 'application/javascript; charset=utf-8')
+      if (filePath.endsWith('.ico')) res.setHeader('Content-Type', 'image/x-icon')
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        let content = data.toString()
+        content = content.replace(/SERVER_IP_ADDRESS/g, SERVER_IP_ADDRESS)
+        res.send(content)
+        return
+      }
       res.send(data)
     }
   })
 })
 
+var SERVER_IP_ADDRESS = 'localhost:' + PORT
 server.listen(PORT, () => {
-  console.log(`WebRTC receiver page link: http://127.0.0.1:${PORT}/receiver.html`)
-  console.log(`WebRTC transceiver page link: http://127.0.0.1:${PORT}/transceiver.html`)
+  SERVER_IP_ADDRESS = getLocalIPv4()[0] + ':' + PORT
+  console.log(`WebRTC receiver page link: http://${SERVER_IP_ADDRESS}/receiver.html`)
+  console.log(`WebRTC transceiver page link: http://${SERVER_IP_ADDRESS}/transceiver.html`)
 })
