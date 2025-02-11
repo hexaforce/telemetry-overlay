@@ -112,6 +112,7 @@ const setupTransceiver = (wsUrl) => {
 
 const setMediaReceiver = async (video, pc, ws) => {
   pc.ontrack = ({ streams }) => {
+    console.log(streams)
     video.srcObject = streams[0]
   }
   ws.onclose = () => video.srcObject.getTracks().forEach((track) => track.stop())

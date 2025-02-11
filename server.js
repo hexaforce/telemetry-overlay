@@ -1,14 +1,21 @@
 const express = require('express')
-const http = require('http')
-const WebSocket = require('ws')
 const fs = require('fs')
+const https = require('https')
+const WebSocket = require('ws')
 const os = require('os')
 const path = require('path')
 const mime = require('mime-types')
 
-const PORT = 8000
+const PORT = 8443
 const app = express()
-const server = http.createServer(app)
+
+const options = {
+  // openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+}
+
+const server = https.createServer(options, app)
 const wss = new WebSocket.Server({ server, path: '/ws' })
 
 let receiver = null
@@ -65,7 +72,7 @@ wss.on('connection', (ws, req) => {
 })
 
 app.use((req, res) => {
-  let filePath = path.join(__dirname, decodeURIComponent(req.path === '/' ? '/index.html' : req.path))
+  let filePath = path.join(__dirname, decodeURIComponent(req.path === '/' ? '/receiver.html' : req.path))
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.status(404).send('Not Found')
@@ -81,6 +88,6 @@ app.use((req, res) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`WebRTC receiver page link: http://${SERVER_IP_ADDRESS}/receiver.html`)
-  console.log(`WebRTC transceiver page link: http://${SERVER_IP_ADDRESS}/transceiver.html`)
+  console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)
+  console.log(`WebRTC transceiver page link: https://${SERVER_IP_ADDRESS}/transceiver.html`)
 })
