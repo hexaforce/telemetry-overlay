@@ -57,11 +57,7 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         stream.getTracks().forEach(track => pc1.addTrack(track, stream))
-        pc1.getTransceivers().forEach(transceiver => {
-          if (transceiver.receiver.track.kind === "video") {
-            transceiver.setCodecPreferences(preferredVideoCodecs())
-          }
-        })
+        preferredVideoCodecs(pc1.getTransceivers())
 
         const offer = await pc1.createOffer({
           offerToReceiveAudio: 1,
@@ -83,11 +79,7 @@
         await pc1.setLocalDescription(offer)
         await pc2.setRemoteDescription(offer)
 
-        pc2.getTransceivers().forEach(transceiver => {
-          if (transceiver.receiver.track.kind === "video") {
-            transceiver.setCodecPreferences(preferredVideoCodecs())
-          }
-        })
+        preferredVideoCodecs(pc2.getTransceivers())
 
         const answer = await pc2.createAnswer()
         await pc2.setLocalDescription(answer)
@@ -97,15 +89,19 @@
       }
     }
 
-    function preferredVideoCodecs() {
+    function preferredVideoCodecs(transceivers) {
       const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
       const preferredOrder = ['video/AV1', 'video/VP9', 'video/H265', 'video/H264', 'video/VP8']
-      return supportedCodecs.sort((a, b) => {
-        const indexA = preferredOrder.indexOf(a.mimeType)
-        const indexB = preferredOrder.indexOf(b.mimeType)
-        const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
-        const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
-        return orderA - orderB
+      transceivers.forEach(transceiver => {
+        if (transceiver.receiver.track.kind === "video") {
+          transceiver.setCodecPreferences(supportedCodecs.sort((a, b) => {
+            const indexA = preferredOrder.indexOf(a.mimeType)
+            const indexB = preferredOrder.indexOf(b.mimeType)
+            const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
+            const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
+            return orderA - orderB
+          }))
+        }
       })
     }
 
