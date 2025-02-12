@@ -45,9 +45,13 @@
       const audioTracks = localStream.getAudioTracks()
 
       pc1 = new RTCPeerConnection()
-      pc1.onicecandidate = (e) => onIceCandidate(pc1, e)
+      pc1.onicecandidate = (e) => {
+        onIceCandidate(pc1, e)
+      }
       pc2 = new RTCPeerConnection()
-      pc2.onicecandidate = (e) => onIceCandidate(pc2, e)
+      pc2.onicecandidate = (e) => {
+        onIceCandidate(pc2, e)
+      }
       pc2.ontrack = (e) => {
         if (remoteVideo.srcObject !== e.streams[0]) {
           remoteVideo.srcObject = e.streams[0]
