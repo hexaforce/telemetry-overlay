@@ -18,21 +18,16 @@
 
     // startButton
     // ------------------------------------------------------
-    startButton.onclick = () => {
+    startButton.onclick = async () => {
       startButton.disabled = true
 
-      navigator.mediaDevices
-        .getUserMedia({
-          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: { echoCancellation: true, noiseSuppression: true }
-        })
-        .then((stream) => {
-          localVideo.srcObject = stream
-          localStream = stream
-          callButton.disabled = false
-        })
-        .catch((e) => alert(`getUserMedia() error: ${e.name}`))
-
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: { echoCancellation: true, noiseSuppression: true }
+      })
+      localVideo.srcObject = stream
+      localStream = stream
+      callButton.disabled = false
     }
 
     // callButton
