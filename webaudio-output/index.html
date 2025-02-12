@@ -57,11 +57,9 @@
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         stream.getTracks().forEach(track => pc1.addTrack(track, stream))
-        const transceivers = pc1.getTransceivers()
-        transceivers.forEach(transceiver => {
+        pc1.getTransceivers().forEach(transceiver => {
           if (transceiver.receiver.track.kind === "video") {
-            const preferredCodecs = preferredVideoCodecs()
-            transceiver.setCodecPreferences(preferredCodecs)
+            transceiver.setCodecPreferences(preferredVideoCodecs())
           }
         })
 
@@ -84,6 +82,12 @@
 
         await pc1.setLocalDescription(offer)
         await pc2.setRemoteDescription(offer)
+
+        pc2.getTransceivers().forEach(transceiver => {
+          if (transceiver.receiver.track.kind === "video") {
+            transceiver.setCodecPreferences(preferredVideoCodecs())
+          }
+        })
 
         const answer = await pc2.createAnswer()
         await pc2.setLocalDescription(answer)
