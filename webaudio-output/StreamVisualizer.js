@@ -73,7 +73,7 @@ export class StreamVisualizer {
       this.drawContext.fillStyle = 'white';
       this.drawContext.fillRect(i * barWidth, offset, 1, 2);
     }
-    console.log(this.freqs)
+
     requestAnimationFrame(this.draw.bind(this));
   }
 

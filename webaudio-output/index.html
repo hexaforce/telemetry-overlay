@@ -23,8 +23,8 @@
 
       navigator.mediaDevices
         .getUserMedia({
-          audio: true,
-          video: true,
+          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: { echoCancellation: true, noiseSuppression: true }
         })
         .then((stream) => {
           localVideo.srcObject = stream
@@ -56,7 +56,21 @@
         }
       }
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
-      pc1.createOffer(offerOptions).then((desc) => {
+      pc1.createOffer({
+        offerToReceiveAudio: 1,
+        offerToReceiveVideo: 1,
+      }).then((desc) => {
+        pc1.getSenders().forEach((s) => {
+          if (s.track.kind === "video") {
+            const p = s.getParameters()
+            if (p.encodings.length > 0) {
+              // p.encodings[0].priority = "high"
+              p.encodings[0].networkPriority = "high"
+              // p.encodings[0].maxBitrate = 10000000
+            }
+            s.setParameters(p)
+          }
+        })
         pc1.setLocalDescription(desc)
         pc2.setRemoteDescription(desc)
         pc2.createAnswer().then((desc) => {
@@ -96,7 +110,9 @@
 
 <body>
   <div id="container">
+    <p>localVideo</p>
     <video id="localVideo" playsinline autoplay muted></video>
+    <p>remoteVideo</p>
     <video id="remoteVideo" playsinline autoplay muted></video>
     <canvas></canvas>
     <div>
