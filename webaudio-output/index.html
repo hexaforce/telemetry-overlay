@@ -21,6 +21,12 @@
     startButton.onclick = async () => {
       startButton.disabled = true
 
+      // const supports = navigator.mediaDevices.getSupportedConstraints()
+      // console.log(supports)
+
+      // const devices = await navigator.mediaDevices.enumerateDevices()
+      // console.log(devices)
+
       const stream = await navigator.mediaDevices.getUserMedia({
         // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
         video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -80,6 +86,21 @@
         const answer = await pc2.createAnswer()
         await pc2.setLocalDescription(answer)
         await pc1.setRemoteDescription(answer)
+        setTimeout(async () => {
+          const stats = await pc1.getStats()
+          stats.forEach((stat) => {
+            if (!(stat.type === 'outbound-rtp' && stat.kind === 'video'))
+              return
+            const codec = stats.get(stat.codecId)
+            // document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
+            if (stat.encoderImplementation) {
+              // document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+            }
+            if (stat.powerEfficientEncoder !== undefined) {
+              // document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
+            }
+          })
+        }, 1000)
       } catch (err) {
         console.error("WebRTC connection error:", err)
       }
