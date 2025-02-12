@@ -54,9 +54,17 @@
         }
       }
 
-      localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
-
       try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        stream.getTracks().forEach(track => pc1.addTrack(track, stream))
+        const transceivers = pc1.getTransceivers()
+        transceivers.forEach(transceiver => {
+          if (transceiver.receiver.track.kind === "video") {
+            const preferredCodecs = preferredVideoCodecs()
+            transceiver.setCodecPreferences(preferredCodecs)
+          }
+        })
+
         const offer = await pc1.createOffer({
           offerToReceiveAudio: 1,
           offerToReceiveVideo: 1,
@@ -85,13 +93,25 @@
       }
     }
 
+    function preferredVideoCodecs() {
+      const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
+      const preferredOrder = ['video/AV1', 'video/VP9', 'video/H265', 'video/H264', 'video/VP8']
+      return supportedCodecs.sort((a, b) => {
+        const indexA = preferredOrder.indexOf(a.mimeType)
+        const indexB = preferredOrder.indexOf(b.mimeType)
+        const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
+        const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
+        return orderA - orderB
+      })
+    }
+
     // hangupButton
     // ------------------------------------------------------
     hangupButton.onclick = () => {
       console.log('Ending call')
       pc1.close()
-      pc2.close()
       pc1 = null
+      pc2.close()
       pc2 = null
       hangupButton.disabled = true
       callButton.disabled = false
