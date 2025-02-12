@@ -37,17 +37,15 @@
 
     // callButton
     // ------------------------------------------------------
-    callButton.onclick = () => {
+    callButton.onclick = async () => {
       callButton.disabled = true
       hangupButton.disabled = false
-
-      // const videoTracks = localStream.getVideoTracks()
-      // const audioTracks = localStream.getAudioTracks()
 
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
       pc2 = new RTCPeerConnection()
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
+
       pc2.ontrack = ({ streams }) => {
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
@@ -55,29 +53,36 @@
           streamVisualizer.start()
         }
       }
-      localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
-      pc1.createOffer({
-        offerToReceiveAudio: 1,
-        offerToReceiveVideo: 1,
-      }).then((desc) => {
-        pc1.getSenders().forEach((s) => {
-          if (s.track.kind === "video") {
-            const p = s.getParameters()
-            if (p.encodings.length > 0) {
-              // p.encodings[0].priority = "high"
-              p.encodings[0].networkPriority = "high"
-              // p.encodings[0].maxBitrate = 10000000
+
+      localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
+
+      try {
+        const offer = await pc1.createOffer({
+          offerToReceiveAudio: 1,
+          offerToReceiveVideo: 1,
+        })
+
+        pc1.getSenders().forEach(sender => {
+          if (sender.track.kind === "video") {
+            const params = sender.getParameters()
+            if (params.encodings.length > 0) {
+              params.encodings[0].priority = "high" // 一部のブラウザ向け
+              params.encodings[0].networkPriority = "high" // 最新の仕様向け
+              // params.encodings[0].maxBitrate = 10000000 // ビットレート調整（必要なら）
             }
-            s.setParameters(p)
+            sender.setParameters(params).catch(err => console.warn("setParameters failed:", err))
           }
         })
-        pc1.setLocalDescription(desc)
-        pc2.setRemoteDescription(desc)
-        pc2.createAnswer().then((desc) => {
-          pc2.setLocalDescription(desc)
-          pc1.setRemoteDescription(desc)
-        })
-      })
+
+        await pc1.setLocalDescription(offer)
+        await pc2.setRemoteDescription(offer)
+
+        const answer = await pc2.createAnswer()
+        await pc2.setLocalDescription(answer)
+        await pc1.setRemoteDescription(answer)
+      } catch (err) {
+        console.error("WebRTC connection error:", err)
+      }
     }
 
     // hangupButton
