@@ -43,7 +43,40 @@
       pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
 
-      pc2.addEventListener('track', gotRemoteTrack)
+      pc2.ontrack = (e) => {
+        console.log('pc2 received remote stream')
+        const frameStreams = e.receiver.createEncodedStreams()
+        frameStreams.readable
+          .pipeThrough(
+            new TransformStream({
+              transform: (encodedFrame, controller) => {
+                const view = new DataView(encodedFrame.data)
+                // We assume that the video is VP8.
+                // TODO: Check the codec to see that it is.
+                // The lowest value bit in the first byte is the keyframe indicator.
+                // https://tools.ietf.org/html/rfc6386#section-9.1
+                const keyframeBit = view.getUint8(0) & 0x01
+                // console.log(view.getUint8(0).toString(16));
+                if (keyframeBit === 0) {
+                  keyFrameCount++
+                  keyFrameLastSize = encodedFrame.data.byteLength
+                } else {
+                  interFrameCount++
+                  interFrameLastSize = encodedFrame.data.byteLength
+                }
+                if (encodedFrame.type === prevFrameType && encodedFrame.timestamp === prevFrameTimestamp && encodedFrame.synchronizationSource === prevFrameSynchronizationSource) {
+                  duplicateCount++
+                }
+                prevFrameType = encodedFrame.type
+                prevFrameTimestamp = encodedFrame.timestamp
+                prevFrameSynchronizationSource = encodedFrame.synchronizationSource
+                controller.enqueue(encodedFrame)
+              },
+            }),
+          )
+          .pipeTo(frameStreams.writable)
+        remoteVideo.srcObject = e.streams[0]
+      }
 
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
       console.log('Added local stream to pc1')
@@ -161,41 +194,6 @@
 
     function onSetSessionDescriptionError(error) {
       console.log(`Failed to set session description: ${error.toString()}`)
-    }
-
-    function gotRemoteTrack(e) {
-      console.log('pc2 received remote stream')
-      const frameStreams = e.receiver.createEncodedStreams()
-      frameStreams.readable
-        .pipeThrough(
-          new TransformStream({
-            transform: (encodedFrame, controller) => {
-              const view = new DataView(encodedFrame.data)
-              // We assume that the video is VP8.
-              // TODO: Check the codec to see that it is.
-              // The lowest value bit in the first byte is the keyframe indicator.
-              // https://tools.ietf.org/html/rfc6386#section-9.1
-              const keyframeBit = view.getUint8(0) & 0x01
-              // console.log(view.getUint8(0).toString(16));
-              if (keyframeBit === 0) {
-                keyFrameCount++
-                keyFrameLastSize = encodedFrame.data.byteLength
-              } else {
-                interFrameCount++
-                interFrameLastSize = encodedFrame.data.byteLength
-              }
-              if (encodedFrame.type === prevFrameType && encodedFrame.timestamp === prevFrameTimestamp && encodedFrame.synchronizationSource === prevFrameSynchronizationSource) {
-                duplicateCount++
-              }
-              prevFrameType = encodedFrame.type
-              prevFrameTimestamp = encodedFrame.timestamp
-              prevFrameSynchronizationSource = encodedFrame.synchronizationSource
-              controller.enqueue(encodedFrame)
-            },
-          }),
-        )
-        .pipeTo(frameStreams.writable)
-      remoteVideo.srcObject = e.streams[0]
     }
 
     async function onCreateAnswerSuccess(desc) {
