@@ -57,12 +57,7 @@
       }
 
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: { echoCancellation: true, noiseSuppression: true }
-        })
-        stream.getTracks().forEach(track => pc1.addTrack(track, stream))
+        localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
         preferredVideoCodecs(pc1.getTransceivers())
 
         const offer = await pc1.createOffer({
