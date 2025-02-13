@@ -91,4 +91,5 @@ server.listen(PORT, () => {
   console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)
   console.log(`WebRTC transceiver page link: https://${SERVER_IP_ADDRESS}/transceiver.html`)
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/video-analyzer/index.html`)
 })
