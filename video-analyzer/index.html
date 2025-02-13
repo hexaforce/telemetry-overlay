@@ -42,38 +42,34 @@
       pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
 
-      pc2.ontrack = (e) => {
-        const frameStreams = e.receiver.createEncodedStreams()
-        frameStreams.readable
-          .pipeThrough(
-            new TransformStream({
-              transform: (encodedFrame, controller) => {
-                const view = new DataView(encodedFrame.data)
-                // We assume that the video is VP8.
-                // TODO: Check the codec to see that it is.
-                // The lowest value bit in the first byte is the keyframe indicator.
-                // https://tools.ietf.org/html/rfc6386#section-9.1
-                const keyframeBit = view.getUint8(0) & 0x01
-                // console.log(view.getUint8(0).toString(16));
-                if (keyframeBit === 0) {
-                  keyFrameCount++
-                  keyFrameLastSize = encodedFrame.data.byteLength
-                } else {
-                  interFrameCount++
-                  interFrameLastSize = encodedFrame.data.byteLength
-                }
-                if (encodedFrame.type === prevFrameType && encodedFrame.timestamp === prevFrameTimestamp && encodedFrame.synchronizationSource === prevFrameSynchronizationSource) {
-                  duplicateCount++
-                }
-                prevFrameType = encodedFrame.type
-                prevFrameTimestamp = encodedFrame.timestamp
-                prevFrameSynchronizationSource = encodedFrame.synchronizationSource
-                controller.enqueue(encodedFrame)
-              },
-            }),
-          )
-          .pipeTo(frameStreams.writable)
-        remoteVideo.srcObject = e.streams[0]
+      pc2.ontrack = ({ receiver, streams }) => {
+        const frameStreams = receiver.createEncodedStreams()
+        frameStreams.readable.pipeThrough(
+          new TransformStream({
+            transform: (encodedFrame, controller) => {
+              const { data, type, timestamp, synchronizationSource } = encodedFrame
+              const view = new DataView(data)
+              const { byteLength } = data
+              const keyframeBit = view.getUint8(0) & 0x01
+              // console.log(view.getUint8(0).toString(16));
+              if (keyframeBit === 0) {
+                keyFrameCount++
+                keyFrameLastSize = byteLength
+              } else {
+                interFrameCount++
+                interFrameLastSize = byteLength
+              }
+              if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+                duplicateCount++
+              }
+              prevFrameType = type
+              prevFrameTimestamp = timestamp
+              prevFrameSynchronizationSource = synchronizationSource
+              controller.enqueue(encodedFrame)
+            },
+          }),
+        ).pipeTo(frameStreams.writable)
+        remoteVideo.srcObject = streams[0]
       }
 
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
@@ -83,7 +79,8 @@
         offerToReceiveVideo: 1,
       })
       await pc1.setLocalDescription(offer)
-      await pc2.setRemoteDescription({ type: 'offer', sdp: offer.sdp.replace('red/90000', 'green/90000') })
+      await pc2.setRemoteDescription(offer)
+      // await pc2.setRemoteDescription({ type: 'offer', sdp: offer.sdp.replace('red/90000', 'green/90000') })
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
