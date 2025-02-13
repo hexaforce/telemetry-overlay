@@ -44,7 +44,6 @@
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
 
       pc2.ontrack = (e) => {
-        console.log('pc2 received remote stream')
         const frameStreams = e.receiver.createEncodedStreams()
         frameStreams.readable
           .pipeThrough(
@@ -79,7 +78,6 @@
       }
 
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
-      console.log('Added local stream to pc1')
 
       try {
         const offer = await pc1.createOffer({
