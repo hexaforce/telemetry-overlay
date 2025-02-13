@@ -35,30 +35,24 @@
     callButton.onclick = async () => {
       callButton.disabled = true
       hangupButton.disabled = false
-      console.log('Starting call')
+
       startTime = window.performance.now()
-      const videoTracks = localStream.getVideoTracks()
-      if (videoTracks.length > 0) {
-        console.log(`Using video device: ${videoTracks[0].label}`)
-      }
+
       pc1 = new RTCPeerConnection()
-      console.log('Created local peer connection object pc1')
-      pc1.addEventListener('icecandidate', (e) => onIceCandidate(pc1, e))
-      pc2 = new RTCPeerConnection({
-        encodedInsertableStreams: true,
-      })
-      console.log('Created remote peer connection object pc2')
-      pc2.addEventListener('icecandidate', (e) => onIceCandidate(pc2, e))
-      pc1.addEventListener('iceconnectionstatechange', (e) => onIceStateChange(pc1, e))
-      pc2.addEventListener('iceconnectionstatechange', (e) => onIceStateChange(pc2, e))
+      pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
+      pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
+      pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
+
       pc2.addEventListener('track', gotRemoteTrack)
 
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
       console.log('Added local stream to pc1')
 
       try {
-        console.log('pc1 createOffer start')
-        const offer = await pc1.createOffer(offerOptions)
+        const offer = await pc1.createOffer({
+          offerToReceiveAudio: 0,
+          offerToReceiveVideo: 1,
+        })
         await onCreateOfferSuccess(offer)
       } catch (e) {
         onCreateSessionDescriptionError(e)
@@ -117,10 +111,6 @@
     let localStream
     let pc1
     let pc2
-    const offerOptions = {
-      offerToReceiveAudio: 0,
-      offerToReceiveVideo: 1,
-    }
 
     function getName(pc) {
       return pc === pc1 ? 'pc1' : 'pc2'
@@ -179,7 +169,29 @@
       frameStreams.readable
         .pipeThrough(
           new TransformStream({
-            transform: videoAnalyzer,
+            transform: (encodedFrame, controller) => {
+              const view = new DataView(encodedFrame.data)
+              // We assume that the video is VP8.
+              // TODO: Check the codec to see that it is.
+              // The lowest value bit in the first byte is the keyframe indicator.
+              // https://tools.ietf.org/html/rfc6386#section-9.1
+              const keyframeBit = view.getUint8(0) & 0x01
+              // console.log(view.getUint8(0).toString(16));
+              if (keyframeBit === 0) {
+                keyFrameCount++
+                keyFrameLastSize = encodedFrame.data.byteLength
+              } else {
+                interFrameCount++
+                interFrameLastSize = encodedFrame.data.byteLength
+              }
+              if (encodedFrame.type === prevFrameType && encodedFrame.timestamp === prevFrameTimestamp && encodedFrame.synchronizationSource === prevFrameSynchronizationSource) {
+                duplicateCount++
+              }
+              prevFrameType = encodedFrame.type
+              prevFrameTimestamp = encodedFrame.timestamp
+              prevFrameSynchronizationSource = encodedFrame.synchronizationSource
+              controller.enqueue(encodedFrame)
+            },
           }),
         )
         .pipeTo(frameStreams.writable)
@@ -204,30 +216,6 @@
       }
     }
 
-    async function onIceCandidate(pc, event) {
-      try {
-        await getOtherPc(pc).addIceCandidate(event.candidate)
-        onAddIceCandidateSuccess(pc)
-      } catch (e) {
-        onAddIceCandidateError(pc, e)
-      }
-      console.log(`${getName(pc)} ICE candidate:\n${event.candidate ? event.candidate.candidate : '(null)'}`)
-    }
-
-    function onAddIceCandidateSuccess(pc) {
-      console.log(`${getName(pc)} addIceCandidate success`)
-    }
-
-    function onAddIceCandidateError(pc, error) {
-      console.log(`${getName(pc)} failed to add ICE Candidate: ${error.toString()}`)
-    }
-
-    function onIceStateChange(pc, event) {
-      if (pc) {
-        console.log(`${getName(pc)} ICE state: ${pc.iceConnectionState}`)
-        console.log('ICE state change event: ', event)
-      }
-    }
 
     const keyFrameCountDisplay = document.querySelector('#keyframe-count')
     const keyFrameSizeDisplay = document.querySelector('#keyframe-size')
@@ -243,30 +231,6 @@
     let prevFrameType
     let prevFrameTimestamp
     let prevFrameSynchronizationSource
-
-    function videoAnalyzer(encodedFrame, controller) {
-      const view = new DataView(encodedFrame.data)
-      // We assume that the video is VP8.
-      // TODO: Check the codec to see that it is.
-      // The lowest value bit in the first byte is the keyframe indicator.
-      // https://tools.ietf.org/html/rfc6386#section-9.1
-      const keyframeBit = view.getUint8(0) & 0x01
-      // console.log(view.getUint8(0).toString(16));
-      if (keyframeBit === 0) {
-        keyFrameCount++
-        keyFrameLastSize = encodedFrame.data.byteLength
-      } else {
-        interFrameCount++
-        interFrameLastSize = encodedFrame.data.byteLength
-      }
-      if (encodedFrame.type === prevFrameType && encodedFrame.timestamp === prevFrameTimestamp && encodedFrame.synchronizationSource === prevFrameSynchronizationSource) {
-        duplicateCount++
-      }
-      prevFrameType = encodedFrame.type
-      prevFrameTimestamp = encodedFrame.timestamp
-      prevFrameSynchronizationSource = encodedFrame.synchronizationSource
-      controller.enqueue(encodedFrame)
-    }
 
     // Update the display of the counters once a second.
     setInterval(() => {
