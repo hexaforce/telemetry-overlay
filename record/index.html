@@ -120,78 +120,63 @@
       mediaRecorder.stop()
     }
 
-    function handleSuccess(stream) {
-      recordButton.disabled = false
-      console.log('Got stream:', stream)
-      window.stream = stream
-
-      const gumVideo = document.querySelector('video#gum')
-      gumVideo.srcObject = stream
-
-      const SupportedType = [
-        'video/webm;codecs=vp9,opus',
-        'video/webm;codecs=vp8,opus',
-        'video/webm;codecs=h264,opus',
-        'video/webm;codecs=av01,opus',
-        'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
-        'video/mp4;codecs=vp9,mp4a.40.2',
-        'video/mp4;codecs=vp9,opus',
-        'video/mp4;codecs=avc1.64003E,mp4a.40.2',
-        'video/mp4;codecs=avc1.64003E,opus',
-        'video/mp4;codecs=avc3.64003E,mp4a.40.2',
-        'video/mp4;codecs=avc3.64003E,opus',
-        'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
-        'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
-        'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
-        'video/mp4;codecs=hev1.1.6.L186.B0,opus',
-        'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
-        'video/mp4;codecs=av01.0.19M.08,opus',
-        'video/mp4',
-      ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
-
-      SupportedType.forEach((mimeType) => {
-        const option = document.createElement('option')
-        option.value = mimeType
-        option.innerText = option.value
-        codecPreferences.appendChild(option)
-      })
-
-      codecPreferences.disabled = false
-
-    }
-
-    async function init(constraints, isGetDisplayMedia) {
+    async function onStart(stream) {
+      document.querySelector('button#start-gum').disabled = true
+      document.querySelector('button#start-gdm').disabled = true
       try {
-        const stream = isGetDisplayMedia ? await navigator.mediaDevices.getDisplayMedia(constraints) : await navigator.mediaDevices.getUserMedia(constraints)
-        handleSuccess(stream)
+        recordButton.disabled = false
+        console.log('Got stream:', stream)
+        window.stream = stream
+        const gumVideo = document.querySelector('video#gum')
+        gumVideo.srcObject = stream
+        const SupportedType = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm;codecs=h264,opus',
+          'video/webm;codecs=av01,opus',
+          'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
+          'video/mp4;codecs=vp9,mp4a.40.2',
+          'video/mp4;codecs=vp9,opus',
+          'video/mp4;codecs=avc1.64003E,mp4a.40.2',
+          'video/mp4;codecs=avc1.64003E,opus',
+          'video/mp4;codecs=avc3.64003E,mp4a.40.2',
+          'video/mp4;codecs=avc3.64003E,opus',
+          'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
+          'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
+          'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
+          'video/mp4;codecs=hev1.1.6.L186.B0,opus',
+          'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
+          'video/mp4;codecs=av01.0.19M.08,opus',
+          'video/mp4',
+        ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
+        SupportedType.forEach((mimeType) => {
+          const option = document.createElement('option')
+          option.value = mimeType
+          option.innerText = option.value
+          codecPreferences.appendChild(option)
+        })
+        codecPreferences.disabled = false
       } catch (e) {
         console.error('Source open error:', e)
         errorMsgElement.innerHTML = `Source error: ${e.toString()}`
       }
     }
 
-    async function onStart(isGetDisplayMedia) {
-      document.querySelector('button#start-gum').disabled = true
-      document.querySelector('button#start-gdm').disabled = true
-      const hasEchoCancellation = document.querySelector('#echoCancellation').checked
-      const constraints = {
-        audio: {
-          echoCancellation: hasEchoCancellation,
-        },
-        video: {
-          width: 1280,
-          height: 720,
-        },
-      }
-      console.log('Using media constraints:', constraints)
-      await init(constraints, isGetDisplayMedia)
-    }
-
     document.querySelector('button#start-gum').addEventListener('click', async () => {
-      await onStart(false)
+      const constraints = {
+        audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
+        video: { width: 1280, height: 720 },
+      }
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      await onStart(stream)
     })
     document.querySelector('button#start-gdm').addEventListener('click', async () => {
-      await onStart(true)
+      const constraints = {
+        audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
+        video: { width: 1280, height: 720 },
+      }
+      const stream = await navigator.mediaDevices.getDisplayMedia(constraints)
+      await onStart(stream)
     })
 
   </script>
