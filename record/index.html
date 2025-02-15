@@ -44,13 +44,48 @@
 
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
-        startRecording()
+        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+
+        if (mimeType.split(';', 1)[0] === 'video/mp4') {
+          // Adjust sampling rate to 48khz.
+          const track = window.stream.getAudioTracks()[0]
+          if (track) {
+            const { sampleRate } = track.getSettings()
+            if (sampleRate != 48000) {
+              track.stop()
+              window.stream.removeTrack(track)
+              const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+              window.stream.addTrack(newStream.getTracks()[0])
+            }
+          }
+        }
+
+        recordedBlobs = []
+        mediaRecorder = new MediaRecorder(window.stream, { mimeType })
+        mediaRecorder.onstop = (event) => {
+          console.log('Recorder stopped: ', event)
+          console.log('Recorded Blobs: ', recordedBlobs)
+        }
+        mediaRecorder.ondataavailable = ({ data }) => {
+          if (data && data.size > 0) {
+            recordedBlobs.push(data)
+          }
+        }
+        mediaRecorder.start()
+
+        recordButton.textContent = 'Stop Recording'
+        playButton.disabled = true
+        downloadButton.disabled = true
+        codecPreferences.disabled = true
+
       } else {
+
         mediaRecorder.stop()
         recordButton.textContent = 'Start Recording'
         playButton.disabled = false
         downloadButton.disabled = false
         codecPreferences.disabled = false
+
       }
     }
 
@@ -92,42 +127,6 @@
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
       }, 100)
-    }
-
-    async function startRecording() {
-      const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-
-      if (mimeType.split(';', 1)[0] === 'video/mp4') {
-        // Adjust sampling rate to 48khz.
-        const track = window.stream.getAudioTracks()[0]
-        if (track) {
-          const { sampleRate } = track.getSettings()
-          if (sampleRate != 48000) {
-            track.stop()
-            window.stream.removeTrack(track)
-            const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
-            window.stream.addTrack(newStream.getTracks()[0])
-          }
-        }
-      }
-
-      recordedBlobs = []
-      mediaRecorder = new MediaRecorder(window.stream, { mimeType })
-      mediaRecorder.onstop = (event) => {
-        console.log('Recorder stopped: ', event)
-        console.log('Recorded Blobs: ', recordedBlobs)
-      }
-      mediaRecorder.ondataavailable = ({ data }) => {
-        if (data && data.size > 0) {
-          recordedBlobs.push(data)
-        }
-      }
-      mediaRecorder.start()
-
-      recordButton.textContent = 'Stop Recording'
-      playButton.disabled = true
-      downloadButton.disabled = true
-      codecPreferences.disabled = true
     }
 
     function onStart() {
