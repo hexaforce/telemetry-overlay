@@ -63,7 +63,7 @@ const audioSelect = document.querySelector('select#audioSource')
 
 const Constraints = {
   video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-  audio: { echoCancellation: true, noiseSuppression: true },
+  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
 }
 
 const setupTransceiver = (wsUrl) => {
@@ -80,29 +80,21 @@ const setupTransceiver = (wsUrl) => {
       Constraints.video.deviceId = { ideal: videoSelect.value }
       Constraints.audio.deviceId = { ideal: audioSelect.value }
       const stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
       pc = new RTCPeerConnection()
-      stream.getTracks().forEach((track) => {
-        pc.addTrack(track, stream)
-        if (track.kind === 'audio')
-          new StreamVisualizer(stream, document.querySelector('canvas')).start()
-      })
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-      // pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendonly'))
+      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendrecv'))
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
       ws.send(JSON.stringify({ active: stream.active }))
     } else {
       if (msg.type) {
-        // console.log('offer received:', msg.sdp)
         await pc.setRemoteDescription(msg)
-        setReceiverAnswerCodec(pc)
+        // setReceiverAnswerCodec(pc)
         const answer = await pc.createAnswer()
-        // console.log('answer:', answer.sdp)
         await pc.setLocalDescription(answer)
         ws.send(JSON.stringify(answer))
       } else {
-        // console.log('ice:', msg)
         await pc.addIceCandidate(msg)
       }
     }
@@ -136,43 +128,33 @@ const setupTransceiver = (wsUrl) => {
 const setupReceiver = (wsUrl) => {
   PROTOCOL = 'receiver'
   var ws = new WebSocket(wsUrl, PROTOCOL)
+  console.log(ws.protocol)
   var pc
-  const OfferOptions = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+  const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
   ws.onopen = async () => ws.send(JSON.stringify({ OfferOptions }))
   ws.onclose = async () => console.log('close ws')
   ws.onmessage = async ({ data }) => {
     const msg = JSON.parse(data)
     if (!msg) return
     if (msg.active) {
-      // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
+      const stream = $('stream')
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
-      // setMediaReceiver($('stream'), pc, ws)
       pc.ontrack = ({ streams, track }) => {
-        console.log(streams)
-        console.log(track)
-        $('stream').srcObject = streams[0]
-        // const streamVisualizer = new StreamVisualizer(streams[0], document.querySelector('canvas'))
-        // streamVisualizer.start()
-        if (track.kind === 'audio')
+        if (stream.srcObject !== streams[0]) {
+          stream.srcObject = streams[0]
           new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+        }
       }
-      ws.onclose = () =>
-        $('stream')
-          .srcObject.getTracks()
-          .forEach((track) => track.stop())
-      // pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'recvonly'))
+      ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
       const offer = await pc.createOffer(OfferOptions)
-      // console.log('offer:', offer.sdp)
       await pc.setLocalDescription(offer)
       ws.send(JSON.stringify(offer))
     } else {
       if (msg.type) {
-        // console.log('answer:', msg.sdp)
         await pc.setRemoteDescription(msg)
       } else {
-        // console.log('ice:', msg)
         await pc.addIceCandidate(msg)
       }
     }
