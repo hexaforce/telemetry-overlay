@@ -50,26 +50,27 @@
       const a = document.createElement('a')
       a.style.display = 'none'
       a.href = url
-      a.download = `test.${mimeTypeToFileExtension(mimeType)}`
+      switch (mimeType) {
+        case 'video/mp4':
+          a.download = `test.mp4`
+          break
+        case 'video/webm':
+          a.download = `test.webm`
+          break
+        case 'video/x-matroska':
+          a.download = `test.mkv`
+          break
+        default:
+          throw new Error(`unsupported mimetype: ${mimeType}`)
+      }
+
       document.body.appendChild(a)
       a.click()
+
       setTimeout(() => {
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
       }, 100)
-    }
-
-    function mimeTypeToFileExtension(mimeType) {
-      switch (mimeType) {
-        case 'video/mp4':
-          return 'mp4'
-        case 'video/webm':
-          return 'webm'
-        case 'video/x-matroska':
-          return 'mkv'
-        default:
-          throw new Error(`unsupported mimetype: ${mimeType}`)
-      }
     }
 
     async function startRecording() {
