@@ -7,7 +7,7 @@ const FFT_SIZE = 2048;
 
 export class StreamVisualizer {
   constructor(remoteStream, canvas) {
-    console.log('Creating StreamVisualizer with remoteStream and canvas:', remoteStream, canvas);
+    // console.log('Creating StreamVisualizer with remoteStream and canvas:', remoteStream, canvas);
     this.canvas = canvas;
     this.drawContext = this.canvas.getContext('2d');
 
@@ -20,7 +20,7 @@ export class StreamVisualizer {
 
     // Create a MediaStreamAudioSourceNode from the remoteStream
     this.source = this.context.createMediaStreamSource(remoteStream);
-    console.log('Created Web Audio source from remote stream:', this.source);
+    // console.log('Created Web Audio source from remote stream:', this.source);
 
     this.analyser = this.context.createAnalyser();
     this.analyser.minDecibels = -140;

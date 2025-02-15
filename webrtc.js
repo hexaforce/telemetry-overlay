@@ -37,6 +37,8 @@ const sendData = (data) => {
 // --- Media --------------------------
 var PROTOCOL = null
 
+import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
+
 const setReceiverAnswerCodec = async (pc) => {
   const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
   const preferredOrder = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
@@ -61,7 +63,7 @@ const audioSelect = document.querySelector('select#audioSource')
 
 const Constraints = {
   video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-  audio: { echoCancellation: true, noiseSuppression: true }
+  audio: { echoCancellation: true, noiseSuppression: true },
 }
 
 const setupTransceiver = (wsUrl) => {
@@ -80,8 +82,10 @@ const setupTransceiver = (wsUrl) => {
       // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
       pc = new RTCPeerConnection()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
+      const streamVisualizer = new StreamVisualizer(stream, document.querySelector('canvas'))
+      streamVisualizer.start()
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendonly'))
+      // pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendonly'))
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
       ws.send(JSON.stringify({ active: stream.active }))
@@ -122,22 +126,16 @@ const setupTransceiver = (wsUrl) => {
       }
     }
   })
-
 }
 
 // --- Media Receiver --------------------------
-
-import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
 
 const setupReceiver = (wsUrl) => {
   PROTOCOL = 'receiver'
   var ws = new WebSocket(wsUrl, PROTOCOL)
   var pc
-  const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
-  ws.onopen = async () => {
-    console.log('opne ws')
-    ws.send(JSON.stringify({ OfferOptions }))
-  }
+  const OfferOptions = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+  ws.onopen = async () => ws.send(JSON.stringify({ OfferOptions }))
   ws.onclose = async () => console.log('close ws')
   ws.onmessage = async ({ data }) => {
     const msg = JSON.parse(data)
@@ -154,8 +152,11 @@ const setupReceiver = (wsUrl) => {
         const streamVisualizer = new StreamVisualizer(streams[0], document.querySelector('canvas'))
         streamVisualizer.start()
       }
-      ws.onclose = () => $('stream').srcObject.getTracks().forEach((track) => track.stop())
-      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'recvonly'))
+      ws.onclose = () =>
+        $('stream')
+          .srcObject.getTracks()
+          .forEach((track) => track.stop())
+      // pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'recvonly'))
       const offer = await pc.createOffer(OfferOptions)
       // console.log('offer:', offer.sdp)
       await pc.setLocalDescription(offer)
