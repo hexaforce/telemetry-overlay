@@ -63,16 +63,7 @@
       clearErrorMessage()
       videoblock.style.display = 'none'
       constraints.video.deviceId = { ideal: videoSelect.value }
-      window.stream = await navigator.mediaDevices.getUserMedia(constraints)
-      gotStream()
-    }
-
-    pauseVideo.onchange = () => {
-      pauseVideo.checked ? video.pause() : video.play()
-    }
-
-    function gotStream() {
-      video.srcObject = window.stream
+      video.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(constraints)
       messagebox.style.display = 'none'
       videoblock.style.display = 'block'
 
@@ -82,6 +73,10 @@
         widthInput.value = value
         widthOutput.textContent = value
       }
+    }
+
+    pauseVideo.onchange = () => {
+      pauseVideo.checked ? video.pause() : video.play()
     }
 
     function errorMessage(who, what) {
