@@ -86,7 +86,7 @@
         interFrameCount++
         interFrameLastSize = byteLength
       }
-      if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+      if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
         duplicateCount++
       }
       prevFrameType = type
