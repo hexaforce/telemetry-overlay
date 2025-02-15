@@ -48,9 +48,32 @@
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
 
       pc2.ontrack = ({ receiver, streams }) => {
-        const { readable, writable } = receiver.createEncodedStreams()
-        const transformStream = new TransformStream(transform)
-        readable.pipeThrough(transformStream).pipeTo(writable)
+        const frameStreams = receiver.createEncodedStreams()
+        frameStreams.readable.pipeThrough(
+          new TransformStream({
+            transform: (encodedFrame, controller) => {
+              const { data, type, timestamp, synchronizationSource } = encodedFrame
+              const view = new DataView(data)
+              const { byteLength } = data
+              const keyframeBit = view.getUint8(0) & 0x01
+              // console.log(view.getUint8(0).toString(16));
+              if (keyframeBit === 0) {
+                keyFrameCount++
+                keyFrameLastSize = byteLength
+              } else {
+                interFrameCount++
+                interFrameLastSize = byteLength
+              }
+              if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+                duplicateCount++
+              }
+              prevFrameType = type
+              prevFrameTimestamp = timestamp
+              prevFrameSynchronizationSource = synchronizationSource
+              controller.enqueue(encodedFrame)
+            },
+          }),
+        ).pipeTo(frameStreams.writable)
         remoteVideo.srcObject = streams[0]
       }
 
@@ -58,36 +81,11 @@
 
       const offer = await pc1.createOffer(OfferOptions)
       await pc1.setLocalDescription(offer)
-      let { type, sdp } = offer
-      sdp = sdp.replace('red/90000', 'green/90000')
-      await pc2.setRemoteDescription({ type, sdp })
-      // await pc2.setRemoteDescription(offer)
+      await pc2.setRemoteDescription(offer)
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
 
-    }
-
-    function transform(encodedFrame, controller) {
-      const { data, type, timestamp, synchronizationSource } = encodedFrame
-      const view = new DataView(data)
-      const { byteLength } = data
-      const keyframeBit = view.getUint8(0) & 0x01
-      // console.log(view.getUint8(0).toString(16));
-      if (keyframeBit === 0) {
-        keyFrameCount++
-        keyFrameLastSize = byteLength
-      } else {
-        interFrameCount++
-        interFrameLastSize = byteLength
-      }
-      if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
-        duplicateCount++
-      }
-      prevFrameType = type
-      prevFrameTimestamp = timestamp
-      prevFrameSynchronizationSource = synchronizationSource
-      controller.enqueue(encodedFrame)
     }
 
     // hangupButton
