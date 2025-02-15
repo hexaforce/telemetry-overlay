@@ -7,6 +7,8 @@
 
     'use strict'
 
+    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
+
     const OfferOptions = {
       offerToReceiveVideo: 1,
       offerToReceiveAudio: 1,
@@ -62,6 +64,9 @@
       const offer = await pc1.createOffer(OfferOptions)
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
+
+      // preferredVideoCodecs(pc2.getTransceivers())
+
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
@@ -155,6 +160,10 @@
 
 <body>
   <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+      <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+    </div>
     <video id="localVideo" playsinline autoplay muted></video>
     <video id="remoteVideo" playsinline autoplay></video>
     <div class="box">
