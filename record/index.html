@@ -108,63 +108,61 @@
         }
       }
       mediaRecorder.start()
+
     }
 
-    async function onStart(stream) {
+    async function onStart() {
       document.querySelector('button#start-gum').disabled = true
       document.querySelector('button#start-gdm').disabled = true
-      try {
-        recordButton.disabled = false
-        window.stream = stream
-        const gumVideo = document.querySelector('video#gum')
-        gumVideo.srcObject = stream
-        const SupportedType = [
-          'video/webm;codecs=vp9,opus',
-          'video/webm;codecs=vp8,opus',
-          'video/webm;codecs=h264,opus',
-          'video/webm;codecs=av01,opus',
-          'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
-          'video/mp4;codecs=vp9,mp4a.40.2',
-          'video/mp4;codecs=vp9,opus',
-          'video/mp4;codecs=avc1.64003E,mp4a.40.2',
-          'video/mp4;codecs=avc1.64003E,opus',
-          'video/mp4;codecs=avc3.64003E,mp4a.40.2',
-          'video/mp4;codecs=avc3.64003E,opus',
-          'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
-          'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
-          'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
-          'video/mp4;codecs=hev1.1.6.L186.B0,opus',
-          'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
-          'video/mp4;codecs=av01.0.19M.08,opus',
-          'video/mp4',
-        ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
-        SupportedType.forEach((mimeType) => {
-          const option = document.createElement('option')
-          option.value = mimeType
-          option.innerText = option.value
-          codecPreferences.appendChild(option)
-        })
-        codecPreferences.disabled = false
-      } catch (e) {
-        console.error('Source open error:', e)
-        errorMsgElement.innerHTML = `Source error: ${e.toString()}`
-      }
+
+      recordButton.disabled = false
+      document.querySelector('video#gum').srcObject = window.stream
+
+      const SupportedType = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus',
+        'video/webm;codecs=h264,opus',
+        'video/webm;codecs=av01,opus',
+        'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
+        'video/mp4;codecs=vp9,mp4a.40.2',
+        'video/mp4;codecs=vp9,opus',
+        'video/mp4;codecs=avc1.64003E,mp4a.40.2',
+        'video/mp4;codecs=avc1.64003E,opus',
+        'video/mp4;codecs=avc3.64003E,mp4a.40.2',
+        'video/mp4;codecs=avc3.64003E,opus',
+        'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
+        'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
+        'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
+        'video/mp4;codecs=hev1.1.6.L186.B0,opus',
+        'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
+        'video/mp4;codecs=av01.0.19M.08,opus',
+        'video/mp4',
+      ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
+
+      SupportedType.forEach((mimeType) => {
+        const option = document.createElement('option')
+        option.value = mimeType
+        option.innerText = option.value
+        codecPreferences.appendChild(option)
+      })
+
+      codecPreferences.disabled = false
     }
 
     document.querySelector('button#start-gum').addEventListener('click', async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      window.stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })
-      await onStart(stream)
+      await onStart()
     })
 
     document.querySelector('button#start-gdm').addEventListener('click', async () => {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
+      window.stream = await navigator.mediaDevices.getDisplayMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })
-      await onStart(stream)
+      await onStart()
     })
 
   </script>
