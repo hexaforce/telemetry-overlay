@@ -23,8 +23,26 @@
 
     const startgumButton = document.querySelector('button#start-gum')
     const startgdmButton = document.querySelector('button#start-gdm')
+    
     startgumButton.onclick = () => onStart(true)
     startgdmButton.onclick = () => onStart(false)
+
+    async function onStart(isGetDisplayMedia) {
+      Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
+      document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
+        await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
+
+      startgumButton.disabled = true
+      startgdmButton.disabled = true
+      recordButton.disabled = false
+      SupportedType.forEach((mimeType) => {
+        const option = document.createElement('option')
+        option.value = mimeType
+        option.innerText = option.value
+        codecPreferences.appendChild(option)
+      })
+      codecPreferences.disabled = false
+    }
 
     const SupportedType = [
       'video/webm;codecs=vp9,opus',
@@ -139,23 +157,6 @@
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
       }, 100)
-    }
-
-    async function onStart(isGetDisplayMedia) {
-      Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
-      document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
-        await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
-
-      startgumButton.disabled = true
-      startgdmButton.disabled = true
-      recordButton.disabled = false
-      SupportedType.forEach((mimeType) => {
-        const option = document.createElement('option')
-        option.value = mimeType
-        option.innerText = option.value
-        codecPreferences.appendChild(option)
-      })
-      codecPreferences.disabled = false
     }
 
   </script>
