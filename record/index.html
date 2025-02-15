@@ -21,6 +21,11 @@
     const playButton = document.querySelector('button#play')
     const downloadButton = document.querySelector('button#download')
 
+    const startgumButton = document.querySelector('button#start-gum')
+    const startgdmButton = document.querySelector('button#start-gdm')
+    startgumButton.onclick = () => onStart(true)
+    startgdmButton.onclick = () => onStart(false)
+
     const SupportedType = [
       'video/webm;codecs=vp9,opus',
       'video/webm;codecs=vp8,opus',
@@ -42,6 +47,13 @@
       'video/mp4',
     ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
 
+    const Constraints = {
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { width: 1280, height: 720 },
+      // audio: { echoCancellation: true, noiseSuppression: true }
+    }
+    
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
         const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
@@ -129,9 +141,13 @@
       }, 100)
     }
 
-    function onStart() {
-      document.querySelector('button#start-gum').disabled = true
-      document.querySelector('button#start-gdm').disabled = true
+    async function onStart(isGetDisplayMedia) {
+      Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
+      document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
+        await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
+
+      startgumButton.disabled = true
+      startgdmButton.disabled = true
       recordButton.disabled = false
       SupportedType.forEach((mimeType) => {
         const option = document.createElement('option')
@@ -141,22 +157,6 @@
       })
       codecPreferences.disabled = false
     }
-
-    document.querySelector('button#start-gum').addEventListener('click', async () => {
-      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
-        video: { width: 1280, height: 720 },
-      })
-      onStart()
-    })
-
-    document.querySelector('button#start-gdm').addEventListener('click', async () => {
-      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getDisplayMedia({
-        audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
-        video: { width: 1280, height: 720 },
-      })
-      onStart()
-    })
 
   </script>
 </head>
