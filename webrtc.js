@@ -127,6 +127,8 @@ const setupTransceiver = (wsUrl) => {
 
 // --- Media Receiver --------------------------
 
+import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
+
 const setupReceiver = (wsUrl) => {
   PROTOCOL = 'receiver'
   var ws = new WebSocket(wsUrl, PROTOCOL)
@@ -139,13 +141,19 @@ const setupReceiver = (wsUrl) => {
   ws.onclose = async () => console.log('close ws')
   ws.onmessage = async ({ data }) => {
     const msg = JSON.parse(data)
+    if (!msg) return
     if (msg.active) {
       // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
       // setMediaReceiver($('stream'), pc, ws)
-      pc.ontrack = ({ streams }) => ($('stream').srcObject = streams[0])
+      pc.ontrack = ({ streams }) => {
+        console.log(streams)
+        $('stream').srcObject = streams[0]
+        const streamVisualizer = new StreamVisualizer(streams[0], document.querySelector('canvas'))
+        streamVisualizer.start()
+      }
       ws.onclose = () => $('stream').srcObject.getTracks().forEach((track) => track.stop())
       pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'recvonly'))
       const offer = await pc.createOffer(OfferOptions)
