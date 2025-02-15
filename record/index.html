@@ -22,18 +22,19 @@
     const downloadButton = document.querySelector('button#download')
 
     const startgumButton = document.querySelector('button#start-gum')
-    const startgdmButton = document.querySelector('button#start-gdm')
+    // const startgdmButton = document.querySelector('button#start-gdm')
 
     startgumButton.onclick = () => onStart(true)
-    startgdmButton.onclick = () => onStart(false)
+    // startgdmButton.onclick = () => onStart(false)
 
     async function onStart(isGetDisplayMedia) {
       Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
-      document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
-        await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
+      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints) 
+      // document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
+      //   await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
 
       startgumButton.disabled = true
-      startgdmButton.disabled = true
+      // startgdmButton.disabled = true
       recordButton.disabled = false
       SupportedType.forEach((mimeType) => {
         const option = document.createElement('option')
@@ -74,7 +75,7 @@
     
     const videoSelect = document.querySelector('select#videoSource')
     const audioSelect = document.querySelector('select#audioSource')
-    
+
     navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
       while (videoSelect.firstChild) {
         videoSelect.removeChild(videoSelect.firstChild)
@@ -198,7 +199,7 @@
     <video id="recorded" playsinline loop></video>
     <div>
       <button id="start-gum">Start camera</button>
-      <button id="start-gdm">Start screenshare</button>
+      <!-- <button id="start-gdm">Start screenshare</button> -->
       <button id="record" disabled>Start Recording</button>
       <button id="play" disabled>Play</button>
       <button id="download" disabled>Download</button>
