@@ -59,7 +59,6 @@
         window.stream.getTracks().forEach((track) => track.stop())
       }
 
-      // clearErrorMessage()
       videoblock.style.display = 'none'
       constraints.video.deviceId = { ideal: videoSelect.value }
       video.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(constraints)
@@ -89,39 +88,20 @@
       }
     }
 
-    video.onloadedmetadata = () => {
-      displayVideoDimensions()
+    video.onloadedmetadata = () => displayVideoDimensions()
+    video.onresize = () => displayVideoDimensions()
+
+    widthInput.onchange = ({ target }) => {
+      widthOutput.textContent = target.value
+      window.stream.getVideoTracks()[0].applyConstraints(
+        aspectLock.checked ?
+          {
+            width: { exact: target.value },
+            aspectRatio: { exact: video.videoWidth / video.videoHeight }
+          }
+          :
+          { width: { exact: target.value } }).then(() => displayVideoDimensions())
     }
-
-    video.onresize = () => {
-      displayVideoDimensions()
-    }
-
-    function constraintChange(e) {
-      widthOutput.textContent = e.target.value
-      const track = window.stream.getVideoTracks()[0]
-      let constraints
-      if (aspectLock.checked) {
-        constraints = {
-          width: { exact: e.target.value },
-          aspectRatio: {
-            exact: video.videoWidth / video.videoHeight,
-          },
-        }
-      } else {
-        constraints = { width: { exact: e.target.value } }
-      }
-
-      console.log('applying ' + JSON.stringify(constraints))
-      track
-        .applyConstraints(constraints)
-        .then(() => {
-          displayVideoDimensions()
-        })
-    }
-
-    widthInput.onchange = constraintChange
-
 
   </script>
 </head>
