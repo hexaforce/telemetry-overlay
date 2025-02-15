@@ -16,7 +16,11 @@
 
     const errorMsgElement = document.querySelector('span#errorMsg')
     const recordedVideo = document.querySelector('video#recorded')
+
     const recordButton = document.querySelector('button#record')
+    const playButton = document.querySelector('button#play')
+    const downloadButton = document.querySelector('button#download')
+
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
         startRecording()
@@ -29,7 +33,6 @@
       }
     }
 
-    const playButton = document.querySelector('button#play')
     playButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
       const superBuffer = new Blob(recordedBlobs, { type: mimeType })
@@ -40,7 +43,6 @@
       recordedVideo.play()
     }
 
-    const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
       const blob = new Blob(recordedBlobs, { type: mimeType })
@@ -73,7 +75,7 @@
     async function startRecording() {
       recordedBlobs = []
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-      const options = { mimeType }
+
       if (mimeType.split(';', 1)[0] === 'video/mp4') {
         // Adjust sampling rate to 48khz.
         const track = window.stream.getAudioTracks()[0]
@@ -88,25 +90,23 @@
         }
       }
 
-      mediaRecorder = new MediaRecorder(window.stream, options)
+      mediaRecorder = new MediaRecorder(window.stream, { mimeType })
 
-      console.log('Created MediaRecorder', mediaRecorder, 'with options', options)
       recordButton.textContent = 'Stop Recording'
       playButton.disabled = true
       downloadButton.disabled = true
       codecPreferences.disabled = true
+
       mediaRecorder.onstop = (event) => {
         console.log('Recorder stopped: ', event)
         console.log('Recorded Blobs: ', recordedBlobs)
       }
       mediaRecorder.ondataavailable = (event) => {
-        console.log('handleDataAvailable', event)
         if (event.data && event.data.size > 0) {
           recordedBlobs.push(event.data)
         }
       }
       mediaRecorder.start()
-      console.log('MediaRecorder started', mediaRecorder)
     }
 
     async function onStart(stream) {
