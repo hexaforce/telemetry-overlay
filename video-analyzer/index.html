@@ -7,6 +7,18 @@
 
     'use strict'
 
+    const OfferOptions = {
+      offerToReceiveVideo: 1,
+      offerToReceiveAudio: 0,
+    }
+
+    const Constraints = {
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      // audio: { echoCancellation: true, noiseSuppression: true }
+      audio: false
+    }
+
     const startButton = document.getElementById('startButton')
     const callButton = document.getElementById('callButton')
     const hangupButton = document.getElementById('hangupButton')
@@ -18,12 +30,7 @@
     startButton.onclick = async () => {
       startButton.disabled = true
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        // audio: { echoCancellation: true, noiseSuppression: true }
-        audio: false
-      })
+      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
       localVideo.srcObject = stream
       localStream = stream
       callButton.disabled = false
@@ -74,10 +81,7 @@
 
       localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
 
-      const offer = await pc1.createOffer({
-        offerToReceiveAudio: 0,
-        offerToReceiveVideo: 1,
-      })
+      const offer = await pc1.createOffer(OfferOptions)
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
       // await pc2.setRemoteDescription({ type: 'offer', sdp: offer.sdp.replace('red/90000', 'green/90000') })

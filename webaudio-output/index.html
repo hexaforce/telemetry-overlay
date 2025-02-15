@@ -8,6 +8,17 @@
 
     'use strict'
 
+    const OfferOptions = {
+      offerToReceiveVideo: 1,
+      offerToReceiveAudio: 1,
+    }
+
+    const Constraints = {
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: { echoCancellation: true, noiseSuppression: true }
+    }
+
     import { StreamVisualizer } from './StreamVisualizer.js'
 
     const startButton = document.getElementById('startButton')
@@ -27,11 +38,7 @@
       // const devices = await navigator.mediaDevices.enumerateDevices()
       // console.log(devices)
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: { echoCancellation: true, noiseSuppression: true }
-      })
+      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
       localVideo.srcObject = stream
       localStream = stream
       callButton.disabled = false
@@ -60,11 +67,7 @@
         localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
         preferredVideoCodecs(pc1.getTransceivers())
 
-        const offer = await pc1.createOffer({
-          offerToReceiveAudio: 1,
-          offerToReceiveVideo: 1,
-        })
-
+        const offer = await pc1.createOffer(OfferOptions)
         pc1.getSenders().forEach(sender => {
           if (sender.track.kind === "video") {
             const params = sender.getParameters()
