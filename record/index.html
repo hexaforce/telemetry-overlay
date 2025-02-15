@@ -111,7 +111,7 @@
 
     }
 
-    async function onStart() {
+    function onStart() {
       document.querySelector('button#start-gum').disabled = true
       document.querySelector('button#start-gdm').disabled = true
 
@@ -154,7 +154,7 @@
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })
-      await onStart()
+      onStart()
     })
 
     document.querySelector('button#start-gdm').addEventListener('click', async () => {
@@ -162,7 +162,7 @@
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })
-      await onStart()
+      onStart()
     })
 
   </script>
