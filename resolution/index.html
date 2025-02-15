@@ -43,6 +43,7 @@
       }
       deviceArray.reverse()
       for (let i = 0; i !== deviceArray.length; ++i) {
+        console.log(deviceArray[i])
         const { deviceId, kind, label } = deviceArray[i]
         if (kind === 'videoinput') {
           const option = document.createElement('option')
@@ -131,7 +132,6 @@
       <input id="aspectlock" type="checkbox" />Lock aspect ratio<br />
       <input id="pausevideo" type="checkbox" />Pause video<br />
     </div>
-    <p id="errormessage"></p>
   </div>
 </body>
 

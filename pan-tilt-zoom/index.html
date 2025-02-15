@@ -14,6 +14,26 @@
   <script type="module" type="text/javascript">
     'use strict'
 
+    const videoSelect = document.querySelector('select#videoSource')
+
+    navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+      // Handles being called several times to update labels. Preserve values.
+      while (videoSelect.firstChild) {
+        videoSelect.removeChild(videoSelect.firstChild)
+      }
+      deviceArray.reverse()
+      for (let i = 0; i !== deviceArray.length; ++i) {
+        console.log(deviceArray[i])
+        const { deviceId, kind, label } = deviceArray[i]
+        if (kind === 'videoinput') {
+          const option = document.createElement('option')
+          option.value = deviceId
+          option.text = label || `camera ${videoSelect.length + 1}`
+          videoSelect.appendChild(option)
+        }
+      }
+    })
+
     // Put variables in global scope to make them available to the browser console.
     const constraints = (window.constraints = {
       video: {
@@ -77,6 +97,7 @@
 
     async function init(e) {
       try {
+        constraints.video.deviceId = { ideal: videoSelect.value }
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
         handleSuccess(stream)
         e.target.disabled = true
@@ -92,6 +113,9 @@
 
 <body>
   <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+    </div>
     <video id="gum-local" autoplay playsinline></video>
     <button id="showVideo">Open camera</button>
     <div>
