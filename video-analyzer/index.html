@@ -79,7 +79,10 @@
       const { byteLength } = data
       const keyframeBit = view.getUint8(0) & 0x01
       // console.log(view.getUint8(0).toString(16));
-      if (keyframeBit === 0) {
+
+      let isKeyFrame = (view.getUint8(0) & 0x01) === 0
+
+      if (isKeyFrame) {
         keyFrameCount++
         keyFrameLastSize = byteLength
       } else {
