@@ -19,7 +19,10 @@
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     }
 
-    
+
+    const videoSelect = document.querySelector('select#videoSource')
+const audioSelect = document.querySelector('select#audioSource')
+
     import { preferredVideoCodecs, setSenderPriority } from './Support.js'
 
     import { StreamVisualizer } from './StreamVisualizer.js'
@@ -34,6 +37,8 @@
     // ------------------------------------------------------
     startButton.onclick = async () => {
       startButton.disabled = true
+      Constraints.video.deviceId = { ideal: videoSelect.value }
+      Constraints.audio.deviceId = { ideal: audioSelect.value }
       localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       callButton.disabled = false
     }
@@ -72,16 +77,20 @@
       setTimeout(async () => {
         const stats = await pc1.getStats()
         stats.forEach((stat) => {
-          if (!(stat.type === 'outbound-rtp' && stat.kind === 'video'))
+          if (!(stat.type === 'outbound-rtp'))
             return
           const codec = stats.get(stat.codecId)
-          document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
-          if (stat.encoderImplementation) {
-            // document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+          console.log(codec)
+          if (stat.kind === 'video') {
+            document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
+            if (stat.encoderImplementation) {
+              document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+            }
+            if (stat.powerEfficientEncoder !== undefined) {
+              document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
+            }
           }
-          if (stat.powerEfficientEncoder !== undefined) {
-            // document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
-          }
+
         })
       }, 1000)
     }
@@ -111,7 +120,10 @@
 </head>
 
 <body>
-  <div id="container">
+  <div class="select">
+    <label for="videoSource">Video source: </label><select id="videoSource"></select>
+    <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+  </div>
     <div id="actualCodec"></div>
     <p>localVideo</p>
     <video id="localVideo" playsinline autoplay muted></video>

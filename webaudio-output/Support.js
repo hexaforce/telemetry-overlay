@@ -1,3 +1,30 @@
+
+const videoSelect = document.querySelector('select#videoSource')
+const audioSelect = document.querySelector('select#audioSource')
+
+navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+  while (videoSelect.firstChild) {
+    videoSelect.removeChild(videoSelect.firstChild)
+  }
+  while (audioSelect.firstChild) {
+    audioSelect.removeChild(audioSelect.firstChild)
+  }
+  for (let i = 0; i < deviceArray.length; i++) {
+    const { deviceId, kind, label } = deviceArray[i]
+    if (kind === 'videoinput') {
+      const option = document.createElement('option')
+      option.value = deviceId
+      option.text = label || `Camera ${videoSelect.length + 1}`
+      videoSelect.appendChild(option)
+    } else if (kind === 'audioinput') {
+      const option = document.createElement('option')
+      option.value = deviceId
+      option.text = label || `Microphone ${audioSelect.length + 1}`
+      audioSelect.appendChild(option)
+    }
+  }
+})
+
 export function preferredVideoCodecs(transceivers) {
   const sort = (supportedCodecs, preferredOrder) =>
     supportedCodecs.sort((a, b) => {
