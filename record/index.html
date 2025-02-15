@@ -115,7 +115,6 @@
       document.querySelector('button#start-gdm').disabled = true
       try {
         recordButton.disabled = false
-        console.log('Got stream:', stream)
         window.stream = stream
         const gumVideo = document.querySelector('video#gum')
         gumVideo.srcObject = stream
@@ -153,19 +152,18 @@
     }
 
     document.querySelector('button#start-gum').addEventListener('click', async () => {
-      const constraints = {
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
-      }
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      })
       await onStart(stream)
     })
+
     document.querySelector('button#start-gdm').addEventListener('click', async () => {
-      const constraints = {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
-      }
-      const stream = await navigator.mediaDevices.getDisplayMedia(constraints)
+      })
       await onStart(stream)
     })
 
