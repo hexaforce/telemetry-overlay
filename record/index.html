@@ -17,20 +17,20 @@
     const errorMsgElement = document.querySelector('span#errorMsg')
     const recordedVideo = document.querySelector('video#recorded')
     const recordButton = document.querySelector('button#record')
-    recordButton.addEventListener('click', () => {
+    recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
         startRecording()
       } else {
-        stopRecording()
+        mediaRecorder.stop()
         recordButton.textContent = 'Start Recording'
         playButton.disabled = false
         downloadButton.disabled = false
         codecPreferences.disabled = false
       }
-    })
+    }
 
     const playButton = document.querySelector('button#play')
-    playButton.addEventListener('click', () => {
+    playButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
       const superBuffer = new Blob(recordedBlobs, { type: mimeType })
       recordedVideo.src = null
@@ -38,10 +38,10 @@
       recordedVideo.src = window.URL.createObjectURL(superBuffer)
       recordedVideo.controls = true
       recordedVideo.play()
-    })
+    }
 
     const downloadButton = document.querySelector('button#download')
-    downloadButton.addEventListener('click', () => {
+    downloadButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
       const blob = new Blob(recordedBlobs, { type: mimeType })
       const url = window.URL.createObjectURL(blob)
@@ -55,7 +55,7 @@
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
       }, 100)
-    })
+    }
 
     function mimeTypeToFileExtension(mimeType) {
       switch (mimeType) {
@@ -67,13 +67,6 @@
           return 'mkv'
         default:
           throw new Error(`unsupported mimetype: ${mimeType}`)
-      }
-    }
-
-    function handleDataAvailable(event) {
-      console.log('handleDataAvailable', event)
-      if (event.data && event.data.size > 0) {
-        recordedBlobs.push(event.data)
       }
     }
 
@@ -111,13 +104,14 @@
         console.log('Recorder stopped: ', event)
         console.log('Recorded Blobs: ', recordedBlobs)
       }
-      mediaRecorder.ondataavailable = handleDataAvailable
+      mediaRecorder.ondataavailable = (event) => {
+        console.log('handleDataAvailable', event)
+        if (event.data && event.data.size > 0) {
+          recordedBlobs.push(event.data)
+        }
+      }
       mediaRecorder.start()
       console.log('MediaRecorder started', mediaRecorder)
-    }
-
-    function stopRecording() {
-      mediaRecorder.stop()
     }
 
     async function onStart(stream) {
