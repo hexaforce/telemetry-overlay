@@ -11,7 +11,6 @@
     const video = document.querySelector('video')
 
     const videoblock = document.querySelector('#videoblock')
-    const messagebox = document.querySelector('#errormessage')
 
     Object.entries({
       _180p: { video: { width: { exact: 320 }, height: { exact: 180 } } },
@@ -62,7 +61,6 @@
       videoblock.style.display = 'none'
       constraints.video.deviceId = { ideal: videoSelect.value }
       video.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(constraints)
-      messagebox.style.display = 'none'
       videoblock.style.display = 'block'
 
       const { width } = window.stream.getVideoTracks()[0].getConstraints()
