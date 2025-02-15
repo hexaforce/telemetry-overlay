@@ -116,8 +116,7 @@
       document.querySelector('button#start-gdm').disabled = true
 
       recordButton.disabled = false
-      document.querySelector('video#gum').srcObject = window.stream
-
+      
       const SupportedType = [
         'video/webm;codecs=vp9,opus',
         'video/webm;codecs=vp8,opus',
@@ -150,7 +149,7 @@
     }
 
     document.querySelector('button#start-gum').addEventListener('click', async () => {
-      window.stream = await navigator.mediaDevices.getUserMedia({
+      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })
@@ -158,7 +157,7 @@
     })
 
     document.querySelector('button#start-gdm').addEventListener('click', async () => {
-      window.stream = await navigator.mediaDevices.getDisplayMedia({
+      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getDisplayMedia({
         audio: { echoCancellation: document.querySelector('#echoCancellation').checked },
         video: { width: 1280, height: 720 },
       })

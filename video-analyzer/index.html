@@ -30,8 +30,7 @@
     startButton.onclick = async () => {
       startButton.disabled = true
 
-      window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      localVideo.srcObject = window.stream
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       callButton.disabled = false
     }
 
