@@ -30,14 +30,12 @@
     const aspectLock = document.querySelector('#aspectlock')
 
     const sizeLock = document.querySelector('#sizelock')
-    sizeLock.onchange = () => video.style.width = sizeLock.checked ? '100%':'auto'
+    sizeLock.onchange = () => video.style.width = sizeLock.checked ? '100%' : 'auto'
 
     const pauseVideo = document.querySelector('#pausevideo')
     pauseVideo.onchange = () => pauseVideo.checked ? video.pause() : video.play()
 
     const videoSelect = document.querySelector('select#videoSource')
-
-    // function gotDevices
 
     navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
       // Handles being called several times to update labels. Preserve values.
@@ -55,9 +53,6 @@
         }
       }
     })
-
-    let currentWidth = 0
-    let currentHeight = 0
 
     async function getMedia(constraints) {
       if (window.stream) {
@@ -79,37 +74,27 @@
       }
     }
 
+    let currentWidth = 0
+    let currentHeight = 0
 
-    // function errorMessage(who, what) {
-    //   const message = who + ': ' + what
-    //   messagebox.innerText = message
-    //   messagebox.style.display = 'block'
-    //   console.log(message)
-    // }
-
-    function clearErrorMessage() {
-      messagebox.style.display = 'none'
-    }
-
-    function displayVideoDimensions(whereSeen) {
+    function displayVideoDimensions() {
+      dimensions.innerText = 'Video not ready'
       if (video.videoWidth) {
-        dimensions.innerText = 'Actual video dimensions: ' + video.videoWidth + 'x' + video.videoHeight + 'px.'
-        if (currentWidth !== video.videoWidth || currentHeight !== video.videoHeight) {
-          console.log(whereSeen + ': ' + dimensions.innerText)
-          currentWidth = video.videoWidth
-          currentHeight = video.videoHeight
+        const { videoWidth, videoHeight } = video
+        dimensions.innerText = `Actual video dimensions: ${videoWidth} x ${videoHeight}`
+        if (currentWidth !== videoWidth || currentHeight !== videoHeight) {
+          currentWidth = videoWidth
+          currentHeight = videoHeight
         }
-      } else {
-        dimensions.innerText = 'Video not ready'
       }
     }
 
     video.onloadedmetadata = () => {
-      displayVideoDimensions('loadedmetadata')
+      displayVideoDimensions()
     }
 
     video.onresize = () => {
-      displayVideoDimensions('resize')
+      displayVideoDimensions()
     }
 
     function constraintChange(e) {
@@ -126,17 +111,13 @@
       } else {
         constraints = { width: { exact: e.target.value } }
       }
-      clearErrorMessage()
+
       console.log('applying ' + JSON.stringify(constraints))
       track
         .applyConstraints(constraints)
         .then(() => {
-          console.log('applyConstraint success')
-          displayVideoDimensions('applyConstraints')
+          displayVideoDimensions()
         })
-        // .catch((err) => {
-        //   errorMessage('applyConstraints', err.name)
-        // })
     }
 
     widthInput.onchange = constraintChange
