@@ -87,13 +87,8 @@
           }
         }
       }
-      try {
-        mediaRecorder = new MediaRecorder(window.stream, options)
-      } catch (e) {
-        console.error('Exception while creating MediaRecorder:', e)
-        errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`
-        return
-      }
+
+      mediaRecorder = new MediaRecorder(window.stream, options)
 
       console.log('Created MediaRecorder', mediaRecorder, 'with options', options)
       recordButton.textContent = 'Stop Recording'
