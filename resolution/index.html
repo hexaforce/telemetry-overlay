@@ -28,8 +28,12 @@
     const widthInput = document.querySelector('div#width input')
     const widthOutput = document.querySelector('div#width span')
     const aspectLock = document.querySelector('#aspectlock')
+
     const sizeLock = document.querySelector('#sizelock')
+    sizeLock.onchange = () => video.style.width = sizeLock.checked ? '100%':'auto'
+
     const pauseVideo = document.querySelector('#pausevideo')
+    pauseVideo.onchange = () => pauseVideo.checked ? video.pause() : video.play()
 
     const videoSelect = document.querySelector('select#videoSource')
 
@@ -60,7 +64,7 @@
         window.stream.getTracks().forEach((track) => track.stop())
       }
 
-      clearErrorMessage()
+      // clearErrorMessage()
       videoblock.style.display = 'none'
       constraints.video.deviceId = { ideal: videoSelect.value }
       video.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(constraints)
@@ -75,16 +79,13 @@
       }
     }
 
-    pauseVideo.onchange = () => {
-      pauseVideo.checked ? video.pause() : video.play()
-    }
 
-    function errorMessage(who, what) {
-      const message = who + ': ' + what
-      messagebox.innerText = message
-      messagebox.style.display = 'block'
-      console.log(message)
-    }
+    // function errorMessage(who, what) {
+    //   const message = who + ': ' + what
+    //   messagebox.innerText = message
+    //   messagebox.style.display = 'block'
+    //   console.log(message)
+    // }
 
     function clearErrorMessage() {
       messagebox.style.display = 'none'
@@ -133,22 +134,13 @@
           console.log('applyConstraint success')
           displayVideoDimensions('applyConstraints')
         })
-        .catch((err) => {
-          errorMessage('applyConstraints', err.name)
-        })
+        // .catch((err) => {
+        //   errorMessage('applyConstraints', err.name)
+        // })
     }
 
     widthInput.onchange = constraintChange
 
-    sizeLock.onchange = () => {
-      if (sizeLock.checked) {
-        console.log('Setting fixed size')
-        video.style.width = '100%'
-      } else {
-        console.log('Setting auto size')
-        video.style.width = 'auto'
-      }
-    }
 
   </script>
 </head>
