@@ -9,7 +9,6 @@
 
     const dimensions = document.querySelector('#dimensions')
     const video = document.querySelector('video')
-    let stream
 
     const videoblock = document.querySelector('#videoblock')
     const messagebox = document.querySelector('#errormessage')
@@ -56,43 +55,34 @@
     let currentWidth = 0
     let currentHeight = 0
 
-    function getMedia(constraints) {
-      if (stream) {
-        stream.getTracks().forEach((track) => {
-          track.stop()
-        })
+    async function getMedia(constraints) {
+      if (window.stream) {
+        window.stream.getTracks().forEach((track) => track.stop())
       }
 
       clearErrorMessage()
       videoblock.style.display = 'none'
       constraints.video.deviceId = { ideal: videoSelect.value }
-      console.log('getUserMedia constraints: ' + JSON.stringify(constraints))
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(gotStream)
-        .catch((e) => {
-          errorMessage('getUserMedia', e.message, e.name)
-        })
+      window.stream = await navigator.mediaDevices.getUserMedia(constraints)
+      gotStream()
     }
 
     pauseVideo.onchange = () => {
       pauseVideo.checked ? video.pause() : video.play()
     }
 
-    function gotStream(mediaStream) {
-      stream = window.stream = mediaStream // stream available to console
-      video.srcObject = mediaStream
+    function gotStream() {
+      video.srcObject = window.stream
       messagebox.style.display = 'none'
       videoblock.style.display = 'block'
-      const track = mediaStream.getVideoTracks()[0]
-      const constraints = track.getConstraints()
-      console.log('Result constraints: ' + JSON.stringify(constraints))
-      if (constraints && constraints.width && constraints.width.exact) {
-        widthInput.value = constraints.width.exact
-        widthOutput.textContent = constraints.width.exact
-      } else if (constraints && constraints.width && constraints.width.min) {
-        widthInput.value = constraints.width.min
-        widthOutput.textContent = constraints.width.min
+
+      const { width } = window.stream.getVideoTracks()[0].getConstraints()
+      if (width && width.exact) {
+        widthInput.value = width.exact
+        widthOutput.textContent = width.exact
+      } else if (constraints && width && width.min) {
+        widthInput.value = width.min
+        widthOutput.textContent = width.min
       }
     }
 
