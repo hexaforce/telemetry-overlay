@@ -74,6 +74,7 @@ const setupTransceiver = (wsUrl) => {
   ws.onclose = async () => console.log('close ws')
   ws.onmessage = async ({ data }) => {
     const msg = JSON.parse(data)
+    if (!msg) return
     if (msg.OfferOptions) {
       const { offerToReceiveVideo, offerToReceiveAudio } = msg.OfferOptions
       Constraints.video.deviceId = { ideal: videoSelect.value }
@@ -81,9 +82,11 @@ const setupTransceiver = (wsUrl) => {
       const stream = await navigator.mediaDevices.getUserMedia(Constraints)
       // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
       pc = new RTCPeerConnection()
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream))
-      const streamVisualizer = new StreamVisualizer(stream, document.querySelector('canvas'))
-      streamVisualizer.start()
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, stream)
+        if (track.kind === 'audio')
+          new StreamVisualizer(stream, document.querySelector('canvas')).start()
+      })
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
       // pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendonly'))
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
@@ -146,11 +149,14 @@ const setupReceiver = (wsUrl) => {
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
       // setMediaReceiver($('stream'), pc, ws)
-      pc.ontrack = ({ streams }) => {
+      pc.ontrack = ({ streams, track }) => {
         console.log(streams)
+        console.log(track)
         $('stream').srcObject = streams[0]
-        const streamVisualizer = new StreamVisualizer(streams[0], document.querySelector('canvas'))
-        streamVisualizer.start()
+        // const streamVisualizer = new StreamVisualizer(streams[0], document.querySelector('canvas'))
+        // streamVisualizer.start()
+        if (track.kind === 'audio')
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
       }
       ws.onclose = () =>
         $('stream')
