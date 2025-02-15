@@ -3,14 +3,6 @@ const d = document.documentElement
 
 import { renderMap } from './navigation-map.js'
 
-// --- ICE Handler --------------------------
-const iceCandidateHandler = (pc, ws) => {
-  pc.onicecandidate = ({ candidate }) => {
-    // console.log('ice answer:', candidate)
-    candidate && ws.send(JSON.stringify(candidate))
-  }
-}
-
 // --- Data Channel --------------------------
 const dataChannel = {}
 
@@ -32,9 +24,9 @@ const dataChannelHandler = (pc, PROTOCOL) => {
   }
   const channel = pc.createDataChannel(PROTOCOL)
   channel.onopen = ({ target }) => (dataChannel[target.label] = target)
-  channel.onmessage = ({ data }) => {
-    console.log('2:', data)
-  }
+  // channel.onmessage = ({ data }) => {
+  //   console.log('???:', data)
+  // }
 }
 
 const sendData = (data) => {
@@ -47,7 +39,7 @@ var PROTOCOL = null
 
 const setReceiverAnswerCodec = async (pc) => {
   const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
-  const preferredOrder = ['video/AV1', 'video/VP9', 'video/H265', 'video/H264', 'video/VP8']
+  const preferredOrder = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
   const [audioTransceiver, videoTransceiver] = pc.getTransceivers()
   if (videoTransceiver) {
     videoTransceiver.setCodecPreferences(
@@ -64,15 +56,12 @@ const setReceiverAnswerCodec = async (pc) => {
 
 // --- Media Transceiver --------------------------
 
-const setMediaTransceiver = async (stream, pc, ws) => {
-  stream.getTracks().forEach((track) => {
-    pc.addTrack(track, stream)
-    // console.log('addTrack:', stream)
-  })
-  ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-  pc.getTransceivers().forEach((transceiver) => {
-    transceiver.direction = 'sendonly'
-  })
+const videoSelect = document.querySelector('select#videoSource')
+const audioSelect = document.querySelector('select#audioSource')
+
+const Constraints = {
+  video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+  audio: { echoCancellation: true, noiseSuppression: true }
 }
 
 const setupTransceiver = (wsUrl) => {
@@ -85,10 +74,15 @@ const setupTransceiver = (wsUrl) => {
     const msg = JSON.parse(data)
     if (msg.OfferOptions) {
       const { offerToReceiveVideo, offerToReceiveAudio } = msg.OfferOptions
-      const stream = await navigator.mediaDevices.getUserMedia({ video: offerToReceiveVideo, audio: offerToReceiveAudio })
-      pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
-      setMediaTransceiver(stream, pc, ws)
-      iceCandidateHandler(pc, ws)
+      Constraints.video.deviceId = { ideal: videoSelect.value }
+      Constraints.audio.deviceId = { ideal: audioSelect.value }
+      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
+      // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
+      pc = new RTCPeerConnection()
+      stream.getTracks().forEach((track) => pc.addTrack(track, stream))
+      ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
+      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendonly'))
+      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
       ws.send(JSON.stringify({ active: stream.active }))
     } else {
@@ -106,20 +100,32 @@ const setupTransceiver = (wsUrl) => {
       }
     }
   }
+  navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+    while (videoSelect.firstChild) {
+      videoSelect.removeChild(videoSelect.firstChild)
+    }
+    while (audioSelect.firstChild) {
+      audioSelect.removeChild(audioSelect.firstChild)
+    }
+    for (let i = 0; i < deviceArray.length; i++) {
+      const { deviceId, kind, label } = deviceArray[i]
+      if (kind === 'videoinput') {
+        const option = document.createElement('option')
+        option.value = deviceId
+        option.text = label || `Camera ${videoSelect.length + 1}`
+        videoSelect.appendChild(option)
+      } else if (kind === 'audioinput') {
+        const option = document.createElement('option')
+        option.value = deviceId
+        option.text = label || `Microphone ${audioSelect.length + 1}`
+        audioSelect.appendChild(option)
+      }
+    }
+  })
+
 }
 
 // --- Media Receiver --------------------------
-
-const setMediaReceiver = async (video, pc, ws) => {
-  pc.ontrack = ({ streams }) => {
-    console.log(streams)
-    video.srcObject = streams[0]
-  }
-  ws.onclose = () => video.srcObject.getTracks().forEach((track) => track.stop())
-  pc.getTransceivers().forEach((transceiver) => {
-    transceiver.direction = 'recvonly'
-  })
-}
 
 const setupReceiver = (wsUrl) => {
   PROTOCOL = 'receiver'
@@ -134,10 +140,14 @@ const setupReceiver = (wsUrl) => {
   ws.onmessage = async ({ data }) => {
     const msg = JSON.parse(data)
     if (msg.active) {
-      pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
-      iceCandidateHandler(pc, ws)
+      // pc = new RTCPeerConnection({ bundlePolicy: 'max-bundle' })
+      pc = new RTCPeerConnection()
+      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       dataChannelHandler(pc, PROTOCOL)
-      setMediaReceiver($('stream'), pc, ws)
+      // setMediaReceiver($('stream'), pc, ws)
+      pc.ontrack = ({ streams }) => ($('stream').srcObject = streams[0])
+      ws.onclose = () => $('stream').srcObject.getTracks().forEach((track) => track.stop())
+      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'recvonly'))
       const offer = await pc.createOffer(OfferOptions)
       // console.log('offer:', offer.sdp)
       await pc.setLocalDescription(offer)
