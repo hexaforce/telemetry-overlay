@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Peer connection as input to Web Audio</title>
   <script type="module" type="text/javascript">
 
     'use strict'
@@ -38,9 +37,8 @@
       // const devices = await navigator.mediaDevices.enumerateDevices()
       // console.log(devices)
 
-      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      localVideo.srcObject = stream
-      localStream = stream
+      window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+      localVideo.srcObject = window.stream
       callButton.disabled = false
     }
 
@@ -64,7 +62,7 @@
       }
 
       try {
-        localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
+        window.stream.getTracks().forEach(track => pc1.addTrack(track, window.stream))
         preferredVideoCodecs(pc1.getTransceivers())
 
         const offer = await pc1.createOffer(OfferOptions)
@@ -147,7 +145,6 @@
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
 
-    let localStream
     let pc1
     let pc2
 

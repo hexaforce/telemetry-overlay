@@ -30,9 +30,8 @@
     startButton.onclick = async () => {
       startButton.disabled = true
 
-      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      localVideo.srcObject = stream
-      localStream = stream
+      window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+      localVideo.srcObject = window.stream
       callButton.disabled = false
     }
 
@@ -79,7 +78,7 @@
         remoteVideo.srcObject = streams[0]
       }
 
-      localStream.getTracks().forEach((track) => pc1.addTrack(track, localStream))
+      window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
       const offer = await pc1.createOffer(OfferOptions)
       await pc1.setLocalDescription(offer)
@@ -118,7 +117,6 @@
       }
     })
 
-    let localStream
     let pc1
     let pc2
 
