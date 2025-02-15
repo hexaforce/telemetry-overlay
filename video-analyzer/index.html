@@ -9,14 +9,14 @@
 
     const OfferOptions = {
       offerToReceiveVideo: 1,
-      offerToReceiveAudio: 0,
+      offerToReceiveAudio: 1,
     }
 
     const Constraints = {
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
       video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       // audio: { echoCancellation: true, noiseSuppression: true }
-      audio: false
+      audio: true
     }
 
     const startButton = document.getElementById('startButton')
@@ -46,35 +46,15 @@
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
       pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
-
-      pc2.ontrack = ({ receiver, streams }) => {
-        const frameStreams = receiver.createEncodedStreams()
-        frameStreams.readable.pipeThrough(
-          new TransformStream({
-            transform: (encodedFrame, controller) => {
-              const { data, type, timestamp, synchronizationSource } = encodedFrame
-              const view = new DataView(data)
-              const { byteLength } = data
-              const keyframeBit = view.getUint8(0) & 0x01
-              // console.log(view.getUint8(0).toString(16));
-              if (keyframeBit === 0) {
-                keyFrameCount++
-                keyFrameLastSize = byteLength
-              } else {
-                interFrameCount++
-                interFrameLastSize = byteLength
-              }
-              if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
-                duplicateCount++
-              }
-              prevFrameType = type
-              prevFrameTimestamp = timestamp
-              prevFrameSynchronizationSource = synchronizationSource
-              controller.enqueue(encodedFrame)
-            },
-          }),
-        ).pipeTo(frameStreams.writable)
-        remoteVideo.srcObject = streams[0]
+      pc2.ontrack = ({ receiver, streams, track }) => {
+        if (track.kind === 'video') {
+          const { readable, writable } = receiver.createEncodedStreams()
+          let keyFrameAnalyzer = new TransformStream({ transform })
+          readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+        }
+        if (remoteVideo.srcObject !== streams[0]) {
+          remoteVideo.srcObject = streams[0]
+        }
       }
 
       window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
@@ -86,6 +66,28 @@
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
 
+    }
+
+    function transform(encodedFrame, controller) {
+      const { data, type, timestamp, synchronizationSource } = encodedFrame
+      const view = new DataView(data)
+      const { byteLength } = data
+      const keyframeBit = view.getUint8(0) & 0x01
+      // console.log(view.getUint8(0).toString(16));
+      if (keyframeBit === 0) {
+        keyFrameCount++
+        keyFrameLastSize = byteLength
+      } else {
+        interFrameCount++
+        interFrameLastSize = byteLength
+      }
+      if (encodedFrame.type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+        duplicateCount++
+      }
+      prevFrameType = type
+      prevFrameTimestamp = timestamp
+      prevFrameSynchronizationSource = synchronizationSource
+      controller.enqueue(encodedFrame)
     }
 
     // hangupButton
