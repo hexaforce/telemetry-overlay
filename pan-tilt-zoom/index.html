@@ -23,7 +23,7 @@
       }
       deviceArray.reverse()
       for (let i = 0; i !== deviceArray.length; ++i) {
-        console.log(deviceArray[i])
+        
         const { deviceId, kind, label } = deviceArray[i]
         if (kind === 'videoinput') {
           const option = document.createElement('option')
@@ -40,6 +40,8 @@
         pan: true,
         tilt: true,
         zoom: true,
+
+    mimeType: "video/H264"
       },
     })
 
