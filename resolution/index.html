@@ -110,15 +110,7 @@
     }
 
     pauseVideo.onchange = () => {
-      if (pauseVideo.checked) {
-        video.pause()
-      } else {
-        video.play()
-      }
-    }
-
-    function handleError(error) {
-      console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name)
+      pauseVideo.checked ? video.pause() : video.play()
     }
 
     function gotStream(mediaStream) {
