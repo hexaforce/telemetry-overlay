@@ -13,9 +13,14 @@
     }
 
     const Constraints = {
-      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     }
+
+    
+    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
 
     import { StreamVisualizer } from './StreamVisualizer.js'
 
@@ -29,15 +34,7 @@
     // ------------------------------------------------------
     startButton.onclick = async () => {
       startButton.disabled = true
-
-      // const supports = navigator.mediaDevices.getSupportedConstraints()
-      // console.log(supports)
-
-      // const devices = await navigator.mediaDevices.enumerateDevices()
-      // console.log(devices)
-
-      window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      localVideo.srcObject = window.stream
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       callButton.disabled = false
     }
 
@@ -55,26 +52,14 @@
       pc2.ontrack = ({ streams }) => {
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
-          const streamVisualizer = new StreamVisualizer(streams[0], canvas)
-          streamVisualizer.start()
+          new StreamVisualizer(streams[0], canvas).start()
         }
       }
 
       window.stream.getTracks().forEach(track => pc1.addTrack(track, window.stream))
-      preferredVideoCodecs(pc1.getTransceivers())
 
       const offer = await pc1.createOffer(OfferOptions)
-      pc1.getSenders().forEach(sender => {
-        if (sender.track.kind === "video") {
-          const params = sender.getParameters()
-          if (params.encodings.length > 0) {
-            params.encodings[0].priority = "high" // 一部のブラウザ向け
-            params.encodings[0].networkPriority = "high" // 最新の仕様向け
-            params.encodings[0].maxBitrate = 10 * 1000 * 1000 // ビットレート調整（必要なら）
-          }
-          sender.setParameters(params).catch(err => console.warn("setParameters failed:", err))
-        }
-      })
+      // setSenderPriority(pc1)
 
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
@@ -90,7 +75,7 @@
           if (!(stat.type === 'outbound-rtp' && stat.kind === 'video'))
             return
           const codec = stats.get(stat.codecId)
-          // document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
+          document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
           if (stat.encoderImplementation) {
             // document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
           }
@@ -101,27 +86,6 @@
       }, 1000)
     }
 
-    function preferredVideoCodecs(transceivers) {
-      const sort = (supportedCodecs, preferredOrder) => supportedCodecs.sort((a, b) => {
-        const indexA = preferredOrder.indexOf(a.mimeType)
-        const indexB = preferredOrder.indexOf(b.mimeType)
-        const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
-        const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
-        return orderA - orderB
-      })
-      transceivers.forEach(transceiver => {
-        if (transceiver.receiver.track.kind === "video") {
-          const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
-          const preferredOrder = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
-          transceiver.setCodecPreferences(sort(supportedCodecs, preferredOrder))
-        }
-        if (transceiver.receiver.track.kind === "audio") {
-          const supportedCodecs = RTCRtpReceiver.getCapabilities('audio').codecs
-          const preferredOrder = ["audio/opus", "audio/G722", "audio/PCMU", "audio/PCMA"]
-          transceiver.setCodecPreferences(sort(supportedCodecs, preferredOrder))
-        }
-      })
-    }
 
     // hangupButton
     // ------------------------------------------------------
@@ -148,6 +112,7 @@
 
 <body>
   <div id="container">
+    <div id="actualCodec"></div>
     <p>localVideo</p>
     <video id="localVideo" playsinline autoplay muted></video>
     <p>remoteVideo</p>
