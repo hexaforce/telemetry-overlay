@@ -7,6 +7,8 @@
 
     'use strict'
 
+    import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
+
     /* globals MediaRecorder */
 
     let mediaRecorder
@@ -35,14 +37,15 @@
       audio: {}
     }
 
+    const recorder = new MultimediaRecorder()
+
     // async function onStart(isGetDisplayMedia) {
     startgumButton.onclick = async () => {
-      
+
       Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
       Constraints.video.deviceId = { ideal: videoSelect.value }
       Constraints.audio.deviceId = { ideal: audioSelect.value }
       document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-
 
       startgumButton.disabled = true
       // startgdmButton.disabled = true
@@ -55,27 +58,6 @@
       })
       codecPreferences.disabled = false
     }
-
-    const SupportedType = [
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp8,opus',
-      'video/webm;codecs=h264,opus',
-      'video/webm;codecs=av01,opus',
-      'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
-      'video/mp4;codecs=vp9,mp4a.40.2',
-      'video/mp4;codecs=vp9,opus',
-      'video/mp4;codecs=avc1.64003E,mp4a.40.2',
-      'video/mp4;codecs=avc1.64003E,opus',
-      'video/mp4;codecs=avc3.64003E,mp4a.40.2',
-      'video/mp4;codecs=avc3.64003E,opus',
-      'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
-      'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
-      'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
-      'video/mp4;codecs=hev1.1.6.L186.B0,opus',
-      'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
-      'video/mp4;codecs=av01.0.19M.08,opus',
-      'video/mp4',
-    ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
 
     const videoSelect = document.querySelector('select#videoSource')
     const audioSelect = document.querySelector('select#audioSource')
@@ -105,8 +87,8 @@
 
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
-        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
 
+        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
         if (mimeType.split(';', 1)[0] === 'video/mp4') {
           // Adjust sampling rate to 48khz.
           const track = window.stream.getAudioTracks()[0]
@@ -120,19 +102,7 @@
             }
           }
         }
-
-        recordedBlobs = []
-        mediaRecorder = new MediaRecorder(window.stream, { mimeType })
-        mediaRecorder.onstop = (event) => {
-          console.log('Recorder stopped: ', event)
-          console.log('Recorded Blobs: ', recordedBlobs)
-        }
-        mediaRecorder.ondataavailable = ({ data }) => {
-          if (data && data.size > 0) {
-            recordedBlobs.push(data)
-          }
-        }
-        mediaRecorder.start()
+        recorder.start(window.stream, mimeType)
 
         recordButton.textContent = 'Stop Recording'
         playButton.disabled = true
@@ -141,7 +111,8 @@
 
       } else {
 
-        mediaRecorder.stop()
+        recorder.stop()
+
         recordButton.textContent = 'Start Recording'
         playButton.disabled = false
         downloadButton.disabled = false
@@ -150,45 +121,8 @@
       }
     }
 
-    playButton.onclick = async () => {
-      const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
-
-      const superBuffer = new Blob(recordedBlobs, { type: mimeType })
-      recordedVideo.src = null
-      recordedVideo.srcObject = null
-      recordedVideo.src = window.URL.createObjectURL(superBuffer)
-      recordedVideo.controls = true
-      recordedVideo.play()
-    }
-
-    downloadButton.onclick = async () => {
-      const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
-
-      const blob = new Blob(recordedBlobs, { type: mimeType })
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.style.display = 'none'
-      a.href = url
-      switch (mimeType) {
-        case 'video/mp4':
-          a.download = `test.mp4`
-          break
-        case 'video/webm':
-          a.download = `test.webm`
-          break
-        case 'video/x-matroska':
-          a.download = `test.mkv`
-          break
-        default:
-          throw new Error(`unsupported mimetype: ${mimeType}`)
-      }
-      document.body.appendChild(a)
-      a.click()
-      setTimeout(() => {
-        document.body.removeChild(a)
-        window.URL.revokeObjectURL(url)
-      }, 100)
-    }
+    playButton.onclick = async () => recorder.play()
+    downloadButton.onclick = async () => recorder.download()
 
   </script>
 </head>
