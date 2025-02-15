@@ -77,12 +77,10 @@
       videoblock.style.display = 'block'
 
       const { width } = window.stream.getVideoTracks()[0].getConstraints()
-      if (width && width.exact) {
-        widthInput.value = width.exact
-        widthOutput.textContent = width.exact
-      } else if (constraints && width && width.min) {
-        widthInput.value = width.min
-        widthOutput.textContent = width.min
+      const value = width?.exact ?? width?.min
+      if (value) {
+        widthInput.value = value
+        widthOutput.textContent = value
       }
     }
 
