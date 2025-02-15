@@ -27,9 +27,19 @@
     startgumButton.onclick = () => onStart(true)
     // startgdmButton.onclick = () => onStart(false)
 
+    const Constraints = {
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+      // audio: { echoCancellation: true, noiseSuppression: true }
+      audio: { }
+    }
+
     async function onStart(isGetDisplayMedia) {
       Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
-      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints) 
+      Constraints.video.deviceId = { ideal: videoSelect.value }
+      Constraints.audio.deviceId = { ideal: audioSelect.value }
+      document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       // document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
       //   await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
 
@@ -66,13 +76,6 @@
       'video/mp4',
     ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
 
-    const Constraints = {
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      video: { width: 1280, height: 720 },
-      // audio: { echoCancellation: true, noiseSuppression: true }
-    }
-    
     const videoSelect = document.querySelector('select#videoSource')
     const audioSelect = document.querySelector('select#audioSource')
 
