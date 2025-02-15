@@ -24,7 +24,7 @@
     const startgumButton = document.querySelector('button#start-gum')
     // const startgdmButton = document.querySelector('button#start-gdm')
 
-    startgumButton.onclick = () => onStart(true)
+    // startgumButton.onclick = () => onStart(true)
     // startgdmButton.onclick = () => onStart(false)
 
     const Constraints = {
@@ -32,16 +32,17 @@
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
       // audio: { echoCancellation: true, noiseSuppression: true }
-      audio: { }
+      audio: {}
     }
 
-    async function onStart(isGetDisplayMedia) {
+    // async function onStart(isGetDisplayMedia) {
+    startgumButton.onclick = async () => {
+      
       Constraints.audio = { echoCancellation: document.querySelector('#echoCancellation').checked }
       Constraints.video.deviceId = { ideal: videoSelect.value }
       Constraints.audio.deviceId = { ideal: audioSelect.value }
       document.querySelector('video#gum').srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      // document.querySelector('video#gum').srcObject = window.stream = isGetDisplayMedia ?
-      //   await navigator.mediaDevices.getUserMedia(Constraints) : await navigator.mediaDevices.getDisplayMedia(Constraints)
+
 
       startgumButton.disabled = true
       // startgdmButton.disabled = true
