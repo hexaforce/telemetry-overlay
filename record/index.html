@@ -21,6 +21,27 @@
     const playButton = document.querySelector('button#play')
     const downloadButton = document.querySelector('button#download')
 
+    const SupportedType = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=h264,opus',
+      'video/webm;codecs=av01,opus',
+      'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
+      'video/mp4;codecs=vp9,mp4a.40.2',
+      'video/mp4;codecs=vp9,opus',
+      'video/mp4;codecs=avc1.64003E,mp4a.40.2',
+      'video/mp4;codecs=avc1.64003E,opus',
+      'video/mp4;codecs=avc3.64003E,mp4a.40.2',
+      'video/mp4;codecs=avc3.64003E,opus',
+      'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
+      'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
+      'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
+      'video/mp4;codecs=hev1.1.6.L186.B0,opus',
+      'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
+      'video/mp4;codecs=av01.0.19M.08,opus',
+      'video/mp4',
+    ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
+
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
         startRecording()
@@ -35,6 +56,7 @@
 
     playButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
+
       const superBuffer = new Blob(recordedBlobs, { type: mimeType })
       recordedVideo.src = null
       recordedVideo.srcObject = null
@@ -45,6 +67,7 @@
 
     downloadButton.onclick = async () => {
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0]
+
       const blob = new Blob(recordedBlobs, { type: mimeType })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -63,10 +86,8 @@
         default:
           throw new Error(`unsupported mimetype: ${mimeType}`)
       }
-
       document.body.appendChild(a)
       a.click()
-
       setTimeout(() => {
         document.body.removeChild(a)
         window.URL.revokeObjectURL(url)
@@ -74,7 +95,6 @@
     }
 
     async function startRecording() {
-      recordedBlobs = []
       const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
 
       if (mimeType.split(';', 1)[0] === 'video/mp4') {
@@ -91,60 +111,35 @@
         }
       }
 
+      recordedBlobs = []
       mediaRecorder = new MediaRecorder(window.stream, { mimeType })
+      mediaRecorder.onstop = (event) => {
+        console.log('Recorder stopped: ', event)
+        console.log('Recorded Blobs: ', recordedBlobs)
+      }
+      mediaRecorder.ondataavailable = ({ data }) => {
+        if (data && data.size > 0) {
+          recordedBlobs.push(data)
+        }
+      }
+      mediaRecorder.start()
 
       recordButton.textContent = 'Stop Recording'
       playButton.disabled = true
       downloadButton.disabled = true
       codecPreferences.disabled = true
-
-      mediaRecorder.onstop = (event) => {
-        console.log('Recorder stopped: ', event)
-        console.log('Recorded Blobs: ', recordedBlobs)
-      }
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          recordedBlobs.push(event.data)
-        }
-      }
-      mediaRecorder.start()
-
     }
 
     function onStart() {
       document.querySelector('button#start-gum').disabled = true
       document.querySelector('button#start-gdm').disabled = true
-
       recordButton.disabled = false
-      
-      const SupportedType = [
-        'video/webm;codecs=vp9,opus',
-        'video/webm;codecs=vp8,opus',
-        'video/webm;codecs=h264,opus',
-        'video/webm;codecs=av01,opus',
-        'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus',
-        'video/mp4;codecs=vp9,mp4a.40.2',
-        'video/mp4;codecs=vp9,opus',
-        'video/mp4;codecs=avc1.64003E,mp4a.40.2',
-        'video/mp4;codecs=avc1.64003E,opus',
-        'video/mp4;codecs=avc3.64003E,mp4a.40.2',
-        'video/mp4;codecs=avc3.64003E,opus',
-        'video/mp4;codecs=hvc1.1.6.L186.B0,mp4a.40.2',
-        'video/mp4;codecs=hvc1.1.6.L186.B0,opus',
-        'video/mp4;codecs=hev1.1.6.L186.B0,mp4a.40.2',
-        'video/mp4;codecs=hev1.1.6.L186.B0,opus',
-        'video/mp4;codecs=av01.0.19M.08,mp4a.40.2',
-        'video/mp4;codecs=av01.0.19M.08,opus',
-        'video/mp4',
-      ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
-
       SupportedType.forEach((mimeType) => {
         const option = document.createElement('option')
         option.value = mimeType
         option.innerText = option.value
         codecPreferences.appendChild(option)
       })
-
       codecPreferences.disabled = false
     }
 
