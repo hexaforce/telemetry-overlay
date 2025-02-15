@@ -32,6 +32,25 @@
 
     const videoSelect = document.querySelector('select#videoSource')
 
+    // function gotDevices
+
+    navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+      // Handles being called several times to update labels. Preserve values.
+      while (videoSelect.firstChild) {
+        videoSelect.removeChild(videoSelect.firstChild)
+      }
+      deviceArray.reverse()
+      for (let i = 0; i !== deviceArray.length; ++i) {
+        const { deviceId, kind, label } = deviceArray[i]
+        if (kind === 'videoinput') {
+          const option = document.createElement('option')
+          option.value = deviceId
+          option.text = label || `camera ${videoSelect.length + 1}`
+          videoSelect.appendChild(option)
+        }
+      }
+    })
+
     let currentWidth = 0
     let currentHeight = 0
 
@@ -98,27 +117,9 @@
       }
     }
 
-    function gotDevices(deviceInfos) {
-      // Handles being called several times to update labels. Preserve values.
-      while (videoSelect.firstChild) {
-        videoSelect.removeChild(videoSelect.firstChild)
-      }
-      for (let i = 0; i !== deviceInfos.length; ++i) {
-        const deviceInfo = deviceInfos[i]
-        const option = document.createElement('option')
-        option.value = deviceInfo.deviceId
-        if (deviceInfo.kind === 'videoinput') {
-          option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`
-          videoSelect.appendChild(option)
-        }
-      }
-    }
-
     function handleError(error) {
       console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name)
     }
-
-    navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError)
 
     function gotStream(mediaStream) {
       stream = window.stream = mediaStream // stream available to console
