@@ -11,16 +11,6 @@
     const video = document.querySelector('video')
     let stream
 
-    const qvgaButton = document.querySelector('#qvga')
-    const p180Button = document.querySelector('#p180')
-    const vgaButton = document.querySelector('#vga')
-    const p360Button = document.querySelector('#p360')
-    const hdButton = document.querySelector('#hd')
-    const fullHdButton = document.querySelector('#full-hd')
-    const cinemaFourKButton = document.querySelector('#cinemaFourK')
-    const televisionFourKButton = document.querySelector('#televisionFourK')
-    const eightKButton = document.querySelector('#eightK')
-
     const videoblock = document.querySelector('#videoblock')
     const messagebox = document.querySelector('#errormessage')
 
@@ -73,41 +63,25 @@
         })
     }
 
-    p180Button.onclick = () => {
-      getMedia({ video: { width: { exact: 320 }, height: { exact: 180 } } })
-    }
 
-    qvgaButton.onclick = () => {
-      getMedia({ video: { width: { exact: 320 }, height: { exact: 240 } } })
+    const buttonMap = {
+      _180p: { video: { width: { exact: 320 }, height: { exact: 180 } } },
+      QVGA: { video: { width: { exact: 320 }, height: { exact: 240 } } },
+      _360p: { video: { width: { exact: 640 }, height: { exact: 360 } } },
+      VGA: { video: { width: { exact: 640 }, height: { exact: 480 } } },
+      HD: { video: { width: { exact: 1280 }, height: { exact: 720 } } },
+      FullHD: { video: { width: { exact: 1920 }, height: { exact: 1080 } } },
+      Television4K: { video: { width: { exact: 3840 }, height: { exact: 2160 } } },
+      Cinema4K: { video: { width: { exact: 4096 }, height: { exact: 2160 } } },
+      _8K: { video: { width: { exact: 7680 }, height: { exact: 4320 } } }
     }
-
-    p360Button.onclick = () => {
-      getMedia({ video: { width: { exact: 640 }, height: { exact: 360 } } })
-    }
-
-    vgaButton.onclick = () => {
-      getMedia({ video: { width: { exact: 640 }, height: { exact: 480 } } })
-    }
-
-    hdButton.onclick = () => {
-      getMedia({ video: { width: { exact: 1280 }, height: { exact: 720 } } })
-    }
-
-    fullHdButton.onclick = () => {
-      getMedia({ video: { width: { exact: 1920 }, height: { exact: 1080 } } })
-    }
-
-    televisionFourKButton.onclick = () => {
-      getMedia({ video: { width: { exact: 3840 }, height: { exact: 2160 } } })
-    }
-
-    cinemaFourKButton.onclick = () => {
-      getMedia({ video: { width: { exact: 4096 }, height: { exact: 2160 } } })
-    }
-
-    eightKButton.onclick = () => {
-      getMedia({ video: { width: { exact: 7680 }, height: { exact: 4320 } } })
-    }
+    Object.entries(buttonMap).forEach(([id, constraints]) => {
+      console.log(id)
+      const button = document.querySelector(`#${id}`)
+      if (button) {
+        button.onclick = () => getMedia(constraints)
+      }
+    })
 
     pauseVideo.onchange = () => {
       pauseVideo.checked ? video.pause() : video.play()
@@ -210,15 +184,15 @@
       <label for="videoSource">Video source: </label><select id="videoSource"></select>
     </div>
     <div id="buttons">
-      <button id="p180">180p (320x180)</button>
-      <button id="qvga">QVGA (320x240)</button>
-      <button id="p360">360p (640x360)</button>
-      <button id="vga">VGA (640x480)</button>
-      <button id="hd">HD/720p (1280x720)</button>
-      <button id="full-hd">Full HD/1080p (1920x1080)</button>
-      <button id="televisionFourK">Television 4K/2160p (3840x2160)</button>
-      <button id="cinemaFourK">Cinema 4K (4096x2160)</button>
-      <button id="eightK">8K</button>
+      <button id="_180p">180p (320x180)</button>
+      <button id="QVGA">QVGA (320x240)</button>
+      <button id="_360p">360p (640x360)</button>
+      <button id="VGA">VGA (640x480)</button>
+      <button id="HD">HD/720p (1280x720)</button>
+      <button id="FullHD">Full HD/1080p (1920x1080)</button>
+      <button id="Television4K">Television 4K/2160p (3840x2160)</button>
+      <button id="Cinema4K">Cinema 4K (4096x2160)</button>
+      <button id="_8K">8K</button>
     </div>
     <div id="videoblock">
       <p id="dimensions"></p>
