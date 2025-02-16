@@ -1,65 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <style>
-      html {
+      html, body {
         height: 100%;
-      }
-
-      body {
-        background: black;
+        margin: 0;
         overflow: hidden;
-        margin: 0;
-        font-family: 'Titillium Web', sans-serif;
-        color: white;
+        background: black;
+      }
+      canvas {
+        display: block;
+        width: 100%;
         height: 100%;
       }
-
-      .annotation {
-        position: absolute;
-        bottom: 32px;
-        left: 32px;
-        width: calc(100% - 198px);
-        -webkit-user-select: none;
-        user-select: none;
-        pointer-events: none;
-      }
-
-      @media (width < 768px) {
-        .annotation {
-          bottom: 8px;
-          left: 8px;
-        }
-      }
-
-      .annotation h1 {
-        font-size: 3rem;
-        font-weight: bold;
-        margin: 0;
-      }
-
-      @media (width < 768px) {
-        .annotation h1 {
-          font-size: 1.5rem;
-        }
-      }
-
-      .annotation p {
-        font-size: 1rem;
-        margin: 0;
-      }
-
-      button {
-        appearance: none;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-        font-family: inherit;
-        -webkit-user-select: none;
-        user-select: none;
-      }
-
       #btnPlay {
         position: absolute;
         bottom: 32px;
@@ -74,104 +28,73 @@
         transition: 0.2s;
         border: 1px solid #006edc;
       }
-
       #btnPlay:hover {
-        box-shadow:
-          #0777f5ff 0px 0px 10px 0px,
-          #367ce47f 0px 0px 20px 0px;
-      }
-
-      @media (width < 768px) {
-        #btnPlay {
-          width: 96px;
-          font-size: 1rem;
-          bottom: 8px;
-          right: 8px;
-        }
-      }
-
-      .container {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        justify-content: center;
-        align-items: center;
-        gap: 1px;
-        padding: 16px;
-        box-sizing: border-box;
-      }
-
-      @media (width < 365px) {
-        .container {
-          gap: 0;
-        }
-      }
-
-      .container:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        position: absolute;
-        top: 50%;
-        left: 0;
-        background: #006edc;
-      }
-
-      .box {
-        flex: 1;
-        height: 100%;
-        scale: 1 0;
-        background: #fff;
+        box-shadow: #0777f5ff 0px 0px 10px 0px, #367ce47f 0px 0px 20px 0px;
       }
     </style>
-    <script type="module">
-      const FFT_SIZE = 512
-      const containerElement = document.querySelector('.container')
-      const boxes = Array.from({ length: FFT_SIZE / 2 }, () => {
-        const div = document.createElement('div')
-        div.classList.add('box')
-        containerElement.append(div)
-        return div
-      })
+  </head>
+  <body>
+    <canvas id="visualizer"></canvas>
+    <button id="btnPlay">PLAY</button>
 
-      let nodeAnalyzer = null
+    <script>
+      const FFT_SIZE = 512;
+      const canvas = document.getElementById("visualizer");
+      const ctx = canvas.getContext("2d");
+
+      let nodeAnalyzer = null;
+      let audioContext = null;
 
       async function initSound() {
+        if (audioContext) return;
+        
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        })
-        const context = new AudioContext()
-        nodeAnalyzer = context.createAnalyser()
-        nodeAnalyzer.fftSize = FFT_SIZE
-        nodeAnalyzer.smoothingTimeConstant = 0.85
+        });
 
-        const nodeSource = context.createMediaStreamSource(stream)
-        nodeSource.connect(nodeAnalyzer)
+        audioContext = new AudioContext();
+        nodeAnalyzer = audioContext.createAnalyser();
+        nodeAnalyzer.fftSize = FFT_SIZE;
+        nodeAnalyzer.smoothingTimeConstant = 0.85;
+
+        const nodeSource = audioContext.createMediaStreamSource(stream);
+        nodeSource.connect(nodeAnalyzer);
+
+        loop();
       }
 
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
       function draw() {
-        if (!nodeAnalyzer) return
-        const freqByteData = new Uint8Array(FFT_SIZE / 2)
-        nodeAnalyzer.getByteFrequencyData(freqByteData)
-        freqByteData.forEach((value, i) => {
-          boxes[i].style.scale = `1 ${value / 256}`
-        })
+        if (!nodeAnalyzer) return;
+        const freqByteData = new Uint8Array(FFT_SIZE / 2);
+        nodeAnalyzer.getByteFrequencyData(freqByteData);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = canvas.width / freqByteData.length;
+        const maxHeight = canvas.height * 0.9;
+
+        for (let i = 0; i < freqByteData.length; i++) {
+          const value = freqByteData[i];
+          const barHeight = (value / 256) * maxHeight;
+          const x = i * barWidth;
+          const y = canvas.height - barHeight;
+          ctx.fillStyle = `rgb(${value + 50}, 50, 255)`;
+          ctx.fillRect(x, y, barWidth - 1, barHeight);
+        }
       }
 
       function loop() {
-        requestAnimationFrame(loop)
-        draw()
+        requestAnimationFrame(loop);
+        draw();
       }
 
-      document.querySelector('#btnPlay').addEventListener('click', () => initSound())
-
-      loop()
+      document.querySelector("#btnPlay").addEventListener("click", initSound);
     </script>
-  </head>
-
-  <body>
-    <div class="container"></div>
-    <button id="btnPlay">PLAY</button>
   </body>
 </html>
