@@ -15,10 +15,10 @@
     }
 
     const Constraints = {
+      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      // audio: { echoCancellation: true, noiseSuppression: true }
-      audio: true
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     }
 
     const startButton = document.getElementById('startButton')
@@ -31,7 +31,8 @@
     // ------------------------------------------------------
     startButton.onclick = async () => {
       startButton.disabled = true
-
+      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
       localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       callButton.disabled = false
     }
