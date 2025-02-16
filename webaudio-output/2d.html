@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    html {
+      height: 100%;
+    }
+
+    body {
+      background: black;
+      overflow: hidden;
+      margin: 0;
+      font-family: "Titillium Web", sans-serif;
+      color: white;
+      height: 100%;
+    }
+
+    .annotation {
+      position: absolute;
+      bottom: 32px;
+      left: 32px;
+      width: calc(100% - 198px);
+      -webkit-user-select: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @media (width < 768px) {
+      .annotation {
+        bottom: 8px;
+        left: 8px;
+      }
+    }
+
+    .annotation h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    @media (width < 768px) {
+      .annotation h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .annotation p {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    #btnPlay,
+    #btnStop {
+      position: absolute;
+      bottom: 32px;
+      right: 32px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 8px 0;
+      width: 128px;
+      border-radius: 32px;
+      background: rgba(0, 0, 0, 0.25);
+      color: white;
+      transition: 0.2s;
+      border: 1px solid #006edc;
+    }
+
+    #btnPlay:hover,
+    #btnStop:hover {
+      box-shadow: #0777f5ff 0px 0px 10px 0px, #367ce47f 0px 0px 20px 0px;
+    }
+
+    @media (width < 768px) {
+
+      #btnPlay,
+      #btnStop {
+        width: 96px;
+        font-size: 1rem;
+        bottom: 8px;
+        right: 8px;
+      }
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      gap: 1px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    @media (width < 365px) {
+      .container {
+        gap: 0;
+      }
+    }
+
+    .container:after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 1px;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      background: #006edc;
+    }
+
+    .box {
+      flex: 1;
+      height: 100%;
+      scale: 1 0;
+      background: #fff;
+    }
+  </style>
+  <script type="module">
+    function useUi(onClickFirstPlay) {
+      let isInited = false;
+      let isUserPlaying = false;
+      const audioElement = document.querySelector("audio");
+      const btnPlay = document.querySelector("#btnPlay");
+      btnPlay.addEventListener("click", () => {
+        isUserPlaying = true;
+        playSound();
+        if (isInited === false) {
+          onClickFirstPlay();
+        }
+        isInited = true;
+      });
+
+      const btnStop = document.querySelector("#btnStop");
+      btnStop.addEventListener("click", () => {
+        isUserPlaying = false;
+        stopSound();
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (isInited === false) {
+          return;
+        }
+        if (document.visibilityState === "visible") {
+          if (isUserPlaying === true) {
+            playSound();
+          }
+        } else {
+          stopSound();
+        }
+      });
+
+      function playSound() {
+        console.log(audioElement)
+        audioElement.play();
+        btnPlay.hidden = true;
+        btnStop.hidden = false;
+      }
+      function stopSound() {
+        audioElement.pause();
+        btnPlay.hidden = false;
+        btnStop.hidden = true;
+      }
+
+      return { audioElement };
+    }
+
+    const FFT_SIZE = 512;
+    const containerElement = document.querySelector(".container");
+    const { audioElement } = useUi(initSound);
+    const boxes = [];
+    for (let i = 0; i < FFT_SIZE / 2; i++) {
+      const div = document.createElement("div");
+      div.classList.add("box");
+      containerElement.append(div);
+      boxes[i] = div;
+    }
+
+    let nodeAnalyzer = null;
+    function initSound() {
+      const obj = analyseSound(audioElement);
+      nodeAnalyzer = obj.nodeAnalyser;
+    }
+
+    function analyseSound(audioElement) {
+      const context = new AudioContext();
+      const nodeAnalyser = context.createAnalyser();
+      nodeAnalyser.fftSize = FFT_SIZE;
+      nodeAnalyser.smoothingTimeConstant = 0.85;
+      nodeAnalyser.connect(context.destination);
+      const nodeSource = context.createMediaElementSource(audioElement);
+      nodeSource.connect(nodeAnalyser);
+
+      return { nodeAnalyser };
+    }
+
+    function loop() {
+      requestAnimationFrame(loop);
+      draw();
+    }
+
+    function draw() {
+      if (nodeAnalyzer == null) {
+        return;
+      }
+      const freqByteData = new Uint8Array(FFT_SIZE / 2);
+      nodeAnalyzer.getByteFrequencyData(freqByteData);
+      for (let i = 0; i < freqByteData.length; i++) {
+        const freqSum = freqByteData[i];
+        const scale = freqSum / 256;
+        const div = boxes[i];
+        div.style.scale = `1 ${scale}`;
+      }
+    }
+    loop();
+  </script>
+</head>
+
+<body>
+  <div class="container"></div>
+  <button id="btnPlay">PLAY</button>
+  <button id="btnStop" hidden>STOP</button>
+  <audio src="sound/q-films.mp3" id="audio" loop></audio>
+</body>
+
+</html>

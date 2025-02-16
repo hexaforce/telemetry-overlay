@@ -9,6 +9,8 @@
 
     import { preferredVideoCodecs, setSenderPriority } from './Support.js'
 
+    import { StreamVisualizer } from './StreamVisualizer.js'
+
     const OfferOptions = {
       offerToReceiveVideo: 1,
       offerToReceiveAudio: 1,
@@ -47,13 +49,17 @@
 
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
-      pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
+      // pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
+      pc2 = new RTCPeerConnection()
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
           const { readable, writable } = receiver.createEncodedStreams()
           let keyFrameAnalyzer = new TransformStream({ transform })
           readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+        }
+        if (track.kind === 'audio') {
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
@@ -86,18 +92,18 @@
         videoSizeDisplay.innerText = `${width}x${height} payload:${payloadType} mime:${mimeType}`
       }
 
-      // let isKeyFrame = (view.getUint8(0) & 0x01) === 0
+      let isKeyFrame = (view.getUint8(0) & 0x01) === 0
 
-      // if (isKeyFrame) {
-      //   keyFrameCount++
-      //   keyFrameLastSize = byteLength
-      // } else {
-      //   interFrameCount++
-      //   interFrameLastSize = byteLength
-      // }
-      // if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
-      //   duplicateCount++
-      // }
+      if (isKeyFrame) {
+        keyFrameCount++
+        keyFrameLastSize = byteLength
+      } else {
+        interFrameCount++
+        interFrameLastSize = byteLength
+      }
+      if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+        duplicateCount++
+      }
 
       prevFrameType = type
       prevFrameTimestamp = timestamp
@@ -141,23 +147,25 @@
     const interFrameSizeDisplay = document.querySelector('#interframe-size')
     const videoSizeDisplay = document.querySelector('#video-size')
     const duplicateCountDisplay = document.querySelector('#duplicate-count')
-    // let keyFrameCount = 0
-    // let interFrameCount = 0
-    // let keyFrameLastSize = 0
-    // let interFrameLastSize = 0
-    // let duplicateCount = 0
+
+    let keyFrameCount = 0
+    let interFrameCount = 0
+    let keyFrameLastSize = 0
+    let interFrameLastSize = 0
+    let duplicateCount = 0
+
     let prevFrameType
     let prevFrameTimestamp
     let prevFrameSynchronizationSource
 
     // // Update the display of the counters once a second.
-    // setInterval(() => {
-    //   keyFrameCountDisplay.innerText = keyFrameCount
-    //   keyFrameSizeDisplay.innerText = keyFrameLastSize
-    //   interFrameCountDisplay.innerText = interFrameCount
-    //   interFrameSizeDisplay.innerText = interFrameLastSize
-    //   duplicateCountDisplay.innerText = duplicateCount
-    // }, 500)
+    setInterval(() => {
+      keyFrameCountDisplay.innerText = keyFrameCount
+      keyFrameSizeDisplay.innerText = keyFrameLastSize
+      interFrameCountDisplay.innerText = interFrameCount
+      interFrameSizeDisplay.innerText = interFrameLastSize
+      duplicateCountDisplay.innerText = duplicateCount
+    }, 500)
 
     // remoteVideo.addEventListener('resize', () => {
     //   console.log(`Remote video size changed to ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`)
@@ -181,6 +189,7 @@
       <button id="callButton">Call</button>
       <button id="hangupButton">Hang Up</button>
     </div>
+    <canvas></canvas>
     <p>View the console to see logging.</p>
     <div class="analyzer">
       Video size: <span id="video-size"></span><br />
