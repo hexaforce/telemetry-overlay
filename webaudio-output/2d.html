@@ -1,105 +1,55 @@
 <!doctype html>
 <html>
-
-<head>
-  <meta charset="UTF-8" />
-  <style>
-    canvas {
-      display: block;
-      margin: 0;
-      width: 600px;
-      height: 150px;
-      background: black;
-    }
-
-    #btnPlay {
-      position: absolute;
-      bottom: 32px;
-      right: 32px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      padding: 8px 0;
-      width: 128px;
-      border-radius: 32px;
-      background: rgba(0, 0, 0, 0.25);
-      color: white;
-      transition: 0.2s;
-      border: 1px solid #006edc;
-    }
-
-    #btnPlay:hover {
-      box-shadow:
-        #0777f5ff 0px 0px 10px 0px,
-        #367ce47f 0px 0px 20px 0px;
-    }
-  </style>
-</head>
-
-<body>
-  <canvas id="visualizer"></canvas>
-  <button id="btnPlay">PLAY</button>
-
-  <script>
-    const FFT_SIZE = 1024
-    const SMOOTHING = 0.85
-    const canvas = document.getElementById('visualizer')
-    const ctx = canvas.getContext('2d')
-
-    let nodeAnalyzer = null
-    let audioContext = null
-
-    function initSound(stream) {
-      if (audioContext) return
-
-      audioContext = new AudioContext()
-      nodeAnalyzer = audioContext.createAnalyser()
-      nodeAnalyzer.fftSize = FFT_SIZE
-      nodeAnalyzer.smoothingTimeConstant = SMOOTHING
-
-      const nodeSource = audioContext.createMediaStreamSource(stream)
-      nodeSource.connect(nodeAnalyzer)
-
-      loop()
-    }
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-    }
-
-    window.addEventListener('resize', resizeCanvas)
-    resizeCanvas()
-
-    function draw() {
-      if (!nodeAnalyzer) return
-      const freqByteData = new Uint8Array(FFT_SIZE / 2)
-      nodeAnalyzer.getByteFrequencyData(freqByteData)
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      const barWidth = canvas.width / freqByteData.length
-      const maxHeight = canvas.height * 0.9
-
-      for (let i = 0; i < freqByteData.length; i++) {
-        const value = freqByteData[i]
-        const barHeight = (value / 256) * maxHeight
-        const x = i * barWidth
-        const y = canvas.height - barHeight
-        ctx.fillStyle = `rgb(${value + 50}, 50, 255)`
-        ctx.fillRect(x, y, barWidth - 1, barHeight)
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      canvas {
+        display: block;
+        margin: 0;
+        width: 600px;
+        height: 150px;
+        background: black;
       }
-    }
 
-    function loop() {
-      requestAnimationFrame(loop)
-      draw()
-    }
+      #btnPlay {
+        position: absolute;
+        bottom: 32px;
+        right: 32px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 8px 0;
+        width: 128px;
+        border-radius: 32px;
+        background: rgba(0, 0, 0, 0.25);
+        color: white;
+        transition: 0.2s;
+        border: 1px solid #006edc;
+      }
 
-    document.querySelector('#btnPlay').addEventListener('click', async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      #btnPlay:hover {
+        box-shadow:
+          #0777f5ff 0px 0px 10px 0px,
+          #367ce47f 0px 0px 20px 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="visualizer"></canvas>
+    <button id="btnPlay">PLAY</button>
+
+    <script type="module">
+      import { AudioVisualizer } from './audioVisualizer.js'
+
+      const canvas = document.getElementById('visualizer')
+      const visualizer = new AudioVisualizer(canvas)
+
+      document.querySelector('#btnPlay').addEventListener('click', async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        })
+        visualizer.start(stream)
       })
-      initSound(stream)
-    })
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>
