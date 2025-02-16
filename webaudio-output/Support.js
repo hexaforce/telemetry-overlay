@@ -1,4 +1,3 @@
-
 const videoSelect = document.querySelector('select#videoSource')
 const audioSelect = document.querySelector('select#audioSource')
 

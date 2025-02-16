@@ -12,7 +12,7 @@ const app = express()
 const options = {
   // openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
   key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
+  cert: fs.readFileSync('cert.pem'),
 }
 
 const server = https.createServer(options, app)

@@ -1,171 +1,168 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <script type="module" type="text/javascript">
+      'use strict'
 
-<head>
-  <meta charset="utf-8" />
-  <script type="module" type="text/javascript">
-    'use strict'
+      const videoSelect = document.querySelector('select#videoSource')
 
-    const videoSelect = document.querySelector('select#videoSource')
-
-    navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
-      // Handles being called several times to update labels. Preserve values.
-      while (videoSelect.firstChild) {
-        videoSelect.removeChild(videoSelect.firstChild)
-      }
-      deviceArray.reverse()
-      for (let i = 0; i !== deviceArray.length; ++i) {
-
-        const { deviceId, kind, label } = deviceArray[i]
-        if (kind === 'videoinput') {
-          const option = document.createElement('option')
-          option.value = deviceId
-          option.text = label || `camera ${videoSelect.length + 1}`
-          videoSelect.appendChild(option)
+      navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+        // Handles being called several times to update labels. Preserve values.
+        while (videoSelect.firstChild) {
+          videoSelect.removeChild(videoSelect.firstChild)
         }
-      }
-    })
+        deviceArray.reverse()
+        for (let i = 0; i !== deviceArray.length; ++i) {
+          const { deviceId, kind, label } = deviceArray[i]
+          if (kind === 'videoinput') {
+            const option = document.createElement('option')
+            option.value = deviceId
+            option.text = label || `camera ${videoSelect.length + 1}`
+            videoSelect.appendChild(option)
+          }
+        }
+      })
 
-    // Put variables in global scope to make them available to the browser console.
-    const constraints = (window.constraints = {
-      audio: false,
-      video: true,
-    })
+      // Put variables in global scope to make them available to the browser console.
+      const constraints = (window.constraints = {
+        audio: false,
+        video: true,
+      })
 
-    function handleSuccess(stream) {
-      const video = document.querySelector('video')
-      const videoTracks = stream.getVideoTracks()
-      console.log('Got stream with constraints:', constraints)
-      console.log(`Using video device: ${videoTracks[0].label}`)
-      video.srcObject = stream
+      function handleSuccess(stream) {
+        const video = document.querySelector('video')
+        const videoTracks = stream.getVideoTracks()
+        console.log('Got stream with constraints:', constraints)
+        console.log(`Using video device: ${videoTracks[0].label}`)
+        video.srcObject = stream
 
         // make track variable available to browser console.
         ;[window.track] = stream.getVideoTracks()
 
-      loadProperties()
+        loadProperties()
 
-      document.querySelector(`button[id=refreshControls]`).disabled = false
-    }
+        document.querySelector(`button[id=refreshControls]`).disabled = false
+      }
 
-    function loadProperties(refreshValuesOnly) {
-      const track = window.track
-      const capabilities = track.getCapabilities()
-      const settings = track.getSettings()
-      console.log('Capabilities: ', capabilities)
-      console.log('Settings: ', settings)
+      function loadProperties(refreshValuesOnly) {
+        const track = window.track
+        const capabilities = track.getCapabilities()
+        const settings = track.getSettings()
+        console.log('Capabilities: ', capabilities)
+        console.log('Settings: ', settings)
 
-      for (const property of ['exposureMode', 'exposureTime', 'exposureCompensation', 'brightness', 'whiteBalanceMode']) {
-        // Check whether camera supports exposure.
-        if (!(property in settings)) {
-          errorMsg(`Camera does not support ${property}.`)
-          continue
-        }
+        for (const property of ['exposureMode', 'exposureTime', 'exposureCompensation', 'brightness', 'whiteBalanceMode']) {
+          // Check whether camera supports exposure.
+          if (!(property in settings)) {
+            errorMsg(`Camera does not support ${property}.`)
+            continue
+          }
 
-        let element
+          let element
 
-        if (Array.isArray(capabilities[property])) {
-          // Map it to a select element.
-          const select = document.querySelector(`select[name=${property}]`)
-          element = select
-          if (capabilities[property] && !refreshValuesOnly) {
-            for (const mode of capabilities[property]) {
-              select.insertAdjacentHTML('afterbegin', `<option value="${mode}">${mode}</option>`)
+          if (Array.isArray(capabilities[property])) {
+            // Map it to a select element.
+            const select = document.querySelector(`select[name=${property}]`)
+            element = select
+            if (capabilities[property] && !refreshValuesOnly) {
+              for (const mode of capabilities[property]) {
+                select.insertAdjacentHTML('afterbegin', `<option value="${mode}">${mode}</option>`)
+              }
+            }
+          } else {
+            // Map it to a slider element.
+            const input = document.querySelector(`input[name=${property}]`)
+            element = input
+            input.min = capabilities[property].min
+            input.max = capabilities[property].max
+            input.step = capabilities[property].step
+          }
+
+          element.value = settings[property]
+          element.disabled = false
+          if (!refreshValuesOnly) {
+            element.oninput = async (event) => {
+              try {
+                const constraints = { advanced: [{ [property]: element.value }] }
+                await track.applyConstraints(constraints)
+                console.log('Did successfully apply new constraints: ', constraints)
+                console.log('New camera settings: ', track.getSettings())
+              } catch (err) {
+                console.error('applyConstraints() failed: ', err)
+              }
             }
           }
-        } else {
-          // Map it to a slider element.
-          const input = document.querySelector(`input[name=${property}]`)
-          element = input
-          input.min = capabilities[property].min
-          input.max = capabilities[property].max
-          input.step = capabilities[property].step
-        }
-
-        element.value = settings[property]
-        element.disabled = false
-        if (!refreshValuesOnly) {
-          element.oninput = async (event) => {
-            try {
-              const constraints = { advanced: [{ [property]: element.value }] }
-              await track.applyConstraints(constraints)
-              console.log('Did successfully apply new constraints: ', constraints)
-              console.log('New camera settings: ', track.getSettings())
-            } catch (err) {
-              console.error('applyConstraints() failed: ', err)
-            }
-          }
         }
       }
-    }
 
-    function handleError(error) {
-      if (error.name === 'NotAllowedError') {
-        errorMsg('Permissions have not been granted to use your camera, ' + 'you need to allow the page access to your devices in ' + 'order for the demo to work.')
+      function handleError(error) {
+        if (error.name === 'NotAllowedError') {
+          errorMsg('Permissions have not been granted to use your camera, ' + 'you need to allow the page access to your devices in ' + 'order for the demo to work.')
+        }
+        errorMsg(`getUserMedia error: ${error.name}`, error)
       }
-      errorMsg(`getUserMedia error: ${error.name}`, error)
-    }
 
-    function errorMsg(msg, error) {
-      const errorElement = document.querySelector('#errorMsg')
-      errorElement.innerHTML += `<p>${msg}</p>`
-      if (typeof error !== 'undefined') {
-        console.error(error)
+      function errorMsg(msg, error) {
+        const errorElement = document.querySelector('#errorMsg')
+        errorElement.innerHTML += `<p>${msg}</p>`
+        if (typeof error !== 'undefined') {
+          console.error(error)
+        }
       }
-    }
 
-    async function init(e) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints)
-        handleSuccess(stream)
-        e.target.disabled = true
-      } catch (e) {
-        handleError(e)
+      async function init(e) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints)
+          handleSuccess(stream)
+          e.target.disabled = true
+        } catch (e) {
+          handleError(e)
+        }
       }
-    }
 
-    document.querySelector('#showVideo').addEventListener('click', (e) => init(e))
+      document.querySelector('#showVideo').addEventListener('click', (e) => init(e))
+    </script>
+    <style>
+      div.label {
+        display: inline-block;
+        font-weight: 400;
+        margin: 0 0.5em 0 0;
+        width: 10em;
+      }
+    </style>
+  </head>
 
-  </script>
-  <style>
-    div.label {
-      display: inline-block;
-      font-weight: 400;
-      margin: 0 0.5em 0 0;
-      width: 10em;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="container">
-    <div class="select">
-      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+  <body>
+    <div id="container">
+      <div class="select">
+        <label for="videoSource">Video source: </label
+        ><select id="videoSource"></select>
+      </div>
+      <video id="gum-local" autoplay playsinline></video>
+      <button id="showVideo">Open camera</button>
+      <div>
+        <div class="label">Exposure Mode:</div>
+        <select name="exposureMode" id="exposureMode" disabled></select>
+      </div>
+      <div>
+        <div class="label">Exposure Time:</div>
+        <input name="exposureTime" type="range" disabled />
+      </div>
+      <div>
+        <div class="label">Exposure Compensation:</div>
+        <input name="exposureCompensation" type="range" disabled />
+      </div>
+      <div>
+        <div class="label">Brightness:</div>
+        <input name="brightness" type="range" disabled />
+      </div>
+      <div>
+        <div class="label">White Balance Mode:</div>
+        <select name="whiteBalanceMode" id="whiteBalanceMode" disabled></select>
+      </div>
+      <button id="refreshControls" onClick="loadProperties(true)" disabled>Refresh Controls</button>
     </div>
-    <video id="gum-local" autoplay playsinline></video>
-    <button id="showVideo">Open camera</button>
-    <div>
-      <div class="label">Exposure Mode:</div>
-      <select name="exposureMode" id="exposureMode" disabled></select>
-    </div>
-    <div>
-      <div class="label">Exposure Time:</div>
-      <input name="exposureTime" type="range" disabled />
-    </div>
-    <div>
-      <div class="label">Exposure Compensation:</div>
-      <input name="exposureCompensation" type="range" disabled />
-    </div>
-    <div>
-      <div class="label">Brightness:</div>
-      <input name="brightness" type="range" disabled />
-    </div>
-    <div>
-      <div class="label">White Balance Mode:</div>
-      <select name="whiteBalanceMode" id="whiteBalanceMode" disabled></select>
-    </div>
-    <button id="refreshControls" onClick="loadProperties(true)" disabled>Refresh Controls</button>
-  </div>
-  <div id="errorMsg"></div>
-</body>
-
+    <div id="errorMsg"></div>
+  </body>
 </html>

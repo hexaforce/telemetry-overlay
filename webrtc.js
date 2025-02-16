@@ -63,7 +63,7 @@ const audioSelect = document.querySelector('select#audioSource')
 
 const Constraints = {
   video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
 }
 
 const setupTransceiver = (wsUrl) => {

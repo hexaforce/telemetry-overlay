@@ -1,140 +1,134 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <script type="module" type="text/javascript">
+      'use strict'
 
-<head>
-  <meta charset="utf-8" />
-  <script type="module" type="text/javascript">
-
-    'use strict'
-
-    const OfferOptions = {
-      offerToReceiveVideo: 1,
-      offerToReceiveAudio: 1,
-    }
-
-    const Constraints = {
-      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-    }
-
-    const videoSelect = document.querySelector('select#videoSource')
-    const audioSelect = document.querySelector('select#audioSource')
-
-    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
-
-    import { StreamVisualizer } from './StreamVisualizer.js'
-
-    const startButton = document.getElementById('startButton')
-    const callButton = document.getElementById('callButton')
-    const hangupButton = document.getElementById('hangupButton')
-    callButton.disabled = true
-    hangupButton.disabled = true
-
-    // startButton
-    // ------------------------------------------------------
-    startButton.onclick = async () => {
-      startButton.disabled = true
-      Constraints.video.deviceId = { ideal: videoSelect.value }
-      Constraints.audio.deviceId = { ideal: audioSelect.value }
-      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      callButton.disabled = false
-    }
-
-    // callButton
-    // ------------------------------------------------------
-    callButton.onclick = async () => {
-      callButton.disabled = true
-      hangupButton.disabled = false
-
-      pc1 = new RTCPeerConnection()
-      pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
-      pc2 = new RTCPeerConnection()
-      pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
-
-      pc2.ontrack = ({ streams }) => {
-        if (remoteVideo.srcObject !== streams[0]) {
-          remoteVideo.srcObject = streams[0]
-          new StreamVisualizer(streams[0], canvas).start()
-        }
+      const OfferOptions = {
+        offerToReceiveVideo: 1,
+        offerToReceiveAudio: 1,
       }
 
-      window.stream.getTracks().forEach(track => pc1.addTrack(track, window.stream))
+      const Constraints = {
+        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
+        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }
 
-      const offer = await pc1.createOffer(OfferOptions)
-      // setSenderPriority(pc1)
+      const videoSelect = document.querySelector('select#videoSource')
+      const audioSelect = document.querySelector('select#audioSource')
 
-      await pc1.setLocalDescription(offer)
-      await pc2.setRemoteDescription(offer)
+      import { preferredVideoCodecs, setSenderPriority } from './Support.js'
 
-      preferredVideoCodecs(pc2.getTransceivers())
+      import { StreamVisualizer } from './StreamVisualizer.js'
 
-      const answer = await pc2.createAnswer()
-      await pc2.setLocalDescription(answer)
-      await pc1.setRemoteDescription(answer)
-      setTimeout(async () => {
-        const stats = await pc1.getStats()
-        stats.forEach((stat) => {
-          if (!(stat.type === 'outbound-rtp'))
-            return
-          const codec = stats.get(stat.codecId)
-
-          if (stat.kind === 'video') {
-            document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
-            if (stat.encoderImplementation) {
-              document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
-            }
-            if (stat.powerEfficientEncoder !== undefined) {
-              document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
-            }
-          }
-
-        })
-      }, 1000)
-    }
-
-
-    // hangupButton
-    // ------------------------------------------------------
-    hangupButton.onclick = () => {
-      console.log('Ending call')
-      pc1.close()
-      pc1 = null
-      pc2.close()
-      pc2 = null
+      const startButton = document.getElementById('startButton')
+      const callButton = document.getElementById('callButton')
+      const hangupButton = document.getElementById('hangupButton')
+      callButton.disabled = true
       hangupButton.disabled = true
-      callButton.disabled = false
-    }
 
-    const canvas = document.querySelector('canvas')
+      // startButton
+      // ------------------------------------------------------
+      startButton.onclick = async () => {
+        startButton.disabled = true
+        Constraints.video.deviceId = { ideal: videoSelect.value }
+        Constraints.audio.deviceId = { ideal: audioSelect.value }
+        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+        callButton.disabled = false
+      }
 
-    const localVideo = document.getElementById('localVideo')
-    const remoteVideo = document.getElementById('remoteVideo')
+      // callButton
+      // ------------------------------------------------------
+      callButton.onclick = async () => {
+        callButton.disabled = true
+        hangupButton.disabled = false
 
-    let pc1
-    let pc2
+        pc1 = new RTCPeerConnection()
+        pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
+        pc2 = new RTCPeerConnection()
+        pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
 
-  </script>
-</head>
+        pc2.ontrack = ({ streams }) => {
+          if (remoteVideo.srcObject !== streams[0]) {
+            remoteVideo.srcObject = streams[0]
+            new StreamVisualizer(streams[0], canvas).start()
+          }
+        }
 
-<body>
-  <div class="select">
-    <label for="videoSource">Video source: </label><select id="videoSource"></select>
-    <label for="audioSource">Audio source: </label><select id="audioSource"></select>
-  </div>
-  <div id="actualCodec"></div>
-  <p>localVideo</p>
-  <video id="localVideo" playsinline autoplay muted></video>
-  <p>remoteVideo</p>
-  <video id="remoteVideo" playsinline autoplay muted></video>
-  <canvas></canvas>
-  <div>
-    <button id="startButton">Start</button>
-    <button id="callButton">Call</button>
-    <button id="hangupButton">Hang Up</button>
-  </div>
-  </div>
-</body>
+        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
+        const offer = await pc1.createOffer(OfferOptions)
+        // setSenderPriority(pc1)
+
+        await pc1.setLocalDescription(offer)
+        await pc2.setRemoteDescription(offer)
+
+        preferredVideoCodecs(pc2.getTransceivers())
+
+        const answer = await pc2.createAnswer()
+        await pc2.setLocalDescription(answer)
+        await pc1.setRemoteDescription(answer)
+        setTimeout(async () => {
+          const stats = await pc1.getStats()
+          stats.forEach((stat) => {
+            if (!(stat.type === 'outbound-rtp')) return
+            const codec = stats.get(stat.codecId)
+
+            if (stat.kind === 'video') {
+              document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
+              if (stat.encoderImplementation) {
+                document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+              }
+              if (stat.powerEfficientEncoder !== undefined) {
+                document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
+              }
+            }
+          })
+        }, 1000)
+      }
+
+      // hangupButton
+      // ------------------------------------------------------
+      hangupButton.onclick = () => {
+        console.log('Ending call')
+        pc1.close()
+        pc1 = null
+        pc2.close()
+        pc2 = null
+        hangupButton.disabled = true
+        callButton.disabled = false
+      }
+
+      const canvas = document.querySelector('canvas')
+
+      const localVideo = document.getElementById('localVideo')
+      const remoteVideo = document.getElementById('remoteVideo')
+
+      let pc1
+      let pc2
+    </script>
+  </head>
+
+  <body>
+    <div class="select">
+      <label for="videoSource">Video source: </label
+      ><select id="videoSource"></select>
+      <label for="audioSource">Audio source: </label
+      ><select id="audioSource"></select>
+    </div>
+    <div id="actualCodec"></div>
+    <p>localVideo</p>
+    <video id="localVideo" playsinline autoplay muted></video>
+    <p>remoteVideo</p>
+    <video id="remoteVideo" playsinline autoplay muted></video>
+    <canvas></canvas>
+    <div>
+      <button id="startButton">Start</button>
+      <button id="callButton">Call</button>
+      <button id="hangupButton">Hang Up</button>
+    </div>
+  </body>
 </html>
