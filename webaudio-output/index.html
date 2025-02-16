@@ -70,28 +70,31 @@
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
 
-      // preferredVideoCodecs(pc2.getTransceivers())
+      preferredVideoCodecs(pc2.getTransceivers())
 
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
-      setTimeout(async () => {
-        const stats = await pc1.getStats()
-        stats.forEach((stat) => {
-          if (!(stat.type === 'outbound-rtp')) return
-          const codec = stats.get(stat.codecId)
+//       setTimeout(async () => {
+//         const stats = await pc1.getStats()
+//         stats.forEach((stat) => {
+//           if (!(stat.type === 'outbound-rtp')) return
+//           console.log(stat)
+//           const codec = stats.get(stat.codecId)
+// console.log(codec)
+//           if (stat.kind === 'video') {
 
-          if (stat.kind === 'video') {
-            document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
-            if (stat.encoderImplementation) {
-              document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
-            }
-            if (stat.powerEfficientEncoder !== undefined) {
-              document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
-            }
-          }
-        })
-      }, 1000)
+            
+//             document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
+//             if (stat.encoderImplementation) {
+//               document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+//             }
+//             if (stat.powerEfficientEncoder !== undefined) {
+//               document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
+//             }
+//           }
+//         })
+//       }, 1000)
     }
 
     // hangupButton

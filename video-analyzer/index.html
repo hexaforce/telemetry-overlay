@@ -68,7 +68,7 @@
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
 
-      // preferredVideoCodecs(pc2.getTransceivers())
+      preferredVideoCodecs(pc2.getTransceivers())
 
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
@@ -148,23 +148,6 @@
       controller.enqueue(encodedFrame)
     }
 
-    localVideo.addEventListener('loadedmetadata', function () {
-      console.log(`Local video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`)
-    })
-
-    remoteVideo.addEventListener('loadedmetadata', function () {
-      if (startTime) {
-        const elapsedTime = window.performance.now() - startTime
-        console.log('Setup time: ' + elapsedTime.toFixed(3) + 'ms')
-        startTime = null
-      }
-    })
-
-    // remoteVideo.addEventListener('resize', () => {
-    //   console.log(`Remote video size changed to ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`)
-    //   // We'll use the first onsize callback as an indication that video has started playing out.
-    //   videoSizeDisplay.innerText = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`
-    // })
   </script>
 </head>
 
