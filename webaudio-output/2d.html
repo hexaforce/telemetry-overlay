@@ -3,16 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        overflow: hidden;
-        background: black;
-      }
       canvas {
         display: block;
-        width: 100%;
-        height: 100%;
+        margin: 0;
+        width: 600px;
+        height: 150px;
+        background: black;
       }
       #btnPlay {
         position: absolute;
@@ -38,7 +34,7 @@
     <button id="btnPlay">PLAY</button>
 
     <script>
-      const FFT_SIZE = 512;
+      const FFT_SIZE = 1024;
       const canvas = document.getElementById("visualizer");
       const ctx = canvas.getContext("2d");
 
@@ -67,7 +63,7 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       }
-      
+
       window.addEventListener("resize", resizeCanvas);
       resizeCanvas();
 
