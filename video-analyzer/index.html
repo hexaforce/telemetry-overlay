@@ -58,7 +58,7 @@
         }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
-          new StreamVisualizer(streams[0], canvas).start()
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
       }
 
@@ -121,18 +121,6 @@
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
 
-    localVideo.addEventListener('loadedmetadata', function () {
-      console.log(`Local video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`)
-    })
-
-    remoteVideo.addEventListener('loadedmetadata', function () {
-      if (startTime) {
-        const elapsedTime = window.performance.now() - startTime
-        console.log('Setup time: ' + elapsedTime.toFixed(3) + 'ms')
-        startTime = null
-      }
-    })
-
     let pc1
     let pc2
 
@@ -161,6 +149,18 @@
       interFrameSizeDisplay.innerText = interFrameLastSize
       duplicateCountDisplay.innerText = duplicateCount
     }, 500)
+
+    localVideo.addEventListener('loadedmetadata', function () {
+      console.log(`Local video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`)
+    })
+
+    remoteVideo.addEventListener('loadedmetadata', function () {
+      if (startTime) {
+        const elapsedTime = window.performance.now() - startTime
+        console.log('Setup time: ' + elapsedTime.toFixed(3) + 'ms')
+        startTime = null
+      }
+    })
 
     // remoteVideo.addEventListener('resize', () => {
     //   console.log(`Remote video size changed to ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`)

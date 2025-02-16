@@ -44,6 +44,8 @@
       callButton.disabled = true
       hangupButton.disabled = false
 
+      startTime = window.performance.now()
+
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
       pc2 = new RTCPeerConnection()
@@ -56,7 +58,7 @@
         }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
-          new StreamVisualizer(streams[0], canvas).start()
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
       }
 
@@ -133,9 +135,8 @@
       hangupButton.disabled = true
       callButton.disabled = false
     }
-
-    const canvas = document.querySelector('canvas')
-
+    
+    let startTime
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
 
