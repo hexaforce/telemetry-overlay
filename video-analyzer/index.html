@@ -75,6 +75,41 @@
       await pc1.setRemoteDescription(answer)
     }
 
+    // hangupButton
+    // ------------------------------------------------------
+    hangupButton.onclick = () => {
+      pc1.close()
+      pc2.close()
+      pc1 = null
+      pc2 = null
+      hangupButton.disabled = true
+      callButton.disabled = false
+    }
+
+    const localVideo = document.getElementById('localVideo')
+    const remoteVideo = document.getElementById('remoteVideo')
+
+    let startTime
+    let pc1
+    let pc2
+
+    const keyFrameCountDisplay = document.querySelector('#keyframe-count')
+    const keyFrameSizeDisplay = document.querySelector('#keyframe-size')
+    const interFrameCountDisplay = document.querySelector('#interframe-count')
+    const interFrameSizeDisplay = document.querySelector('#interframe-size')
+    const videoSizeDisplay = document.querySelector('#video-size')
+    const duplicateCountDisplay = document.querySelector('#duplicate-count')
+
+    let keyFrameCount = 0
+    let interFrameCount = 0
+    let keyFrameLastSize = 0
+    let interFrameLastSize = 0
+    let duplicateCount = 0
+
+    let prevFrameType
+    let prevFrameTimestamp
+    let prevFrameSynchronizationSource
+
     function transform(encodedFrame, controller) {
       const { data, type, timestamp, synchronizationSource } = encodedFrame
       const view = new DataView(data)
@@ -100,55 +135,18 @@
         duplicateCount++
       }
 
-      prevFrameType = type
-      prevFrameTimestamp = timestamp
-      prevFrameSynchronizationSource = synchronizationSource
-      controller.enqueue(encodedFrame)
-    }
-
-    // hangupButton
-    // ------------------------------------------------------
-    hangupButton.onclick = () => {
-      pc1.close()
-      pc2.close()
-      pc1 = null
-      pc2 = null
-      hangupButton.disabled = true
-      callButton.disabled = false
-    }
-
-    let startTime
-    const localVideo = document.getElementById('localVideo')
-    const remoteVideo = document.getElementById('remoteVideo')
-
-    let pc1
-    let pc2
-
-    const keyFrameCountDisplay = document.querySelector('#keyframe-count')
-    const keyFrameSizeDisplay = document.querySelector('#keyframe-size')
-    const interFrameCountDisplay = document.querySelector('#interframe-count')
-    const interFrameSizeDisplay = document.querySelector('#interframe-size')
-    const videoSizeDisplay = document.querySelector('#video-size')
-    const duplicateCountDisplay = document.querySelector('#duplicate-count')
-
-    let keyFrameCount = 0
-    let interFrameCount = 0
-    let keyFrameLastSize = 0
-    let interFrameLastSize = 0
-    let duplicateCount = 0
-
-    let prevFrameType
-    let prevFrameTimestamp
-    let prevFrameSynchronizationSource
-
-    // // Update the display of the counters once a second.
-    setInterval(() => {
       keyFrameCountDisplay.innerText = keyFrameCount
       keyFrameSizeDisplay.innerText = keyFrameLastSize
       interFrameCountDisplay.innerText = interFrameCount
       interFrameSizeDisplay.innerText = interFrameLastSize
       duplicateCountDisplay.innerText = duplicateCount
-    }, 500)
+
+      prevFrameType = type
+      prevFrameTimestamp = timestamp
+      prevFrameSynchronizationSource = synchronizationSource
+
+      controller.enqueue(encodedFrame)
+    }
 
     localVideo.addEventListener('loadedmetadata', function () {
       console.log(`Local video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`)
