@@ -127,86 +127,58 @@
       background: #fff;
     }
   </style>
-  <script type="module">async function useUi(onClickFirstPlay) {
+  <script type="module">
+    function setupUI(onClickFirstPlay) {
       let isInited = false;
-      let isUserPlaying = false;
-      const audioElement = document.querySelector("audio");
       const btnPlay = document.querySelector("#btnPlay");
-      btnPlay.addEventListener("click", () => {
-        isUserPlaying = true;
-        playSound();
-        if (isInited === false) {
-          onClickFirstPlay();
-        }
-        isInited = true;
-      });
-
       const btnStop = document.querySelector("#btnStop");
-      btnStop.addEventListener("click", () => {
-        isUserPlaying = false;
-        stopSound();
-      });
 
-      document.addEventListener("visibilitychange", () => {
-        if (isInited === false) {
-          return;
-        }
-        if (document.visibilityState === "visible") {
-          if (isUserPlaying === true) {
-            playSound();
-          }
-        } else {
-          stopSound();
-        }
-      });
-
-      function playSound() {
-        // audioElement.play();
+      btnPlay.addEventListener("click", () => {
         btnPlay.hidden = true;
         btnStop.hidden = false;
-      }
+        if (!isInited) {
+          onClickFirstPlay();
+          isInited = true;
+        }
+      });
 
-      function stopSound() {
-        audioElement.pause();
+      btnStop.addEventListener("click", () => {
         btnPlay.hidden = false;
         btnStop.hidden = true;
-      }
-
-      return { audioElement };
+      });
     }
 
     const FFT_SIZE = 512;
     const containerElement = document.querySelector(".container");
-    const { audioElement } = useUi(initSound);
-    const boxes = [];
-    for (let i = 0; i < FFT_SIZE / 2; i++) {
+    const boxes = Array.from({ length: FFT_SIZE / 2 }, () => {
       const div = document.createElement("div");
       div.classList.add("box");
       containerElement.append(div);
-      boxes[i] = div;
-    }
+      return div;
+    });
 
     let nodeAnalyzer = null;
 
     async function initSound() {
-      // マイク音声を取得
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-      const obj = analyseSound(stream);
-      nodeAnalyzer = obj.nodeAnalyser;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+      });
+      const context = new AudioContext();
+      nodeAnalyzer = context.createAnalyser();
+      nodeAnalyzer.fftSize = FFT_SIZE;
+      nodeAnalyzer.smoothingTimeConstant = 0.85;
+
+      const nodeSource = context.createMediaStreamSource(stream);
+      nodeSource.connect(nodeAnalyzer);
     }
 
-    function analyseSound(stream) {
-      const context = new AudioContext();
-      const nodeAnalyser = context.createAnalyser();
-      nodeAnalyser.fftSize = FFT_SIZE;
-      nodeAnalyser.smoothingTimeConstant = 0.85;
-      nodeAnalyser.connect(context.destination);
-
-      // マイク音声のストリームを AudioContext に接続
-      const nodeSource = context.createMediaStreamSource(stream);
-      nodeSource.connect(nodeAnalyser);
-
-      return { nodeAnalyser };
+    function draw() {
+      if (!nodeAnalyzer) return;
+      const freqByteData = new Uint8Array(FFT_SIZE / 2);
+      nodeAnalyzer.getByteFrequencyData(freqByteData);
+      freqByteData.forEach((value, i) => {
+        boxes[i].style.scale = `1 ${value / 256}`;
+      });
     }
 
     function loop() {
@@ -214,20 +186,9 @@
       draw();
     }
 
-    function draw() {
-      if (nodeAnalyzer == null) {
-        return;
-      }
-      const freqByteData = new Uint8Array(FFT_SIZE / 2);
-      nodeAnalyzer.getByteFrequencyData(freqByteData);
-      for (let i = 0; i < freqByteData.length; i++) {
-        const freqSum = freqByteData[i];
-        const scale = freqSum / 256;
-        const div = boxes[i];
-        div.style.scale = `1 ${scale}`;
-      }
-    }
+    setupUI(initSound);
     loop();
+
   </script>
 </head>
 
@@ -235,7 +196,6 @@
   <div class="container"></div>
   <button id="btnPlay">PLAY</button>
   <button id="btnStop" hidden>STOP</button>
-  <audio id="audio" loop></audio>
 </body>
 
 </html>
