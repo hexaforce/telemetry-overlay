@@ -84,30 +84,27 @@ const setupTransceiver = (wsUrl) => {
     if (!data) return
 
     if (data === MediaOn) {
+
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
-
       const stream = await getUserMedia()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-
       ws.send(MediaReady)
-
       dataChannelHandler(pc, PROTOCOL)
+
     } else {
       const msg = JSON.parse(data)
-
       if (msg.type) {
+
         await pc.setRemoteDescription(msg)
-
         preferredVideoCodecs(pc.getTransceivers())
-
         const answer = await pc.createAnswer()
-
         await pc.setLocalDescription(answer)
-
         ws.send(JSON.stringify(answer))
+
       } else {
+
         await pc.addIceCandidate(msg)
       }
     }
@@ -166,6 +163,7 @@ const setupReceiver = (wsUrl) => {
       const msg = JSON.parse(data)
       if (!msg) return
       if (msg.active) {
+
         const stream = $('stream')
         pc = new RTCPeerConnection()
         pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
@@ -180,6 +178,7 @@ const setupReceiver = (wsUrl) => {
         await pc.setLocalDescription(offer)
         ws.send(JSON.stringify(offer))
         dataChannelHandler(pc, PROTOCOL)
+        
       } else {
         if (msg.type) {
           await pc.setRemoteDescription(msg)
