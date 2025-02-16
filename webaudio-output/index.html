@@ -92,18 +92,6 @@
       }, 1000)
     }
 
-    // hangupButton
-    // ------------------------------------------------------
-    hangupButton.onclick = () => {
-      console.log('Ending call')
-      pc1.close()
-      pc1 = null
-      pc2.close()
-      pc2 = null
-      hangupButton.disabled = true
-      callButton.disabled = false
-    }
-
     function transform(encodedFrame, controller) {
       const { data, type, timestamp, synchronizationSource } = encodedFrame
       const view = new DataView(data)
@@ -133,6 +121,18 @@
       prevFrameTimestamp = timestamp
       prevFrameSynchronizationSource = synchronizationSource
       controller.enqueue(encodedFrame)
+    }
+
+    // hangupButton
+    // ------------------------------------------------------
+    hangupButton.onclick = () => {
+      console.log('Ending call')
+      pc1.close()
+      pc1 = null
+      pc2.close()
+      pc2 = null
+      hangupButton.disabled = true
+      callButton.disabled = false
     }
 
     const keyFrameCountDisplay = document.querySelector('#keyframe-count')
