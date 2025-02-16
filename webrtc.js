@@ -7,8 +7,11 @@ import { renderMap } from './navigation-map.js'
 const dataChannel = {}
 
 const dataChannelHandler = (pc, PROTOCOL) => {
+  console.log('-----------')
   pc.ondatachannel = ({ channel }) => {
+    console.log('-----------')
     channel.onopen = ({ target }) => {
+      console.log('-----------')
       dataChannel[target.label] = target
       if (PROTOCOL === 'transceiver' && target.label === 'receiver') {
         sendPosition(10000)
@@ -24,9 +27,9 @@ const dataChannelHandler = (pc, PROTOCOL) => {
   }
   const channel = pc.createDataChannel(PROTOCOL)
   channel.onopen = ({ target }) => (dataChannel[target.label] = target)
-  // channel.onmessage = ({ data }) => {
-  //   console.log('???:', data)
-  // }
+  channel.onmessage = ({ data }) => {
+    console.log('???:', data)
+  }
 }
 
 const sendData = (data) => {
@@ -86,15 +89,16 @@ const setupTransceiver = (wsUrl) => {
     if (data === MediaOn) {
 
       pc = new RTCPeerConnection()
+      dataChannelHandler(pc, PROTOCOL)
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       const stream = await getUserMedia()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
       ws.send(MediaReady)
-      dataChannelHandler(pc, PROTOCOL)
 
     } else {
       const msg = JSON.parse(data)
+      if (!msg) return
       if (msg.type) {
 
         await pc.setRemoteDescription(msg)
@@ -144,6 +148,7 @@ const setupReceiver = (wsUrl) => {
 
     if (data === MediaReady) {
       pc = new RTCPeerConnection()
+      dataChannelHandler(pc, PROTOCOL)
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
 
       const stream = $('stream')
@@ -158,7 +163,6 @@ const setupReceiver = (wsUrl) => {
       await pc.setLocalDescription(offer)
       ws.send(JSON.stringify(offer))
 
-      dataChannelHandler(pc, PROTOCOL)
     } else {
       const msg = JSON.parse(data)
       if (!msg) return
@@ -178,7 +182,7 @@ const setupReceiver = (wsUrl) => {
         await pc.setLocalDescription(offer)
         ws.send(JSON.stringify(offer))
         dataChannelHandler(pc, PROTOCOL)
-        
+
       } else {
         if (msg.type) {
           await pc.setRemoteDescription(msg)
