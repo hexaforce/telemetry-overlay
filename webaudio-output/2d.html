@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -25,7 +25,9 @@
         border: 1px solid #006edc;
       }
       #btnPlay:hover {
-        box-shadow: #0777f5ff 0px 0px 10px 0px, #367ce47f 0px 0px 20px 0px;
+        box-shadow:
+          #0777f5ff 0px 0px 10px 0px,
+          #367ce47f 0px 0px 20px 0px;
       }
     </style>
   </head>
@@ -34,63 +36,65 @@
     <button id="btnPlay">PLAY</button>
 
     <script>
-      const FFT_SIZE = 1024;
-      const canvas = document.getElementById("visualizer");
-      const ctx = canvas.getContext("2d");
+      const FFT_SIZE = 1024
+      const SMOOTHING = 0.8
+      const canvas = document.getElementById('visualizer')
+      const ctx = canvas.getContext('2d')
 
-      let nodeAnalyzer = null;
-      let audioContext = null;
+      let nodeAnalyzer = null
+      let audioContext = null
 
       async function initSound() {
-        if (audioContext) return;
-        
+        if (audioContext) return
+
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        });
+        })
 
-        audioContext = new AudioContext();
-        nodeAnalyzer = audioContext.createAnalyser();
-        nodeAnalyzer.fftSize = FFT_SIZE;
-        nodeAnalyzer.smoothingTimeConstant = 0.85;
+        audioContext = new AudioContext()
+        nodeAnalyzer = audioContext.createAnalyser()
+        nodeAnalyzer.smoothingTimeConstant = SMOOTHING
+        nodeAnalyzer.fftSize = FFT_SIZE
+        nodeAnalyzer.smoothingTimeConstant = 0.85
 
-        const nodeSource = audioContext.createMediaStreamSource(stream);
-        nodeSource.connect(nodeAnalyzer);
+        const nodeSource = audioContext.createMediaStreamSource(stream)
+        nodeSource.connect(nodeAnalyzer)
 
-        loop();
+        loop()
       }
 
       function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
       }
 
-      window.addEventListener("resize", resizeCanvas);
-      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas)
+      resizeCanvas()
 
       function draw() {
-        if (!nodeAnalyzer) return;
-        const freqByteData = new Uint8Array(FFT_SIZE / 2);
-        nodeAnalyzer.getByteFrequencyData(freqByteData);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const barWidth = canvas.width / freqByteData.length;
-        const maxHeight = canvas.height * 0.9;
+        if (!nodeAnalyzer) return
+        const freqByteData = new Uint8Array(FFT_SIZE / 2)
+        nodeAnalyzer.getByteFrequencyData(freqByteData)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const barWidth = canvas.width / freqByteData.length
+        const maxHeight = canvas.height * 0.9
 
         for (let i = 0; i < freqByteData.length; i++) {
-          const value = freqByteData[i];
-          const barHeight = (value / 256) * maxHeight;
-          const x = i * barWidth;
-          const y = canvas.height - barHeight;
-          ctx.fillStyle = `rgb(${value + 50}, 50, 255)`;
-          ctx.fillRect(x, y, barWidth - 1, barHeight);
+          const value = freqByteData[i]
+          const barHeight = (value / 256) * maxHeight
+          const x = i * barWidth
+          const y = canvas.height - barHeight
+          ctx.fillStyle = `rgb(${value + 50}, 50, 255)`
+          ctx.fillRect(x, y, barWidth - 1, barHeight)
         }
       }
 
       function loop() {
-        requestAnimationFrame(loop);
-        draw();
+        requestAnimationFrame(loop)
+        draw()
       }
 
-      document.querySelector("#btnPlay").addEventListener("click", initSound);
+      document.querySelector('#btnPlay').addEventListener('click', initSound)
     </script>
   </body>
 </html>
