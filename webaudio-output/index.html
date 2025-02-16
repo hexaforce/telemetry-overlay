@@ -172,29 +172,31 @@
 </head>
 
 <body>
-  <div class="select">
-    <label for="videoSource">Video source: </label><select id="videoSource"></select>
-    <label for="audioSource">Audio source: </label><select id="audioSource"></select>
-  </div>
-  <p>localVideo</p>
-  <video id="localVideo" playsinline autoplay muted></video>
-  <p>remoteVideo</p>
-  <video id="remoteVideo" playsinline autoplay muted></video>
-  <canvas></canvas>
-  <div>
-    <button id="startButton">Start</button>
-    <button id="callButton">Call</button>
-    <button id="hangupButton">Hang Up</button>
-  </div>
-  <div id="actualCodec"></div>
-  <p>View the console to see logging.</p>
-  <div class="analyzer">
-    Video size: <span id="video-size"></span><br />
-    Keyframe count: <span id="keyframe-count"></span><br />
-    Interframe count: <span id="interframe-count"></span><br />
-    Last keyframe size: <span id="keyframe-size"></span><br />
-    Last interframe size: <span id="interframe-size"></span><br />
-    Duplicate count: <span id="duplicate-count"></span><br />
+  <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+      <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+    </div>
+    <p>localVideo</p>
+    <video id="localVideo" playsinline autoplay muted></video>
+    <p>remoteVideo</p>
+    <video id="remoteVideo" playsinline autoplay muted></video>
+    <div>
+      <button id="startButton">Start</button>
+      <button id="callButton">Call</button>
+      <button id="hangupButton">Hang Up</button>
+    </div>
+    <div id="actualCodec"></div>
+    <canvas></canvas>
+    <p>View the console to see logging.</p>
+    <div class="analyzer">
+      Video size: <span id="video-size"></span><br />
+      Keyframe count: <span id="keyframe-count"></span><br />
+      Interframe count: <span id="interframe-count"></span><br />
+      Last keyframe size: <span id="keyframe-size"></span><br />
+      Last interframe size: <span id="interframe-size"></span><br />
+      Duplicate count: <span id="duplicate-count"></span><br />
+    </div>
   </div>
 </body>
 
