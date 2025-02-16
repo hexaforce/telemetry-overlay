@@ -1,5 +1,5 @@
-const WIDTH = 308
-const HEIGHT = 231
+const WIDTH = 600
+const HEIGHT = 150
 
 // Interesting parameters to tweak!
 const SMOOTHING = 0.8
@@ -9,7 +9,8 @@ export class StreamVisualizer {
   constructor(remoteStream, canvas) {
     // console.log('Creating StreamVisualizer with remoteStream and canvas:', remoteStream, canvas);
     this.canvas = canvas
-    this.drawContext = canvas.getContext('2d')
+    this.canvas.style.backgroundColor = "rgba(0, 0, 0, 0.9)"
+    this.drawContext = this.canvas.getContext('2d')
 
     // cope with browser differences
     this.context = new (window.AudioContext || window.webkitAudioContext)()
@@ -59,7 +60,7 @@ export class StreamVisualizer {
       offset = HEIGHT - height - 1
       barWidth = WIDTH / this.analyser.frequencyBinCount
       let hue = (i / this.analyser.frequencyBinCount) * 360
-      this.drawContext.fillStyle = `hsl(${hue}, 100%, 50%)`
+      this.drawContext.fillStyle = `rgb(${value + 50}, 50, 255)`
       this.drawContext.fillRect(i * barWidth, offset, barWidth, height)
     }
 
@@ -70,7 +71,7 @@ export class StreamVisualizer {
       height = HEIGHT * percent
       offset = HEIGHT - height - 1
       barWidth = WIDTH / this.analyser.frequencyBinCount
-      this.drawContext.fillStyle = 'white'
+      this.drawContext.fillStyle = `rgb(125, 25, 150)`
       this.drawContext.fillRect(i * barWidth, offset, 1, 2)
     }
 

@@ -17,9 +17,7 @@
 
     import { preferredVideoCodecs, setSenderPriority } from './Support.js'
 
-    import { AudioVisualizer } from './audioVisualizer.js'
-
-    const visualizer = new AudioVisualizer(document.querySelector('canvas'))
+    import { StreamVisualizer } from './StreamVisualizer.js'
 
     const OfferOptions = {
       offerToReceiveVideo: 1,
@@ -69,8 +67,7 @@
           readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
         }
         if (track.kind === 'audio') {
-          // new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-          visualizer.start(streams[0])
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]

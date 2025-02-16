@@ -3,7 +3,7 @@ export class AudioVisualizer {
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')
     this.audioContext = null
-    this.nodeAnalyzer = null
+    this.analyzer = null
     this.FFT_SIZE = 1024
     this.SMOOTHING = 0.85
 
@@ -15,12 +15,12 @@ export class AudioVisualizer {
     if (this.audioContext) return
 
     this.audioContext = new AudioContext()
-    this.nodeAnalyzer = this.audioContext.createAnalyser()
-    this.nodeAnalyzer.fftSize = this.FFT_SIZE
-    this.nodeAnalyzer.smoothingTimeConstant = this.SMOOTHING
+    this.analyzer = this.audioContext.createAnalyser()
+    this.analyzer.fftSize = this.FFT_SIZE
+    this.analyzer.smoothingTimeConstant = this.SMOOTHING
 
     const nodeSource = this.audioContext.createMediaStreamSource(stream)
-    nodeSource.connect(this.nodeAnalyzer)
+    nodeSource.connect(this.analyzer)
 
     this.loop()
   }
@@ -31,10 +31,10 @@ export class AudioVisualizer {
   }
 
   draw() {
-    if (!this.nodeAnalyzer) return
+    if (!this.analyzer) return
 
     const freqByteData = new Uint8Array(this.FFT_SIZE / 2)
-    this.nodeAnalyzer.getByteFrequencyData(freqByteData)
+    this.analyzer.getByteFrequencyData(freqByteData)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
     const barWidth = this.canvas.width / freqByteData.length
