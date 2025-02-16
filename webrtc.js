@@ -39,60 +39,71 @@ var PROTOCOL = null
 
 import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
 
-const setReceiverAnswerCodec = async (pc) => {
-  const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
-  const preferredOrder = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
-  const [audioTransceiver, videoTransceiver] = pc.getTransceivers()
-  if (videoTransceiver) {
-    videoTransceiver.setCodecPreferences(
-      supportedCodecs.sort((a, b) => {
-        const indexA = preferredOrder.indexOf(a.mimeType)
-        const indexB = preferredOrder.indexOf(b.mimeType)
-        const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
-        const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
-        return orderA - orderB
-      }),
-    )
-  }
+const preferredOrderAudio = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
+const preferredOrderVideo = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
+
+export function preferredVideoCodecs(transceivers) {
+  const sort = (supportedCodecs, preferredOrder) =>
+    supportedCodecs.sort((a, b) => {
+      const indexA = preferredOrder.indexOf(a.mimeType)
+      const indexB = preferredOrder.indexOf(b.mimeType)
+      const orderA = indexA >= 0 ? indexA : Number.MAX_VALUE
+      const orderB = indexB >= 0 ? indexB : Number.MAX_VALUE
+      return orderA - orderB
+    })
+  transceivers.forEach((transceiver) => {
+    const kind = transceiver.receiver.track.kind
+    const codecs = sort(RTCRtpReceiver.getCapabilities(kind).codecs, kind === 'video' ? preferredOrderVideo : preferredOrderAudio)
+    transceiver.setCodecPreferences(codecs)
+  })
 }
 
 // --- Media Transceiver --------------------------
-
-const videoSelect = document.querySelector('select#videoSource')
-const audioSelect = document.querySelector('select#audioSource')
 
 const Constraints = {
   video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
   audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
 }
 
+async function getUserMedia() {
+  Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+  Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+  return await navigator.mediaDevices.getUserMedia(Constraints)
+}
+
+const MediaOn = 'MediaOn'
+
+const MediaReady = 'MediaReady'
+
 const setupTransceiver = (wsUrl) => {
   PROTOCOL = 'transceiver'
+
   var ws = new WebSocket(wsUrl, PROTOCOL)
-  var pc
-  ws.onopen = async () => console.log('opne ws')
-  ws.onclose = async () => console.log('close ws')
+
   ws.onmessage = async ({ data }) => {
-    const msg = JSON.parse(data)
-    if (!msg) return
-    if (msg.OfferOptions) {
-      const { offerToReceiveVideo, offerToReceiveAudio } = msg.OfferOptions
-      Constraints.video.deviceId = { ideal: videoSelect.value }
-      Constraints.audio.deviceId = { ideal: audioSelect.value }
-      const stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      pc = new RTCPeerConnection()
+    if (data === MediaOn) {
+      const pc = new RTCPeerConnection()
+      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+
+      const stream = await getUserMedia()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-      pc.getTransceivers().forEach((transceiver) => (transceiver.direction = 'sendrecv'))
-      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+
+      ws.send(MediaReady)
+
       dataChannelHandler(pc, PROTOCOL)
-      ws.send(JSON.stringify({ active: stream.active }))
     } else {
+      const msg = JSON.parse(data)
+
       if (msg.type) {
-        await pc.setRemoteDescription(msg)
-        // setReceiverAnswerCodec(pc)
+        await pc.setRemoteDescription()
+
+        preferredVideoCodecs(pc.getTransceivers())
+
         const answer = await pc.createAnswer()
+
         await pc.setLocalDescription(answer)
+
         ws.send(JSON.stringify(answer))
       } else {
         await pc.addIceCandidate(msg)
@@ -100,22 +111,18 @@ const setupTransceiver = (wsUrl) => {
     }
   }
   navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
-    while (videoSelect.firstChild) {
-      videoSelect.removeChild(videoSelect.firstChild)
-    }
-    while (audioSelect.firstChild) {
-      audioSelect.removeChild(audioSelect.firstChild)
-    }
+    const videoSelect = document.querySelector('select#videoSource')
+    const audioSelect = document.querySelector('select#audioSource')
+    while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+    while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
     for (let i = 0; i < deviceArray.length; i++) {
+      const option = document.createElement('option')
+      option.value = deviceId
       const { deviceId, kind, label } = deviceArray[i]
       if (kind === 'videoinput') {
-        const option = document.createElement('option')
-        option.value = deviceId
         option.text = label || `Camera ${videoSelect.length + 1}`
         videoSelect.appendChild(option)
       } else if (kind === 'audioinput') {
-        const option = document.createElement('option')
-        option.value = deviceId
         option.text = label || `Microphone ${audioSelect.length + 1}`
         audioSelect.appendChild(option)
       }
@@ -125,22 +132,39 @@ const setupTransceiver = (wsUrl) => {
 
 // --- Media Receiver --------------------------
 
+const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
+
 const setupReceiver = (wsUrl) => {
   PROTOCOL = 'receiver'
   var ws = new WebSocket(wsUrl, PROTOCOL)
-  console.log(ws.protocol)
   var pc
-  const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
-  ws.onopen = async () => ws.send(JSON.stringify({ OfferOptions }))
-  ws.onclose = async () => console.log('close ws')
+  ws.onopen = async () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
+    if (data === MediaReady) {
+      pc = new RTCPeerConnection()
+      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+
+      const stream = $('stream')
+      pc.ontrack = ({ streams, track }) => {
+        if (stream.srcObject !== streams[0]) {
+          stream.srcObject = streams[0]
+        }
+      }
+      ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
+
+      const offer = await pc.createOffer(OfferOptions)
+      await pc.setLocalDescription(offer)
+      ws.send(JSON.stringify(offer))
+
+      dataChannelHandler(pc, PROTOCOL)
+    }
+
     const msg = JSON.parse(data)
     if (!msg) return
     if (msg.active) {
       const stream = $('stream')
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
-      dataChannelHandler(pc, PROTOCOL)
       pc.ontrack = ({ streams, track }) => {
         if (stream.srcObject !== streams[0]) {
           stream.srcObject = streams[0]
@@ -151,6 +175,7 @@ const setupReceiver = (wsUrl) => {
       const offer = await pc.createOffer(OfferOptions)
       await pc.setLocalDescription(offer)
       ws.send(JSON.stringify(offer))
+      dataChannelHandler(pc, PROTOCOL)
     } else {
       if (msg.type) {
         await pc.setRemoteDescription(msg)

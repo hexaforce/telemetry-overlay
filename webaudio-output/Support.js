@@ -1,28 +1,24 @@
-const videoSelect = document.querySelector('select#videoSource')
-const audioSelect = document.querySelector('select#audioSource')
-
 navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
-  while (videoSelect.firstChild) {
-    videoSelect.removeChild(videoSelect.firstChild)
-  }
-  while (audioSelect.firstChild) {
-    audioSelect.removeChild(audioSelect.firstChild)
-  }
+  const videoSelect = document.querySelector('select#videoSource')
+  const audioSelect = document.querySelector('select#audioSource')
+  while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+  while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
   for (let i = 0; i < deviceArray.length; i++) {
+    const option = document.createElement('option')
+    option.value = deviceId
     const { deviceId, kind, label } = deviceArray[i]
     if (kind === 'videoinput') {
-      const option = document.createElement('option')
-      option.value = deviceId
       option.text = label || `Camera ${videoSelect.length + 1}`
       videoSelect.appendChild(option)
     } else if (kind === 'audioinput') {
-      const option = document.createElement('option')
-      option.value = deviceId
       option.text = label || `Microphone ${audioSelect.length + 1}`
       audioSelect.appendChild(option)
     }
   }
 })
+
+const preferredOrderAudio = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
+const preferredOrderVideo = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
 
 export function preferredVideoCodecs(transceivers) {
   const sort = (supportedCodecs, preferredOrder) =>
@@ -34,16 +30,9 @@ export function preferredVideoCodecs(transceivers) {
       return orderA - orderB
     })
   transceivers.forEach((transceiver) => {
-    if (transceiver.receiver.track.kind === 'video') {
-      const supportedCodecs = RTCRtpReceiver.getCapabilities('video').codecs
-      const preferredOrder = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
-      transceiver.setCodecPreferences(sort(supportedCodecs, preferredOrder))
-    }
-    if (transceiver.receiver.track.kind === 'audio') {
-      const supportedCodecs = RTCRtpReceiver.getCapabilities('audio').codecs
-      const preferredOrder = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
-      transceiver.setCodecPreferences(sort(supportedCodecs, preferredOrder))
-    }
+    const kind = transceiver.receiver.track.kind
+    const codecs = sort(RTCRtpReceiver.getCapabilities(kind).codecs, kind === 'video' ? preferredOrderVideo : preferredOrderAudio)
+    transceiver.setCodecPreferences(codecs)
   })
 }
 
