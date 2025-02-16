@@ -79,10 +79,12 @@ const setupTransceiver = (wsUrl) => {
   PROTOCOL = 'transceiver'
 
   var ws = new WebSocket(wsUrl, PROTOCOL)
-
+  var pc
   ws.onmessage = async ({ data }) => {
+    if (!data) return
+
     if (data === MediaOn) {
-      const pc = new RTCPeerConnection()
+      pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
 
       const stream = await getUserMedia()
@@ -96,7 +98,7 @@ const setupTransceiver = (wsUrl) => {
       const msg = JSON.parse(data)
 
       if (msg.type) {
-        await pc.setRemoteDescription()
+        await pc.setRemoteDescription(msg)
 
         preferredVideoCodecs(pc.getTransceivers())
 
@@ -116,9 +118,10 @@ const setupTransceiver = (wsUrl) => {
     while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
     while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
     for (let i = 0; i < deviceArray.length; i++) {
+      const { deviceId, kind, label } = deviceArray[i]
+
       const option = document.createElement('option')
       option.value = deviceId
-      const { deviceId, kind, label } = deviceArray[i]
       if (kind === 'videoinput') {
         option.text = label || `Camera ${videoSelect.length + 1}`
         videoSelect.appendChild(option)
@@ -140,6 +143,8 @@ const setupReceiver = (wsUrl) => {
   var pc
   ws.onopen = async () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
+    if (!data) return
+
     if (data === MediaReady) {
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
@@ -157,30 +162,30 @@ const setupReceiver = (wsUrl) => {
       ws.send(JSON.stringify(offer))
 
       dataChannelHandler(pc, PROTOCOL)
-    }
-
-    const msg = JSON.parse(data)
-    if (!msg) return
-    if (msg.active) {
-      const stream = $('stream')
-      pc = new RTCPeerConnection()
-      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
-      pc.ontrack = ({ streams, track }) => {
-        if (stream.srcObject !== streams[0]) {
-          stream.srcObject = streams[0]
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-        }
-      }
-      ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
-      const offer = await pc.createOffer(OfferOptions)
-      await pc.setLocalDescription(offer)
-      ws.send(JSON.stringify(offer))
-      dataChannelHandler(pc, PROTOCOL)
     } else {
-      if (msg.type) {
-        await pc.setRemoteDescription(msg)
+      const msg = JSON.parse(data)
+      if (!msg) return
+      if (msg.active) {
+        const stream = $('stream')
+        pc = new RTCPeerConnection()
+        pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+        pc.ontrack = ({ streams, track }) => {
+          if (stream.srcObject !== streams[0]) {
+            stream.srcObject = streams[0]
+            new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+          }
+        }
+        ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
+        const offer = await pc.createOffer(OfferOptions)
+        await pc.setLocalDescription(offer)
+        ws.send(JSON.stringify(offer))
+        dataChannelHandler(pc, PROTOCOL)
       } else {
-        await pc.addIceCandidate(msg)
+        if (msg.type) {
+          await pc.setRemoteDescription(msg)
+        } else {
+          await pc.addIceCandidate(msg)
+        }
       }
     }
   }
