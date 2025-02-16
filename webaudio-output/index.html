@@ -48,7 +48,6 @@
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
       pc2 = new RTCPeerConnection()
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
-
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
           const { readable, writable } = receiver.createEncodedStreams()

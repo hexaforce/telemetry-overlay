@@ -48,7 +48,6 @@
 
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
-      // pc2 = new RTCPeerConnection({ encodedInsertableStreams: true })
       pc2 = new RTCPeerConnection()
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
       pc2.ontrack = ({ receiver, streams, track }) => {
@@ -57,11 +56,9 @@
           let keyFrameAnalyzer = new TransformStream({ transform })
           readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
         }
-        if (track.kind === 'audio') {
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-        }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
+          new StreamVisualizer(streams[0], canvas).start()
         }
       }
 
