@@ -6,6 +6,10 @@
   <script type="module" type="text/javascript">
     'use strict'
 
+    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
+
+    import { StreamVisualizer } from './StreamVisualizer.js'
+
     const OfferOptions = {
       offerToReceiveVideo: 1,
       offerToReceiveAudio: 1,
@@ -17,10 +21,6 @@
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     }
-
-    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
-
-    import { StreamVisualizer } from './StreamVisualizer.js'
 
     const startButton = document.getElementById('startButton')
     const callButton = document.getElementById('callButton')
