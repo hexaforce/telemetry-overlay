@@ -127,8 +127,7 @@
       background: #fff;
     }
   </style>
-  <script type="module">
-    function useUi(onClickFirstPlay) {
+  <script type="module">async function useUi(onClickFirstPlay) {
       let isInited = false;
       let isUserPlaying = false;
       const audioElement = document.querySelector("audio");
@@ -162,11 +161,11 @@
       });
 
       function playSound() {
-        console.log(audioElement)
-        audioElement.play();
+        // audioElement.play();
         btnPlay.hidden = true;
         btnStop.hidden = false;
       }
+
       function stopSound() {
         audioElement.pause();
         btnPlay.hidden = false;
@@ -188,18 +187,23 @@
     }
 
     let nodeAnalyzer = null;
-    function initSound() {
-      const obj = analyseSound(audioElement);
+
+    async function initSound() {
+      // マイク音声を取得
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      const obj = analyseSound(stream);
       nodeAnalyzer = obj.nodeAnalyser;
     }
 
-    function analyseSound(audioElement) {
+    function analyseSound(stream) {
       const context = new AudioContext();
       const nodeAnalyser = context.createAnalyser();
       nodeAnalyser.fftSize = FFT_SIZE;
       nodeAnalyser.smoothingTimeConstant = 0.85;
       nodeAnalyser.connect(context.destination);
-      const nodeSource = context.createMediaElementSource(audioElement);
+
+      // マイク音声のストリームを AudioContext に接続
+      const nodeSource = context.createMediaStreamSource(stream);
       nodeSource.connect(nodeAnalyser);
 
       return { nodeAnalyser };
@@ -231,7 +235,7 @@
   <div class="container"></div>
   <button id="btnPlay">PLAY</button>
   <button id="btnStop" hidden>STOP</button>
-  <audio src="sound/q-films.mp3" id="audio" loop></audio>
+  <audio id="audio" loop></audio>
 </body>
 
 </html>
