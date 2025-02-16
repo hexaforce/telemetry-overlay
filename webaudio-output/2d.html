@@ -37,7 +37,7 @@
 
     <script>
       const FFT_SIZE = 1024
-      const SMOOTHING = 0.8
+      const SMOOTHING = 0.85
       const canvas = document.getElementById('visualizer')
       const ctx = canvas.getContext('2d')
 
@@ -53,9 +53,8 @@
 
         audioContext = new AudioContext()
         nodeAnalyzer = audioContext.createAnalyser()
-        nodeAnalyzer.smoothingTimeConstant = SMOOTHING
         nodeAnalyzer.fftSize = FFT_SIZE
-        nodeAnalyzer.smoothingTimeConstant = 0.85
+        nodeAnalyzer.smoothingTimeConstant = SMOOTHING
 
         const nodeSource = audioContext.createMediaStreamSource(stream)
         nodeSource.connect(nodeAnalyzer)
