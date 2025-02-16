@@ -81,18 +81,24 @@
       const keyframeBit = view.getUint8(0) & 0x01
       // console.log(view.getUint8(0).toString(16));
 
-      let isKeyFrame = (view.getUint8(0) & 0x01) === 0
+      if (videoSizeDisplay.innerText === "") {
+        const { width, height, mimeType, payloadType } = encodedFrame.getMetadata()
+        videoSizeDisplay.innerText = `${width}x${height} payload:${payloadType} mime:${mimeType}`
+      }
 
-      if (isKeyFrame) {
-        keyFrameCount++
-        keyFrameLastSize = byteLength
-      } else {
-        interFrameCount++
-        interFrameLastSize = byteLength
-      }
-      if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
-        duplicateCount++
-      }
+      // let isKeyFrame = (view.getUint8(0) & 0x01) === 0
+
+      // if (isKeyFrame) {
+      //   keyFrameCount++
+      //   keyFrameLastSize = byteLength
+      // } else {
+      //   interFrameCount++
+      //   interFrameLastSize = byteLength
+      // }
+      // if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
+      //   duplicateCount++
+      // }
+
       prevFrameType = type
       prevFrameTimestamp = timestamp
       prevFrameSynchronizationSource = synchronizationSource
@@ -135,29 +141,29 @@
     const interFrameSizeDisplay = document.querySelector('#interframe-size')
     const videoSizeDisplay = document.querySelector('#video-size')
     const duplicateCountDisplay = document.querySelector('#duplicate-count')
-    let keyFrameCount = 0
-    let interFrameCount = 0
-    let keyFrameLastSize = 0
-    let interFrameLastSize = 0
-    let duplicateCount = 0
+    // let keyFrameCount = 0
+    // let interFrameCount = 0
+    // let keyFrameLastSize = 0
+    // let interFrameLastSize = 0
+    // let duplicateCount = 0
     let prevFrameType
     let prevFrameTimestamp
     let prevFrameSynchronizationSource
 
-    // Update the display of the counters once a second.
-    setInterval(() => {
-      keyFrameCountDisplay.innerText = keyFrameCount
-      keyFrameSizeDisplay.innerText = keyFrameLastSize
-      interFrameCountDisplay.innerText = interFrameCount
-      interFrameSizeDisplay.innerText = interFrameLastSize
-      duplicateCountDisplay.innerText = duplicateCount
-    }, 500)
+    // // Update the display of the counters once a second.
+    // setInterval(() => {
+    //   keyFrameCountDisplay.innerText = keyFrameCount
+    //   keyFrameSizeDisplay.innerText = keyFrameLastSize
+    //   interFrameCountDisplay.innerText = interFrameCount
+    //   interFrameSizeDisplay.innerText = interFrameLastSize
+    //   duplicateCountDisplay.innerText = duplicateCount
+    // }, 500)
 
-    remoteVideo.addEventListener('resize', () => {
-      console.log(`Remote video size changed to ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`)
-      // We'll use the first onsize callback as an indication that video has started playing out.
-      videoSizeDisplay.innerText = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`
-    })
+    // remoteVideo.addEventListener('resize', () => {
+    //   console.log(`Remote video size changed to ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`)
+    //   // We'll use the first onsize callback as an indication that video has started playing out.
+    //   videoSizeDisplay.innerText = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`
+    // })
 
   </script>
 </head>

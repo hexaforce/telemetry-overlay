@@ -79,7 +79,7 @@
           if (!(stat.type === 'outbound-rtp'))
             return
           const codec = stats.get(stat.codecId)
-          console.log(codec)
+
           if (stat.kind === 'video') {
             document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
             if (stat.encoderImplementation) {
