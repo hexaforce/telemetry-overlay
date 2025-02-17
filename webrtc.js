@@ -6,14 +6,11 @@ import { renderMap } from './navigation-map.js'
 // --- Data Channel --------------------------
 const dataChannel = {}
 
-const dataChannelHandler = (pc, PROTOCOL) => {
-  console.log('-----------')
+const dataChannelHandler = (pc) => {
   pc.ondatachannel = ({ channel }) => {
-    console.log('-----------')
     channel.onopen = ({ target }) => {
-      console.log('-----------')
       dataChannel[target.label] = target
-      if (PROTOCOL === 'transceiver' && target.label === 'receiver') {
+      if (ws.protocol === 'transceiver' && target.label === 'receiver') {
         sendPosition(10000)
       }
     }
@@ -25,7 +22,7 @@ const dataChannelHandler = (pc, PROTOCOL) => {
       }
     }
   }
-  const channel = pc.createDataChannel(PROTOCOL)
+  const channel = pc.createDataChannel(ws.protocol)
   channel.onopen = ({ target }) => (dataChannel[target.label] = target)
   channel.onmessage = ({ data }) => {
     console.log('???:', data)
@@ -34,11 +31,10 @@ const dataChannelHandler = (pc, PROTOCOL) => {
 
 const sendData = (data) => {
   console.log('sendData:', data)
-  dataChannel[PROTOCOL].send(JSON.stringify(data))
+  dataChannel[ws.protocol].send(JSON.stringify(data))
 }
 
 // --- Media --------------------------
-var PROTOCOL = null
 
 import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
 
@@ -78,18 +74,18 @@ const MediaOn = 'MediaOn'
 
 const MediaReady = 'MediaReady'
 
-const setupTransceiver = (wsUrl) => {
-  PROTOCOL = 'transceiver'
+var ws
+var pc
 
-  var ws = new WebSocket(wsUrl, PROTOCOL)
-  var pc
+const setupTransceiver = (wsUrl) => {
+  ws = new WebSocket(wsUrl, 'transceiver')
   ws.onmessage = async ({ data }) => {
     if (!data) return
 
     if (data === MediaOn) {
 
       pc = new RTCPeerConnection()
-      dataChannelHandler(pc, PROTOCOL)
+      dataChannelHandler(pc, ws.protocol)
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       const stream = await getUserMedia()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
@@ -139,16 +135,14 @@ const setupTransceiver = (wsUrl) => {
 const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
 
 const setupReceiver = (wsUrl) => {
-  PROTOCOL = 'receiver'
-  var ws = new WebSocket(wsUrl, PROTOCOL)
-  var pc
+  ws = new WebSocket(wsUrl, 'transceiver')
   ws.onopen = async () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
     if (!data) return
 
     if (data === MediaReady) {
       pc = new RTCPeerConnection()
-      dataChannelHandler(pc, PROTOCOL)
+      dataChannelHandler(pc, ws.protocol)
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
 
       const stream = $('stream')
@@ -181,7 +175,7 @@ const setupReceiver = (wsUrl) => {
         const offer = await pc.createOffer(OfferOptions)
         await pc.setLocalDescription(offer)
         ws.send(JSON.stringify(offer))
-        dataChannelHandler(pc, PROTOCOL)
+        dataChannelHandler(pc, ws.protocol)
 
       } else {
         if (msg.type) {
@@ -210,8 +204,8 @@ const sendPosition = async (timeout) => {
   )
 }
 
-// const sendOrientation = ({ isTrusted, absolute, alpha, beta, bubbles, cancelBubble, cancelable, composed, defaultPrevented, eventPhase, gamma, returnValue, timeStamp, type }) => {
-//   sendData({ isTrusted, absolute, alpha, beta, bubbles, cancelBubble, cancelable, composed, defaultPrevented, eventPhase, gamma, returnValue, timeStamp, type })
-// }
+const sendOrientation = ({ isTrusted, absolute, alpha, beta, bubbles, cancelBubble, cancelable, composed, defaultPrevented, eventPhase, gamma, returnValue, timeStamp, type }) => {
+  sendData({ isTrusted, absolute, alpha, beta, bubbles, cancelBubble, cancelable, composed, defaultPrevented, eventPhase, gamma, returnValue, timeStamp, type })
+}
 
 export { setupReceiver, setupTransceiver }

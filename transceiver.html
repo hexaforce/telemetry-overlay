@@ -3,11 +3,16 @@
   window.onload = async () => {
     setupTransceiver(`wss://SERVER_IP_ADDRESS/ws`)
   }
+  window.ondeviceorientationabsolute = (event) => {
+    console.log(event)
+  }
+  window.ondeviceorientation = (event) => {
+    console.log(event)
+  }
 </script>
+
 <body>
   <canvas></canvas>
-  <label for="videoSource">Video source: </label
-  ><select id="videoSource"></select>
-  <label for="audioSource">Audio source: </label
-  ><select id="audioSource"></select>
+  <label for="videoSource">Video source: </label><select id="videoSource"></select>
+  <label for="audioSource">Audio source: </label><select id="audioSource"></select>
 </body>
