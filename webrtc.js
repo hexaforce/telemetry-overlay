@@ -10,36 +10,9 @@ var dc
 
 import { renderMap } from './navigation-map.js'
 
-// --- Data Channel --------------------------
-// const dataChannel = {}
-
-// const dataChannelHandler = (pc) => {
-//   pc.ondatachannel = ({ channel }) => {
-//     channel.onopen = ({ target }) => {
-//       dataChannel[target.label] = target
-//       if (ws.protocol === 'transceiver' && target.label === 'receiver') {
-//         sendPosition(10000)
-//       }
-//     }
-//     channel.onmessage = ({ data }) => {
-//       const msg = JSON.parse(data)
-//       console.log('incoming:', msg)
-//       if (msg.longitude && msg.latitude) {
-//         renderMap([msg.longitude, msg.latitude])
-//       }
-//     }
-//   }
-//   const channel = pc.createDataChannel(ws.protocol)
-//   channel.onopen = ({ target }) => (dataChannel[target.label] = target)
-//   channel.onmessage = ({ data }) => {
-//     console.log('???:', data)
-//   }
-// }
-
 const sendData = (data) => {
   console.log('sendData:', data)
-  console.log(dc)
-  if (dc) dc.send(JSON.stringify(data))
+  if (dc && dc.readyState == "open") dc.send(JSON.stringify(data))
 }
 
 // --- Media --------------------------
