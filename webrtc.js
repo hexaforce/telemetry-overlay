@@ -79,9 +79,6 @@ async function getUserMedia() {
 
 const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
-  ws.onopen = () => {
-    console.log('----------')
-  }
   ws.onmessage = async ({ data }) => {
     console.log('onmessage:', data)
     if (!data) return
@@ -144,11 +141,8 @@ const setupTransceiver = (wsUrl) => {
 const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
 
 const setupReceiver = (wsUrl) => {
-  ws = new WebSocket(wsUrl, 'transceiver')
-  ws.onopen = () => {
-    console.log('----------')
-    ws.send(MediaOn)
-  }
+  ws = new WebSocket(wsUrl, 'receiver')
+  ws.onopen = () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
     console.log('onmessage:', data)
     if (!data) return
@@ -158,12 +152,12 @@ const setupReceiver = (wsUrl) => {
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
       pc.ondatachannel = ({ channel }) => {
         dc = channel
-      }
-      dc.onmessage = ({ data }) => {
-        const msg = JSON.parse(data)
-        console.log('incoming:', msg)
-        if (msg.longitude && msg.latitude) {
-          renderMap([msg.longitude, msg.latitude])
+        channel.onmessage = ({ data }) => {
+          const msg = JSON.parse(data)
+          console.log('incoming:', msg)
+          if (msg.longitude && msg.latitude) {
+            renderMap([msg.longitude, msg.latitude])
+          }
         }
       }
 
