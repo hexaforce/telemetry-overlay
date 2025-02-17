@@ -51,6 +51,7 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
+    console.log('message====: ',text)
     if (protocol === 'receiver' && transceiver) {
       transceiver.send(text)
     } else if (protocol === 'transceiver' && receiver) {

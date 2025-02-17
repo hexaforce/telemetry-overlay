@@ -79,9 +79,12 @@ async function getUserMedia() {
 
 const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
+  ws.onopen = () => {
+    console.log('----------')
+  }
   ws.onmessage = async ({ data }) => {
-    if (!data) return
     console.log('onmessage:', data)
+    if (!data) return
 
     if (data === MediaOn) {
       pc = new RTCPeerConnection()
@@ -142,10 +145,13 @@ const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
 
 const setupReceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
-  ws.onopen = async () => ws.send(MediaOn)
+  ws.onopen = () => {
+    console.log('----------')
+    ws.send(MediaOn)
+  }
   ws.onmessage = async ({ data }) => {
-    if (!data) return
     console.log('onmessage:', data)
+    if (!data) return
 
     if (data === MediaReady) {
       pc = new RTCPeerConnection()
