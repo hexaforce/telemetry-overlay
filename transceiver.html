@@ -1,18 +1,14 @@
 <script type="module" type="text/javascript">
-  import { setupTransceiver } from './webrtc.js'
+  import { setupTransceiver, sendOrientation } from './webrtc.js'
   window.onload = async () => {
     setupTransceiver(`wss://SERVER_IP_ADDRESS/ws`)
   }
-  window.ondeviceorientationabsolute = (event) => {
-    console.log(event)
-  }
-  window.ondeviceorientation = (event) => {
-    console.log(event)
-  }
+  window.ondeviceorientationabsolute = sendOrientation
+  window.ondeviceorientation = sendOrientation
 </script>
 
 <body>
-  <canvas></canvas>
   <label for="videoSource">Video source: </label><select id="videoSource"></select>
   <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+  <canvas></canvas>
 </body>

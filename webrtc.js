@@ -36,10 +36,11 @@ import { renderMap } from './navigation-map.js'
 //   }
 // }
 
-// const sendData = (data) => {
-//   console.log('sendData:', data)
-//   dataChannel[ws.protocol].send(JSON.stringify(data))
-// }
+const sendData = (data) => {
+  console.log('sendData:', data)
+  console.log(dc)
+  if (dc) dc.send(JSON.stringify(data))
+}
 
 // --- Media --------------------------
 
@@ -70,7 +71,7 @@ async function getUserMedia() {
   const Constraints = {
     video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
     audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-  }  
+  }
   Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
   Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
   return await navigator.mediaDevices.getUserMedia(Constraints)
@@ -80,6 +81,7 @@ const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
   ws.onmessage = async ({ data }) => {
     if (!data) return
+    console.log('onmessage:', data)
 
     if (data === MediaOn) {
       pc = new RTCPeerConnection()
@@ -143,6 +145,7 @@ const setupReceiver = (wsUrl) => {
   ws.onopen = async () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
     if (!data) return
+    console.log('onmessage:', data)
 
     if (data === MediaReady) {
       pc = new RTCPeerConnection()
@@ -217,4 +220,4 @@ const sendOrientation = ({ isTrusted, absolute, alpha, beta, bubbles, cancelBubb
   sendData({ isTrusted, absolute, alpha, beta, bubbles, cancelBubble, cancelable, composed, defaultPrevented, eventPhase, gamma, returnValue, timeStamp, type })
 }
 
-export { setupReceiver, setupTransceiver }
+export { setupReceiver, setupTransceiver, sendOrientation }
