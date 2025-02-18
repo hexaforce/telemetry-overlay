@@ -54,9 +54,12 @@ const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
   ws.onmessage = async ({ data }) => {
     if (!data) return
-    if (data === MediaOn) {
+    const msg = JSON.parse(data)
+    if (!msg) return
+
+    if (msg.type === MediaOn) {
       pc = new RTCPeerConnection()
-      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+      pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
       dc = pc.createDataChannel(ws.protocol)
       dc.onopen = ({ target }) => {
         if (ws.protocol === 'transceiver' && target.label === 'receiver') {
@@ -72,19 +75,15 @@ const setupTransceiver = (wsUrl) => {
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
 
-      ws.send(MediaReady)
-    } else {
-      const msg = JSON.parse(data)
-      if (!msg) return
-      if (msg.type === "offer") {
-        await pc.setRemoteDescription(msg)
-        preferredVideoCodecs(pc.getTransceivers())
-        const answer = await pc.createAnswer()
-        await pc.setLocalDescription(answer)
-        ws.send(JSON.stringify(answer))
-      } else {
-        await pc.addIceCandidate(msg)
-      }
+      ws.send(JSON.stringify({ type: MediaReady }))
+    } else if (msg.type === 'offer') {
+      await pc.setRemoteDescription(msg)
+      preferredVideoCodecs(pc.getTransceivers())
+      const answer = await pc.createAnswer()
+      await pc.setLocalDescription(answer)
+      ws.send(JSON.stringify(answer))
+    } else if (msg.type === 'ice') {
+      await pc.addIceCandidate(msg.candidate)
     }
   }
   navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
@@ -114,13 +113,17 @@ const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
 
 const setupReceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'receiver')
-  ws.onopen = () => ws.send(MediaOn)
+  ws.onopen = () => ws.send(JSON.stringify({ type: MediaOn }))
+
   ws.onmessage = async ({ data }) => {
     if (!data) return
 
-    if (data === MediaReady) {
+    const msg = JSON.parse(data)
+    if (!msg) return
+
+    if (msg.type === MediaReady) {
       pc = new RTCPeerConnection()
-      pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
+      pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
       pc.ondatachannel = ({ channel }) => {
         dc = channel
         channel.onmessage = ({ data }) => {
@@ -132,10 +135,10 @@ const setupReceiver = (wsUrl) => {
         }
       }
 
-      const stream = $('stream')
+      const streamElement = $('stream')
       pc.ontrack = ({ streams, track }) => {
-        if (stream.srcObject !== streams[0]) {
-          stream.srcObject = streams[0]
+        if (streamElement.srcObject !== streams[0]) {
+          streamElement.srcObject = streams[0]
         }
       }
       ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
@@ -143,14 +146,13 @@ const setupReceiver = (wsUrl) => {
       const offer = await pc.createOffer(OfferOptions)
       await pc.setLocalDescription(offer)
       ws.send(JSON.stringify(offer))
-    } else {
-      const msg = JSON.parse(data)
-      if (!msg) return
-      if (msg.type === "answer") {
-        await pc.setRemoteDescription(msg)
-      } else {
-        await pc.addIceCandidate(msg)
-      }
+
+    } else if (msg.type === 'answer') {
+
+      await pc.setRemoteDescription(msg)
+    } else if (msg.type === 'ice') {
+      
+      await pc.addIceCandidate(msg.candidate)
     }
   }
 }

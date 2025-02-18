@@ -52,19 +52,13 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
-
-    if (text === MediaOn || text === MediaReady){
-      console.log(`Incoming message ${protocol} :`, text)
-    } else {
-      console.log(`Incoming message ${protocol} :`, JSON.parse(text))
-    }
-    
+    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
     if (protocol === 'receiver' && transceiver) {
       transceiver.send(text)
-      console.log(`Outgoing message transceiver`)
+      console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
     } else if (protocol === 'transceiver' && receiver) {
       receiver.send(text)
-      console.log(`Outgoing message receiver`)
+      console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
     }
   })
 
