@@ -52,6 +52,7 @@ async function getUserMedia() {
 
 const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
+
   ws.onmessage = async ({ data }) => {
     if (!data) return
     const msg = JSON.parse(data)
@@ -86,6 +87,7 @@ const setupTransceiver = (wsUrl) => {
       await pc.addIceCandidate(msg.candidate)
     }
   }
+
   navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
     const videoSelect = document.querySelector('select#videoSource')
     const audioSelect = document.querySelector('select#audioSource')
@@ -93,7 +95,6 @@ const setupTransceiver = (wsUrl) => {
     while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
     for (let i = 0; i < deviceArray.length; i++) {
       const { deviceId, kind, label } = deviceArray[i]
-
       const option = document.createElement('option')
       option.value = deviceId
       if (kind === 'videoinput') {
@@ -117,7 +118,6 @@ const setupReceiver = (wsUrl) => {
 
   ws.onmessage = async ({ data }) => {
     if (!data) return
-
     const msg = JSON.parse(data)
     if (!msg) return
 
@@ -141,17 +141,14 @@ const setupReceiver = (wsUrl) => {
           streamElement.srcObject = streams[0]
         }
       }
-      ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
+      ws.onclose = () => streamElement.srcObject.getTracks().forEach((track) => track.stop())
 
       const offer = await pc.createOffer(OfferOptions)
       await pc.setLocalDescription(offer)
       ws.send(JSON.stringify(offer))
-
     } else if (msg.type === 'answer') {
-
       await pc.setRemoteDescription(msg)
     } else if (msg.type === 'ice') {
-      
       await pc.addIceCandidate(msg.candidate)
     }
   }
