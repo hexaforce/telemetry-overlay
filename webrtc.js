@@ -70,10 +70,13 @@ async function onmessage({ data }) {
   const msg = JSON.parse(data)
   if (!msg) return
 
-  if (msg.type === MediaOn) {
+  if (!pc) {
     pc = new RTCPeerConnection()
     pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
     dc = pc.createDataChannel(ws.protocol)
+  }
+
+  if (msg.type === MediaOn) {
     dc.onopen = ({ target }) => {
       console.log('target: ', target)
       sendPosition()
@@ -88,11 +91,8 @@ async function onmessage({ data }) {
     ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
 
     ws.send(JSON.stringify({ type: MediaReady }))
-
+    
   } else if (msg.type === MediaReady) {
-    pc = new RTCPeerConnection()
-    pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
-    pc.createDataChannel(ws.protocol)
     pc.ondatachannel = ({ channel }) => {
       console.log('channel: ', channel)
       dc = channel
@@ -116,7 +116,6 @@ async function onmessage({ data }) {
     const offer = await pc.createOffer(OfferOptions)
     await pc.setLocalDescription(offer)
     ws.send(JSON.stringify(offer))
-
   } else if (msg.type === 'offer') {
     await pc.setRemoteDescription(msg)
     preferredVideoCodecs(pc.getTransceivers())
@@ -128,13 +127,12 @@ async function onmessage({ data }) {
   } else if (msg.type === 'ice') {
     await pc.addIceCandidate(msg.candidate)
   }
-
 }
 
 // --- GPS Send Position --------------------------
 
 const sendPosition = async (timeout) => {
-  console.log("sendPosition start")
+  console.log('sendPosition start')
   window.navigator.geolocation.getCurrentPosition(
     ({ coords, timestamp }) => {
       const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
