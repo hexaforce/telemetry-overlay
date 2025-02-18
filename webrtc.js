@@ -63,9 +63,8 @@ const setupTransceiver = (wsUrl) => {
       pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
       dc = pc.createDataChannel(ws.protocol)
       dc.onopen = ({ target }) => {
-        if (ws.protocol === 'transceiver' && target.label === 'receiver') {
-          sendPosition(10000)
-        }
+        console.log('target: ', target)
+        sendPosition()
       }
       dc.onmessage = ({ data }) => {
         const msg = JSON.parse(data)
@@ -124,7 +123,9 @@ const setupReceiver = (wsUrl) => {
     if (msg.type === MediaReady) {
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
+      pc.createDataChannel(ws.protocol)
       pc.ondatachannel = ({ channel }) => {
+        console.log('channel: ', channel)
         dc = channel
         channel.onmessage = ({ data }) => {
           const msg = JSON.parse(data)
@@ -157,6 +158,7 @@ const setupReceiver = (wsUrl) => {
 // --- GPS Send Position --------------------------
 
 const sendPosition = async (timeout) => {
+  console.log("sendPosition start")
   window.navigator.geolocation.getCurrentPosition(
     ({ coords, timestamp }) => {
       const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
