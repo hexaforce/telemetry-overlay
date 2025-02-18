@@ -1,14 +1,10 @@
-// const express = require('express')
-const fs = require('fs')
-const https = require('https')
-const url = require('url')
-const WebSocket = require('ws')
 const os = require('os')
-const { Transform } = require('stream')
-
+const fs = require('fs')
+const url = require('url')
 const path = require('path')
-
-const PORT = 8443
+const https = require('https')
+const WebSocket = require('ws')
+const { Transform } = require('stream')
 
 const baseDirectory = __dirname
 
@@ -36,6 +32,24 @@ const validExtensions = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
 }
+
+
+function getLocalIPv4() {
+  const interfaces = os.networkInterfaces()
+  const ipv4Addresses = []
+  for (const iface of Object.values(interfaces)) {
+    for (const details of iface) {
+      if (details.family === 'IPv4' && !details.internal) {
+        ipv4Addresses.push(details.address)
+      }
+    }
+  }
+  return ipv4Addresses
+}
+
+const ipAddresses = getLocalIPv4()
+const PORT = 8443
+const SERVER_IP_ADDRESS = (ipAddresses.length > 0 ? ipAddresses[0] : 'localhost') + ':' + PORT
 
 // openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
 
@@ -79,10 +93,10 @@ const server = https.createServer(
         response.writeHead(404)
         response.end()
       })
-    } catch (e) {
+    } catch ({ stack }) {
       response.writeHead(500)
       response.end()
-      console.log(e.stack)
+      console.log(stack)
     }
   },
 )
@@ -92,25 +106,6 @@ const wss = new WebSocket.Server({ server, path: '/ws' })
 let receiver = null
 let transceiver = null
 const CLOSE_PAIR_ON_DISCONNECT = false
-
-function getLocalIPv4() {
-  const interfaces = os.networkInterfaces()
-  const ipv4Addresses = []
-  for (const iface of Object.values(interfaces)) {
-    for (const details of iface) {
-      if (details.family === 'IPv4' && !details.internal) {
-        ipv4Addresses.push(details.address)
-      }
-    }
-  }
-  return ipv4Addresses
-}
-
-const ipAddresses = getLocalIPv4()
-const SERVER_IP_ADDRESS = (ipAddresses.length > 0 ? ipAddresses[0] : 'localhost') + ':' + PORT
-
-const MediaOn = 'MediaOn'
-const MediaReady = 'MediaReady'
 
 wss.on('connection', (ws, req) => {
   const protocol = req.headers['sec-websocket-protocol']?.toLowerCase()
