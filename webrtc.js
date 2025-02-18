@@ -12,7 +12,7 @@ import { renderMap } from './navigation-map.js'
 
 const sendData = (data) => {
   console.log('sendData:', data)
-  if (dc && dc.readyState == "open") dc.send(JSON.stringify(data))
+  if (dc && dc.readyState == 'open') dc.send(JSON.stringify(data))
 }
 
 // --- Media --------------------------
@@ -53,9 +53,7 @@ async function getUserMedia() {
 const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
   ws.onmessage = async ({ data }) => {
-    console.log('onmessage:', data)
     if (!data) return
-
     if (data === MediaOn) {
       pc = new RTCPeerConnection()
       pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
@@ -73,11 +71,12 @@ const setupTransceiver = (wsUrl) => {
       const stream = await getUserMedia()
       stream.getTracks().forEach((track) => pc.addTrack(track, stream))
       ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
+
       ws.send(MediaReady)
     } else {
       const msg = JSON.parse(data)
       if (!msg) return
-      if (msg.type) {
+      if (msg.type === "offer") {
         await pc.setRemoteDescription(msg)
         preferredVideoCodecs(pc.getTransceivers())
         const answer = await pc.createAnswer()
@@ -117,7 +116,6 @@ const setupReceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'receiver')
   ws.onopen = () => ws.send(MediaOn)
   ws.onmessage = async ({ data }) => {
-    console.log('onmessage:', data)
     if (!data) return
 
     if (data === MediaReady) {
@@ -148,26 +146,10 @@ const setupReceiver = (wsUrl) => {
     } else {
       const msg = JSON.parse(data)
       if (!msg) return
-      if (msg.active) {
-        const stream = $('stream')
-        pc = new RTCPeerConnection()
-        pc.onicecandidate = ({ candidate }) => ws.send(JSON.stringify(candidate))
-        pc.ontrack = ({ streams, track }) => {
-          if (stream.srcObject !== streams[0]) {
-            stream.srcObject = streams[0]
-            new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-          }
-        }
-        ws.onclose = () => stream.srcObject.getTracks().forEach((track) => track.stop())
-        const offer = await pc.createOffer(OfferOptions)
-        await pc.setLocalDescription(offer)
-        ws.send(JSON.stringify(offer))
+      if (msg.type === "answer") {
+        await pc.setRemoteDescription(msg)
       } else {
-        if (msg.type) {
-          await pc.setRemoteDescription(msg)
-        } else {
-          await pc.addIceCandidate(msg)
-        }
+        await pc.addIceCandidate(msg)
       }
     }
   }

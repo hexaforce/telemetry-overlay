@@ -38,37 +38,45 @@ function getLocalIPv4() {
 const ipAddresses = getLocalIPv4()
 const SERVER_IP_ADDRESS = (ipAddresses.length > 0 ? ipAddresses[0] : 'localhost') + ':' + PORT
 
+const MediaOn = 'MediaOn'
+const MediaReady = 'MediaReady'
+
 wss.on('connection', (ws, req) => {
   const protocol = req.headers['sec-websocket-protocol']?.toLowerCase()
-
   if (protocol === 'receiver') {
     receiver = ws
-    console.log('Receiver connected')
   } else if (protocol === 'transceiver') {
     transceiver = ws
-    console.log('Transceiver connected')
   }
+  console.log(`${protocol} connected`)
 
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
-    console.log('message====: ',text)
+
+    if (text === MediaOn || text === MediaReady){
+      console.log(`Incoming message ${protocol} :`, text)
+    } else {
+      console.log(`Incoming message ${protocol} :`, JSON.parse(text))
+    }
+    
     if (protocol === 'receiver' && transceiver) {
       transceiver.send(text)
+      console.log(`Outgoing message transceiver`)
     } else if (protocol === 'transceiver' && receiver) {
       receiver.send(text)
+      console.log(`Outgoing message receiver`)
     }
   })
 
   ws.on('close', () => {
     if (ws === receiver) {
       receiver = null
-      console.log('Receiver disconnected')
       if (CLOSE_PAIR_ON_DISCONNECT && transceiver) transceiver.close()
     } else if (ws === transceiver) {
       transceiver = null
-      console.log('Transceiver disconnected')
       if (CLOSE_PAIR_ON_DISCONNECT && receiver) receiver.close()
     }
+    console.log(`${protocol} disconnected`)
   })
 })
 
