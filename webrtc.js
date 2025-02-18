@@ -9,6 +9,7 @@ var pc
 var dc
 
 import { renderMap } from './navigation-map.js'
+import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
 
 const sendData = (data) => {
   console.log('sendData:', data)
@@ -16,8 +17,6 @@ const sendData = (data) => {
 }
 
 // --- Media --------------------------
-
-import { StreamVisualizer } from './webaudio-output/StreamVisualizer.js'
 
 const preferredOrderAudio = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
 const preferredOrderVideo = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
@@ -107,6 +106,9 @@ async function onmessage({ data }) {
 
     const streamElement = $('stream')
     pc.ontrack = ({ streams, track }) => {
+      if (track.kind === 'audio') {
+        new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+      }
       if (streamElement.srcObject !== streams[0]) {
         streamElement.srcObject = streams[0]
       }
