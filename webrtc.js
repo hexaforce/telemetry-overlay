@@ -52,59 +52,7 @@ async function getUserMedia() {
 
 const setupTransceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'transceiver')
-
-  ws.onmessage = async ({ data }) => {
-    if (!data) return
-    const msg = JSON.parse(data)
-    if (!msg) return
-
-    if (msg.type === MediaOn) {
-      pc = new RTCPeerConnection()
-      pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
-      dc = pc.createDataChannel(ws.protocol)
-      dc.onopen = ({ target }) => {
-        console.log('target: ', target)
-        sendPosition()
-      }
-      dc.onmessage = ({ data }) => {
-        const msg = JSON.parse(data)
-        console.log('incoming:', msg)
-      }
-
-      const stream = await getUserMedia()
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream))
-      ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
-
-      ws.send(JSON.stringify({ type: MediaReady }))
-    } else if (msg.type === 'offer') {
-      await pc.setRemoteDescription(msg)
-      preferredVideoCodecs(pc.getTransceivers())
-      const answer = await pc.createAnswer()
-      await pc.setLocalDescription(answer)
-      ws.send(JSON.stringify(answer))
-    } else if (msg.type === 'ice') {
-      await pc.addIceCandidate(msg.candidate)
-    }
-  }
-
-  navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
-    const videoSelect = document.querySelector('select#videoSource')
-    const audioSelect = document.querySelector('select#audioSource')
-    while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-    while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-    for (let i = 0; i < deviceArray.length; i++) {
-      const { deviceId, kind, label } = deviceArray[i]
-      const option = document.createElement('option')
-      option.value = deviceId
-      if (kind === 'videoinput') {
-        option.text = label || `Camera ${videoSelect.length + 1}`
-        videoSelect.appendChild(option)
-      } else if (kind === 'audioinput') {
-        option.text = label || `Microphone ${audioSelect.length + 1}`
-        audioSelect.appendChild(option)
-      }
-    }
-  })
+  ws.onmessage = onmessage
 }
 
 // --- Media Receiver --------------------------
@@ -114,45 +62,73 @@ const OfferOptions = { offerToReceiveAudio: true, offerToReceiveVideo: true }
 const setupReceiver = (wsUrl) => {
   ws = new WebSocket(wsUrl, 'receiver')
   ws.onopen = () => ws.send(JSON.stringify({ type: MediaOn }))
+  ws.onmessage = onmessage
+}
 
-  ws.onmessage = async ({ data }) => {
-    if (!data) return
-    const msg = JSON.parse(data)
-    if (!msg) return
+async function onmessage({ data }) {
+  if (!data) return
+  const msg = JSON.parse(data)
+  if (!msg) return
 
-    if (msg.type === MediaReady) {
-      pc = new RTCPeerConnection()
-      pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
-      pc.createDataChannel(ws.protocol)
-      pc.ondatachannel = ({ channel }) => {
-        console.log('channel: ', channel)
-        dc = channel
-        channel.onmessage = ({ data }) => {
-          const msg = JSON.parse(data)
-          console.log('incoming:', msg)
-          if (msg.longitude && msg.latitude) {
-            renderMap([msg.longitude, msg.latitude])
-          }
-        }
-      }
-
-      const streamElement = $('stream')
-      pc.ontrack = ({ streams, track }) => {
-        if (streamElement.srcObject !== streams[0]) {
-          streamElement.srcObject = streams[0]
-        }
-      }
-      ws.onclose = () => streamElement.srcObject.getTracks().forEach((track) => track.stop())
-
-      const offer = await pc.createOffer(OfferOptions)
-      await pc.setLocalDescription(offer)
-      ws.send(JSON.stringify(offer))
-    } else if (msg.type === 'answer') {
-      await pc.setRemoteDescription(msg)
-    } else if (msg.type === 'ice') {
-      await pc.addIceCandidate(msg.candidate)
+  if (msg.type === MediaOn) {
+    pc = new RTCPeerConnection()
+    pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
+    dc = pc.createDataChannel(ws.protocol)
+    dc.onopen = ({ target }) => {
+      console.log('target: ', target)
+      sendPosition()
     }
+    dc.onmessage = ({ data }) => {
+      const msg = JSON.parse(data)
+      console.log('incoming:', msg)
+    }
+
+    const stream = await getUserMedia()
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream))
+    ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
+
+    ws.send(JSON.stringify({ type: MediaReady }))
+
+  } else if (msg.type === MediaReady) {
+    pc = new RTCPeerConnection()
+    pc.onicecandidate = ({ candidate }) => candidate && ws.send(JSON.stringify({ type: 'ice', candidate }))
+    pc.createDataChannel(ws.protocol)
+    pc.ondatachannel = ({ channel }) => {
+      console.log('channel: ', channel)
+      dc = channel
+      channel.onmessage = ({ data }) => {
+        const msg = JSON.parse(data)
+        console.log('incoming:', msg)
+        if (msg.longitude && msg.latitude) {
+          renderMap([msg.longitude, msg.latitude])
+        }
+      }
+    }
+
+    const streamElement = $('stream')
+    pc.ontrack = ({ streams, track }) => {
+      if (streamElement.srcObject !== streams[0]) {
+        streamElement.srcObject = streams[0]
+      }
+    }
+    ws.onclose = () => streamElement.srcObject.getTracks().forEach((track) => track.stop())
+
+    const offer = await pc.createOffer(OfferOptions)
+    await pc.setLocalDescription(offer)
+    ws.send(JSON.stringify(offer))
+
+  } else if (msg.type === 'offer') {
+    await pc.setRemoteDescription(msg)
+    preferredVideoCodecs(pc.getTransceivers())
+    const answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)
+    ws.send(JSON.stringify(answer))
+  } else if (msg.type === 'answer') {
+    await pc.setRemoteDescription(msg)
+  } else if (msg.type === 'ice') {
+    await pc.addIceCandidate(msg.candidate)
   }
+
 }
 
 // --- GPS Send Position --------------------------

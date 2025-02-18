@@ -5,6 +5,24 @@
   }
   window.ondeviceorientationabsolute = sendOrientation
   window.ondeviceorientation = sendOrientation
+  navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
+    const videoSelect = document.querySelector('select#videoSource')
+    const audioSelect = document.querySelector('select#audioSource')
+    while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+    while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+    for (let i = 0; i < deviceArray.length; i++) {
+      const { deviceId, kind, label } = deviceArray[i]
+      const option = document.createElement('option')
+      option.value = deviceId
+      if (kind === 'videoinput') {
+        option.text = label || `Camera ${videoSelect.length + 1}`
+        videoSelect.appendChild(option)
+      } else if (kind === 'audioinput') {
+        option.text = label || `Microphone ${audioSelect.length + 1}`
+        audioSelect.appendChild(option)
+      }
+    }
+  })
 </script>
 
 <body>
