@@ -1,21 +1,92 @@
-const express = require('express')
+// const express = require('express')
 const fs = require('fs')
 const https = require('https')
+const url = require('url')
 const WebSocket = require('ws')
 const os = require('os')
+const { Transform } = require('stream')
+
 const path = require('path')
-const mime = require('mime-types')
 
 const PORT = 8443
-const app = express()
 
-const options = {
-  // openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem'),
+const baseDirectory = __dirname
+
+const validExtensions = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.json': 'application/json',
+  '.geojson': 'application/json',
+  '.bin': 'application/octet-stream',
+  '.css': 'text/css',
+  '.txt': 'text/plain',
+  '.bmp': 'image/bmp',
+  '.jpg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.dae': 'application/vnd.oipf.dae.svg+xml',
+  '.pbf': 'application/octet-stream',
+  '.mtl': 'model/mtl',
+  '.obj': 'model/obj',
+  '.glb': 'model/gltf-binary',
+  '.gltf': 'model/gltf+json',
+  '.fbx': 'application/octet-stream',
+  '.ttf': 'application/octet-stream',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
 }
 
-const server = https.createServer(options, app)
+// openssl req -nodes -new -x509 -keyout key.pem -out cert.pem -days 365
+
+const server = https.createServer(
+  {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem'),
+  },
+  (request, response) => {
+    try {
+      let pathname = url.parse(request.url).pathname
+      pathname = pathname === '/' ? '/receiver.html' : pathname
+      let fsPath = path.join(baseDirectory, path.normalize(pathname))
+      let ext = path.extname(fsPath)
+
+      if (!validExtensions[ext]) {
+        response.writeHead(403)
+        response.end('Forbidden')
+        return
+      }
+
+      const fileStream = fs.createReadStream(fsPath)
+
+      response.setHeader('Content-Type', validExtensions[ext])
+      response.writeHead(200)
+
+      if (ext === '.html') {
+        const transformStream = new Transform({
+          transform(chunk, encoding, callback) {
+            const modifiedChunk = chunk.toString().replace(/SERVER_IP_ADDRESS/g, SERVER_IP_ADDRESS)
+            callback(null, modifiedChunk)
+          },
+        })
+        fileStream.pipe(transformStream).pipe(response)
+      } else {
+        fileStream.pipe(response)
+      }
+
+      fileStream.on('error', (err) => {
+        console.error('File read error:', err)
+        response.writeHead(404)
+        response.end()
+      })
+    } catch (e) {
+      response.writeHead(500)
+      response.end()
+      console.log(e.stack)
+    }
+  },
+)
+
 const wss = new WebSocket.Server({ server, path: '/ws' })
 
 let receiver = null
@@ -71,22 +142,6 @@ wss.on('connection', (ws, req) => {
       if (CLOSE_PAIR_ON_DISCONNECT && receiver) receiver.close()
     }
     console.log(`${protocol} disconnected`)
-  })
-})
-
-app.use((req, res) => {
-  let filePath = path.join(__dirname, decodeURIComponent(req.path === '/' ? '/receiver.html' : req.path))
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.status(404).send('Not Found')
-    } else {
-      res.setHeader('Content-Type', mime.lookup(filePath) || 'application/octet-stream')
-      let content = data.toString()
-      if (filePath.endsWith('.html')) {
-        content = content.replace(/SERVER_IP_ADDRESS/g, SERVER_IP_ADDRESS)
-      }
-      res.send(content)
-    }
   })
 })
 
