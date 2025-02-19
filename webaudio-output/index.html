@@ -43,11 +43,8 @@
           ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
         }
       }
-      pc1.ondatachannel = ({ channel }) => {
-        console.log('channel1: ', channel)
-      }
       dc1 = pc1.createDataChannel('pc1')
-      dc1.onopen = () => console.log('DataChannel1 open')
+      dc1.onopen = () => console.log('DataChannel open pc1')
       dc1.onmessage = (e) => console.log('DataChannel1 message:', e.data)
       window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
@@ -58,11 +55,12 @@
         }
       }
       pc2.ondatachannel = ({ channel }) => {
-        console.log('channel2: ', channel)
+        console.log('DataChannel open pc2')
+        dc2 = channel
+        dc2.onmessage = (e) => console.log('DataChannel2 message:', e.data)
       }
-      dc2 = pc2.createDataChannel('pc2')
-      dc2.onopen = () => console.log('DataChannel2 open')
-      dc2.onmessage = (e) => console.log('DataChannel2 message:', e.data)
+      // dc2 = pc2.createDataChannel('pc2')
+      // dc2.onopen = () => console.log('DataChannel2 open')
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
           const { readable, writable } = receiver.createEncodedStreams()
