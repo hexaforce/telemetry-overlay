@@ -63,6 +63,7 @@
           ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
         }
       }
+
       dc2 = pc2.createDataChannel('pc2')
       dc2.onopen = () => console.log('DataChannel2 open')
       dc2.onmessage = (e) => console.log('DataChannel2 message:', e.data)
@@ -72,9 +73,11 @@
           let keyFrameAnalyzer = new TransformStream({ transform })
           readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
         }
+        if (track.kind === 'audio') {
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+        }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
       }
 
@@ -101,10 +104,10 @@
 
       ws2.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
-        console.log('ws2.onmessage: ', message)
+        // console.log('ws2.onmessage: ', message)
         if (message.type === 'offer') {
-          console.log('Received offer on ws2')
           await pc2.setRemoteDescription(new RTCSessionDescription(message))
+          fixH264Codecs(pc2.getTransceivers())
           const answer = await pc2.createAnswer()
           await pc2.setLocalDescription(answer)
           ws2.send(JSON.stringify(answer))
@@ -115,9 +118,8 @@
 
       ws1.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
-        console.log('ws1.onmessage: ', message)
+        // console.log('ws1.onmessage: ', message)
         if (message.type === 'answer') {
-          console.log('Received answer on ws1')
           await pc1.setRemoteDescription(new RTCSessionDescription(message))
         } else if (message.type === 'ice') {
           await pc1.addIceCandidate(message.candidate)
@@ -127,19 +129,23 @@
       setTimeout(async () => {
         const stats = await pc1.getStats()
         stats.forEach((stat) => {
-          if (!(stat.type === 'outbound-rtp')) return
-          console.log(stat)
-          const codec = stats.get(stat.codecId)
-          console.log(codec)
-          //           if (stat.kind === 'video') {
-          //             document.getElementById('actualCodec').innerText = 'Using ' + codec.mimeType + (codec.sdpFmtpLine ? ' ' + codec.sdpFmtpLine + ' ' : '') + ', payloadType=' + codec.payloadType + '.'
-          //             if (stat.encoderImplementation) {
-          //               document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
-          //             }
-          //             if (stat.powerEfficientEncoder !== undefined) {
-          //               document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
-          //             }
-          //           }
+          // if (!(stat.type === 'outbound-rtp')) return
+          // console.log(stat)
+          // const codec = stats.get(stat.codecId)
+          // // console.log(codec)
+          // if (stat.kind === 'video') {
+          //   const { mimeType, sdpFmtpLine, payloadType, clockRate } = codec
+          //   document.getElementById('actualCodec').innerText = `Using mimeType:${mimeType} sdpFmtpLine:${sdpFmtpLine} payloadType:${payloadType}`
+          //   if (stat.encoderImplementation) {
+          //     document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
+          //   }
+          //   if (stat.powerEfficientEncoder !== undefined) {
+          //     document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
+          //   }
+          // }
+          // if (stat.kind === 'audio') {
+          //   const { mimeType, payloadType, clockRate } = codec
+          // }
         })
       }, 1000)
     }
