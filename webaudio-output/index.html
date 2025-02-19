@@ -82,7 +82,7 @@
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
       await pc1.setRemoteDescription(answer)
-      
+
       setTimeout(async () => {
         const stats = await pc1.getStats()
         stats.forEach((stat) => {
