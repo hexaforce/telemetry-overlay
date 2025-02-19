@@ -38,6 +38,15 @@
       dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
     }
 
+    async function setUserMedia() {
+      const Constraints = {
+        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }
+      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+    }
 
     // callButton
     // ------------------------------------------------------
@@ -46,11 +55,10 @@
       send1Button.disabled = false
       send2Button.disabled = false
       hangupButton.disabled = false
-      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+
       startTime = window.performance.now()
 
+      await setUserMedia()
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => {
         if (candidate) {
