@@ -22,28 +22,19 @@
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     }
 
-    const startButton = document.getElementById('startButton')
     const callButton = document.getElementById('callButton')
     const hangupButton = document.getElementById('hangupButton')
-    callButton.disabled = true
     hangupButton.disabled = true
 
-    // startButton
-    // ------------------------------------------------------
-    startButton.onclick = async () => {
-      startButton.disabled = true
-      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      callButton.disabled = false
-    }
 
     // callButton
     // ------------------------------------------------------
     callButton.onclick = async () => {
       callButton.disabled = true
       hangupButton.disabled = false
-
+      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
       startTime = window.performance.now()
 
       pc1 = new RTCPeerConnection()
@@ -238,7 +229,6 @@
     <p>remoteVideo</p>
     <video id="remoteVideo" playsinline autoplay muted></video>
     <div>
-      <button id="startButton">Start</button>
       <button id="callButton">Call</button>
       <button id="hangupButton">Hang Up</button>
     </div>
