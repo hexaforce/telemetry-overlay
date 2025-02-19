@@ -23,14 +23,28 @@
     }
 
     const callButton = document.getElementById('callButton')
+    const send1Button = document.getElementById('send1Button')
+    const send2Button = document.getElementById('send2Button')
     const hangupButton = document.getElementById('hangupButton')
+    send1Button.disabled = true
+    send2Button.disabled = true
     hangupButton.disabled = true
+
+    send1Button.onclick = async () => {
+      dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    }
+
+    send2Button.onclick = async () => {
+      dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    }
 
 
     // callButton
     // ------------------------------------------------------
     callButton.onclick = async () => {
       callButton.disabled = true
+      send1Button.disabled = false
+      send2Button.disabled = false
       hangupButton.disabled = false
       Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
       Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
@@ -45,7 +59,7 @@
       }
       dc1 = pc1.createDataChannel('pc1')
       dc1.onopen = () => console.log('DataChannel open pc1')
-      dc1.onmessage = (e) => console.log('DataChannel1 message:', e.data)
+      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
       window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
       pc2 = new RTCPeerConnection()
@@ -57,7 +71,7 @@
       pc2.ondatachannel = ({ channel }) => {
         console.log('DataChannel open pc2')
         dc2 = channel
-        dc2.onmessage = (e) => console.log('DataChannel2 message:', e.data)
+        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
       }
       // dc2 = pc2.createDataChannel('pc2')
       // dc2.onopen = () => console.log('DataChannel2 open')
@@ -144,6 +158,7 @@
       }, 1000)
     }
 
+
     // hangupButton
     // ------------------------------------------------------
     hangupButton.onclick = () => {
@@ -151,6 +166,8 @@
       pc2.close()
       pc1 = null
       pc2 = null
+      send1Button.disabled = true
+      send2Button.disabled = true
       hangupButton.disabled = true
       callButton.disabled = false
     }
@@ -233,6 +250,8 @@
     <video id="remoteVideo" playsinline autoplay muted></video>
     <div>
       <button id="callButton">Call</button>
+      <button id="send1Button">dc1 -> dc2</button>
+      <button id="send2Button">dc2 -> dc1</button>
       <button id="hangupButton">Hang Up</button>
     </div>
     <div id="actualCodec"></div>
