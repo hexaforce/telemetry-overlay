@@ -44,20 +44,16 @@ export function preferredCodecs(transceivers) {
 // 64001f	High Profile (Level 3.1)
 export function fixH264Codecs(transceivers, profileLevelId = '42001f', packetizationMode = '1') {
   transceivers.forEach((transceiver) => {
-    const kind = transceiver.receiver.track.kind;
-    const codecs = RTCRtpReceiver.getCapabilities(kind).codecs;
-    let filteredCodecs;
+    const kind = transceiver.receiver.track.kind
+    const codecs = RTCRtpReceiver.getCapabilities(kind).codecs
+    let filteredCodecs
     if (kind === 'video') {
-      filteredCodecs = codecs.filter(codec => 
-        codec.mimeType === 'video/H264' &&
-        codec.sdpFmtpLine.includes(`profile-level-id=${profileLevelId}`) &&
-        codec.sdpFmtpLine.includes(`packetization-mode=${packetizationMode}`)
-      );
+      filteredCodecs = codecs.filter((codec) => codec.mimeType === 'video/H264' && codec.sdpFmtpLine.includes(`profile-level-id=${profileLevelId}`) && codec.sdpFmtpLine.includes(`packetization-mode=${packetizationMode}`))
     } else if (kind === 'audio') {
-      filteredCodecs = codecs.filter(codec => codec.mimeType === 'audio/opus');
+      filteredCodecs = codecs.filter((codec) => codec.mimeType === 'audio/opus')
     }
-    transceiver.setCodecPreferences(filteredCodecs);
-  });
+    transceiver.setCodecPreferences(filteredCodecs)
+  })
 }
 
 // --- Media Transceiver --------------------------
@@ -113,7 +109,6 @@ async function onmessage({ data }) {
     ws.onclose = () => stream.getTracks().forEach((track) => track.stop())
 
     ws.send(JSON.stringify({ type: MediaReady }))
-    
   } else if (msg.type === MediaReady) {
     pc.ondatachannel = ({ channel }) => {
       console.log('channel: ', channel)

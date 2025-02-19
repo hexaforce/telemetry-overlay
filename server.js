@@ -33,7 +33,6 @@ const validExtensions = {
   '.woff2': 'font/woff2',
 }
 
-
 function getLocalIPv4() {
   const interfaces = os.networkInterfaces()
   const ipv4Addresses = []

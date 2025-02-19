@@ -9,7 +9,7 @@ export class StreamVisualizer {
   constructor(remoteStream, canvas) {
     // console.log('Creating StreamVisualizer with remoteStream and canvas:', remoteStream, canvas);
     this.canvas = canvas
-    this.canvas.style.backgroundColor = "rgba(0, 0, 0, 0.9)"
+    this.canvas.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
     this.drawContext = this.canvas.getContext('2d')
 
     // cope with browser differences
