@@ -46,42 +46,84 @@
 
       startTime = window.performance.now()
 
-      pc1 = new RTCPeerConnection()
-      pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
-      dc1 = pc1.createDataChannel("pc1")
-      dc1.onopen = ({ target }) => console.log('target: ', target)
-      pc1.ondatachannel = ({ channel }) => console.log('channel: ', channel)
+      pc1 = new RTCPeerConnection();
+      pc1.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          ws1.send(JSON.stringify({ type: "ice", target: "pc2", candidate }));
+        }
+      };
+      dc1 = pc1.createDataChannel("pc1");
+      dc1.onopen = () => console.log("DataChannel1 open");
+      dc1.onmessage = (e) => console.log("DataChannel1 message:", e.data);
+      window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream));
 
-      pc2 = new RTCPeerConnection()
-      pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
-      dc2 = pc2.createDataChannel("pc2")
-      dc2.onopen = ({ target }) => console.log('target: ', target)
-      pc2.ondatachannel = ({ channel }) => console.log('channel: ', channel)
 
+      pc2 = new RTCPeerConnection();
+      pc2.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          ws2.send(JSON.stringify({ type: "ice", target: "pc1", candidate }));
+        }
+      };
+      dc2 = pc2.createDataChannel("pc2");
+      dc2.onopen = () => console.log("DataChannel2 open");
+      dc2.onmessage = (e) => console.log("DataChannel2 message:", e.data);
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
-          const { readable, writable } = receiver.createEncodedStreams()
-          let keyFrameAnalyzer = new TransformStream({ transform })
-          readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+          const { readable, writable } = receiver.createEncodedStreams();
+          let keyFrameAnalyzer = new TransformStream({ transform });
+          readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable);
         }
         if (remoteVideo.srcObject !== streams[0]) {
-          remoteVideo.srcObject = streams[0]
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+          remoteVideo.srcObject = streams[0];
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start();
         }
-      }
+      };
 
-      window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-      setSenderPriority(pc1)
-      const offer = await pc1.createOffer(OfferOptions)
+      const ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver');
+      const ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver');
 
-      await pc1.setLocalDescription(offer)
-      await pc2.setRemoteDescription(offer)
+      // --- 送信側 (pc1) の処理 ---
+      ws1.onopen = async () => {
+        console.log("ws1 connected");
+        // ws2 に直接送らず、ws1 経由で送信
+        const sendOffer = async () => {
+          if (ws2.readyState === WebSocket.OPEN) {
+            const offer = await pc1.createOffer();
+            await pc1.setLocalDescription(offer);
+            ws1.send(JSON.stringify({ type: "offer", sdp: offer.sdp }));
+          } else {
+            setTimeout(await sendOffer, 100);
+          }
+        };
+        await sendOffer();
+      };
 
-      fixH264Codecs(pc2.getTransceivers())
+      // --- 受信側 (pc2) の処理 ---
+      ws2.onopen = () => {
+        console.log("ws2 connected");
+      };
 
-      const answer = await pc2.createAnswer()
-      await pc2.setLocalDescription(answer)
-      await pc1.setRemoteDescription(answer)
+      // --- WebSocket メッセージの処理 ---
+      ws2.onmessage = async (event) => {
+        console.log('ws2.onmessage: ', event)
+        const message = JSON.parse(event.data);
+        if (message.type === "offer") {
+          console.log("Received offer on ws2");
+          await pc2.setRemoteDescription(new RTCSessionDescription({ type: "offer", sdp: message.sdp }));
+          const answer = await pc2.createAnswer();
+          await pc2.setLocalDescription(answer);
+          ws2.send(JSON.stringify({ type: "answer", sdp: answer.sdp }));
+        }
+      };
+
+      ws1.onmessage = async (event) => {
+        console.log('ws1.onmessage: ', event)
+        const message = JSON.parse(event.data);
+        if (message.type === "answer") {
+          console.log("Received answer on ws1");
+          await pc1.setRemoteDescription(new RTCSessionDescription({ type: "answer", sdp: message.sdp }));
+        }
+      };
 
       setTimeout(async () => {
         const stats = await pc1.getStats()
