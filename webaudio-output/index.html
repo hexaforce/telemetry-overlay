@@ -87,7 +87,7 @@
           if (ws2.readyState === WebSocket.OPEN) {
             const offer = await pc1.createOffer()
             await pc1.setLocalDescription(offer)
-            ws1.send(JSON.stringify({ type: 'offer', sdp: offer.sdp }))
+            ws1.send(JSON.stringify(offer))
           } else {
             setTimeout(await sendOffer, 100)
           }
@@ -104,10 +104,12 @@
         console.log('ws2.onmessage: ', message)
         if (message.type === 'offer') {
           console.log('Received offer on ws2')
-          await pc2.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: message.sdp }))
+          await pc2.setRemoteDescription(new RTCSessionDescription(message))
           const answer = await pc2.createAnswer()
           await pc2.setLocalDescription(answer)
-          ws2.send(JSON.stringify({ type: 'answer', sdp: answer.sdp }))
+          ws2.send(JSON.stringify(answer))
+        } else if (message.type === 'ice') {
+          await pc2.addIceCandidate(message.candidate)
         }
       }
 
@@ -116,7 +118,9 @@
         console.log('ws1.onmessage: ', message)
         if (message.type === 'answer') {
           console.log('Received answer on ws1')
-          await pc1.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: message.sdp }))
+          await pc1.setRemoteDescription(new RTCSessionDescription(message))
+        } else if (message.type === 'ice') {
+          await pc1.addIceCandidate(message.candidate)
         }
       }
 
