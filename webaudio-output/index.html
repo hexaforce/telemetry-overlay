@@ -60,6 +60,12 @@
 
       await setUserMedia()
       pc1 = new RTCPeerConnection()
+      pc1.oniceconnectionstatechange = (event) => {
+        console.log("ICE State Changed:", pc1.iceConnectionState)
+        if ('connected' ===  pc1.iceConnectionState){
+          // console.log(pc1.localDescription.sdp)
+        }
+      }
       pc1.onicecandidate = ({ candidate }) => {
         if (candidate) {
           ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
@@ -71,6 +77,12 @@
       window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
       pc2 = new RTCPeerConnection()
+      pc2.oniceconnectionstatechange = (event) => {
+        console.log("ICE State Changed:", pc2.iceConnectionState)
+        if ('connected' ===  pc2.iceConnectionState){
+          // console.log(pc2.localDescription.sdp)
+        }
+      }
       pc2.onicecandidate = ({ candidate }) => {
         if (candidate) {
           ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
