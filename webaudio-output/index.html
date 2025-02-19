@@ -6,7 +6,7 @@
   <script type="module" type="text/javascript">
     'use strict'
 
-    import { preferredVideoCodecs, setSenderPriority } from './Support.js'
+    import { preferredVideoCodecs, setSenderPriority, fixH264Codecs } from './Support.js'
 
     import { StreamVisualizer } from './StreamVisualizer.js'
 
@@ -48,8 +48,16 @@
 
       pc1 = new RTCPeerConnection()
       pc1.onicecandidate = ({ candidate }) => pc2.addIceCandidate(candidate)
+      dc1 = pc1.createDataChannel("pc1")
+      dc1.onopen = ({ target }) => console.log('target: ', target)
+      pc1.ondatachannel = ({ channel }) => console.log('channel: ', channel)
+
       pc2 = new RTCPeerConnection()
       pc2.onicecandidate = ({ candidate }) => pc1.addIceCandidate(candidate)
+      dc2 = pc2.createDataChannel("pc2")
+      dc2.onopen = ({ target }) => console.log('target: ', target)
+      pc2.ondatachannel = ({ channel }) => console.log('channel: ', channel)
+
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
           const { readable, writable } = receiver.createEncodedStreams()
@@ -63,14 +71,13 @@
       }
 
       window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-
+      setSenderPriority(pc1)
       const offer = await pc1.createOffer(OfferOptions)
-      // setSenderPriority(pc1)
 
       await pc1.setLocalDescription(offer)
       await pc2.setRemoteDescription(offer)
 
-      preferredVideoCodecs(pc2.getTransceivers())
+      fixH264Codecs(pc2.getTransceivers())
 
       const answer = await pc2.createAnswer()
       await pc2.setLocalDescription(answer)
@@ -113,6 +120,8 @@
     let startTime
     let pc1
     let pc2
+    let dc1
+    let dc2
 
     const keyFrameCountDisplay = document.querySelector('#keyframe-count')
     const keyFrameSizeDisplay = document.querySelector('#keyframe-size')
