@@ -62,7 +62,7 @@
       pc1 = new RTCPeerConnection()
       pc1.oniceconnectionstatechange = (event) => {
         console.log("ICE State Changed:", pc1.iceConnectionState)
-        if ('connected' ===  pc1.iceConnectionState){
+        if ('connected' === pc1.iceConnectionState) {
           // console.log(pc1.localDescription.sdp)
         }
       }
@@ -79,7 +79,7 @@
       pc2 = new RTCPeerConnection()
       pc2.oniceconnectionstatechange = (event) => {
         console.log("ICE State Changed:", pc2.iceConnectionState)
-        if ('connected' ===  pc2.iceConnectionState){
+        if ('connected' === pc2.iceConnectionState) {
           // console.log(pc2.localDescription.sdp)
         }
       }
@@ -93,8 +93,6 @@
         dc2 = channel
         dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
       }
-      // dc2 = pc2.createDataChannel('pc2')
-      // dc2.onopen = () => console.log('DataChannel2 open')
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
           const { readable, writable } = receiver.createEncodedStreams()
@@ -155,27 +153,57 @@
       }
 
       setTimeout(async () => {
-        const stats = await pc1.getStats()
-        stats.forEach((stat) => {
-          // if (!(stat.type === 'outbound-rtp')) return
+        const pc2stats = await pc2.getStats()
+        pc2stats.forEach((stat) => {
+          // if (!(stat.type === 'inbound-rtp')) return
           // console.log(stat)
-          // const codec = stats.get(stat.codecId)
-          // // console.log(codec)
-          // if (stat.kind === 'video') {
-          //   const { mimeType, sdpFmtpLine, payloadType, clockRate } = codec
-          //   document.getElementById('actualCodec').innerText = `Using mimeType:${mimeType} sdpFmtpLine:${sdpFmtpLine} payloadType:${payloadType}`
-          //   if (stat.encoderImplementation) {
-          //     document.getElementById('actualCodec').innerText += ' Encoder: "' + stat.encoderImplementation + '".'
-          //   }
-          //   if (stat.powerEfficientEncoder !== undefined) {
-          //     document.getElementById('actualCodec').innerText += ' Power efficient: ' + stat.powerEfficientEncoder + '.'
-          //   }
-          // }
-          // if (stat.kind === 'audio') {
-          //   const { mimeType, payloadType, clockRate } = codec
+          if (stat.type === 'local-candidate') {
+            const { candidateType, networkType, protocol, ip, port, priority } = stat
+            console.log({ candidateType, networkType, protocol, ip, port, priority })
+          }
+          if (stat.type === 'remote-candidate') {
+            const { candidateType, protocol, ip, port, priority } = stat
+            console.log({ candidateType, protocol, ip, port, priority })
+          }
+          // if (stat.type === 'inbound-rtp') {
+          //   const codec = pc2stats.get(stat.codecId)
+          //   console.log(codec)
           // }
         })
       }, 1000)
+
+      setInterval(() => {
+        pc2 && pc2.getStats(null).then((stats) => {
+
+          let statsOutput = "";
+
+          stats.forEach((report) => {
+          // if (report.type === 'local-candidate') return
+          // if (report.type === 'remote-candidate') return
+          // if (report.type === 'certificate') return
+          // if (report.type === 'data-channel') return
+
+            statsOutput +=
+              `<h2>Report: ${report.type}</h2>\n<strong>ID:</strong> ${report.id}<br>\n
+              <strong>Timestamp:</strong> ${report.timestamp}<br>\n`;
+
+            // Now the statistics for this report; we intentionally drop the ones we
+            // sorted to the top above
+
+            Object.keys(report).forEach((statName) => {
+              if (
+                statName !== "id" &&
+                statName !== "timestamp" &&
+                statName !== "type"
+              ) {
+                statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`;
+              }
+            });
+          });
+
+          document.querySelector(".stats-box").innerHTML = statsOutput;
+        });
+      }, 1000);
     }
 
 
@@ -285,6 +313,7 @@
       Last interframe size: <span id="interframe-size"></span><br />
       Duplicate count: <span id="duplicate-count"></span><br />
     </div>
+    <div class="stats-box"></div>
   </div>
 </body>
 
