@@ -192,7 +192,7 @@
 
           stats.forEach((report) => {
             const { type, id } = report
-            if (type === 'inbound-rtp') {
+            if (type === 'candidate-pair' || type === 'inbound-rtp') {
               let enrichedReport = { ...report }
               resolveIds(enrichedReport)
               x.push(enrichedReport)
