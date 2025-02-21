@@ -167,7 +167,7 @@
 
       setInterval(() => {
         pc2 && pc2.getStats(null).then((stats) => {
-
+       
           function resolveIds(report1) {
             Object.keys(report1).forEach((key) => {
               if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
@@ -187,14 +187,12 @@
             })
           }
 
-          let statsOutput = ''
           let visited = new Set()
           let x = []
 
           stats.forEach((report) => {
             const { type, id } = report
-            // if (type === 'inbound-rtp') {
-            if (type === 'transport') {
+            if (type === 'inbound-rtp') {
               let enrichedReport = { ...report }
               resolveIds(enrichedReport)
               x.push(enrichedReport)
