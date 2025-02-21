@@ -164,60 +164,41 @@
           }
         }
 
-        setTimeout(async () => {
-          const pc2stats = await pc2.getStats()
-          pc2stats.forEach((stat) => {
-            // if (!(stat.type === 'inbound-rtp')) return
-            // console.log(stat)
-            if (stat.type === 'local-candidate') {
-              const { candidateType, networkType, protocol, ip, port, priority } = stat
-              console.log({ candidateType, networkType, protocol, ip, port, priority })
-            }
-            if (stat.type === 'remote-candidate') {
-              const { candidateType, protocol, ip, port, priority } = stat
-              console.log({ candidateType, protocol, ip, port, priority })
-            }
-            // if (stat.type === 'inbound-rtp') {
-            //   const codec = pc2stats.get(stat.codecId)
-            //   console.log(codec)
-            // }
-          })
-        }, 1000)
-
         setInterval(() => {
-          pc2 &&
-            pc2.getStats(null).then((stats) => {
+          pc2 && pc2.getStats(null).then((stats) => {
+
+              function resolveIds(report1) {
+                Object.keys(report1).forEach((key) => {
+                  if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
+                    let id_ = report1[key]
+                    if (!visited.has(id_)) {
+                      visited.add(id_)
+                      const report2 = { ...stats.get(id_) }
+                      resolveIds(report2)
+                      delete report2.id
+                      if (report2.type !== 'remote-outbound-rtp') {
+                        delete report2.timestamp
+                      }
+                      delete report2.type
+                      report1[key] = report2
+                    }
+                  }
+                })
+              }
+
               let statsOutput = ''
               let visited = new Set()
               let x = []
+
               stats.forEach((report) => {
                 const { type, id } = report
-                if (report.type === 'inbound-rtp') {
+                if (type === 'transport' || type === 'inbound-rtp') {
                   let enrichedReport = { ...report }
-                  function resolveIds(obj) {
-                    Object.keys(obj).forEach((key) => {
-                      if (key.endsWith('Id') && typeof obj[key] === 'string' && stats.has(obj[key])) {
-                        let idValue = obj[key]
-                        if (!visited.has(idValue)) {
-                          visited.add(idValue)
-                          obj[key] = { id: idValue, ...stats.get(idValue) }
-                          resolveIds(obj[key])
-                        }
-                      }
-                    })
-                  }
                   resolveIds(enrichedReport)
                   x.push(enrichedReport)
                 }
 
-                // if (report.type === 'local-candidate') return
-                // if (report.type === 'remote-candidate') return
-                // if (report.type === 'certificate') return
-                // if (report.type === 'data-channel') return
-                // if (report.type === 'peer-connection') return
-
-                statsOutput += `<h2>Report: ${report.type}</h2>\n<strong>ID:</strong> ${report.id}<br>\n
-              <strong>Timestamp:</strong> ${report.timestamp}<br>\n`
+                statsOutput += `<h2>Report: ${report.type}</h2>\n<strong>ID:</strong> ${report.id}<br>\n<strong>Timestamp:</strong> ${report.timestamp}<br>\n`
 
                 // Now the statistics for this report; we intentionally drop the ones we
                 // sorted to the top above
@@ -229,7 +210,7 @@
                 })
               })
 
-              // console.log(JSON.stringify(x))
+              console.log(JSON.stringify(x))
 
               document.querySelector('.stats-box').innerHTML = statsOutput
             })
