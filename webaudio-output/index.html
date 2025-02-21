@@ -1,337 +1,260 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <script type="module" type="text/javascript">
-      'use strict'
 
-      import { preferredVideoCodecs, setSenderPriority, fixH264Codecs } from './Support.js'
+<head>
+  <meta charset="utf-8" />
+  <script type="module" type="text/javascript">
+    'use strict'
 
-      import { StreamVisualizer } from './StreamVisualizer.js'
+    import { preferredVideoCodecs, setSenderPriority, fixH264Codecs } from './Support.js'
 
-      const OfferOptions = {
-        offerToReceiveVideo: 1,
-        offerToReceiveAudio: 1,
-      }
+    import { StreamVisualizer } from './StreamVisualizer.js'
 
+    const OfferOptions = {
+      offerToReceiveVideo: 1,
+      offerToReceiveAudio: 1,
+    }
+
+    const Constraints = {
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
+      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    }
+
+    const callButton = document.getElementById('callButton')
+    const send1Button = document.getElementById('send1Button')
+    const send2Button = document.getElementById('send2Button')
+    const hangupButton = document.getElementById('hangupButton')
+    send1Button.disabled = true
+    send2Button.disabled = true
+    hangupButton.disabled = true
+
+    send1Button.onclick = async () => {
+      dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    }
+
+    send2Button.onclick = async () => {
+      dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    }
+
+    async function setUserMedia() {
       const Constraints = {
-        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
-        // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
         video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       }
+      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+    }
 
-      const callButton = document.getElementById('callButton')
-      const send1Button = document.getElementById('send1Button')
-      const send2Button = document.getElementById('send2Button')
-      const hangupButton = document.getElementById('hangupButton')
+    // callButton
+    // ------------------------------------------------------
+    callButton.onclick = async () => {
+      callButton.disabled = true
+      send1Button.disabled = false
+      send2Button.disabled = false
+      hangupButton.disabled = false
+
+      startTime = window.performance.now()
+
+      await setUserMedia()
+      pc1 = new RTCPeerConnection()
+      pc1.oniceconnectionstatechange = (event) => {
+        console.log('ICE State Changed:', pc1.iceConnectionState)
+        if ('connected' === pc1.iceConnectionState) {
+          // console.log(pc1.localDescription.sdp)
+        }
+      }
+      pc1.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+        }
+      }
+      dc1 = pc1.createDataChannel('pc1')
+      dc1.onopen = () => console.log('DataChannel open pc1')
+      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+      window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+
+      pc2 = new RTCPeerConnection()
+      pc2.oniceconnectionstatechange = (event) => {
+        console.log('ICE State Changed:', pc2.iceConnectionState)
+        if ('connected' === pc2.iceConnectionState) {
+          // console.log(pc2.localDescription.sdp)
+        }
+      }
+      pc2.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+        }
+      }
+      pc2.ondatachannel = ({ channel }) => {
+        console.log('DataChannel open pc2')
+        dc2 = channel
+        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
+      }
+      pc2.ontrack = ({ receiver, streams, track }) => {
+        if (track.kind === 'video') {
+          const { readable, writable } = receiver.createEncodedStreams()
+          let keyFrameAnalyzer = new TransformStream({
+            transform: (encodedFrame, controller) => {
+              const { type, timestamp, data } = encodedFrame
+              if (type == 'key') {
+                console.log(encodedFrame.getMetadata())
+              } else if (type == 'delta') {
+              }
+              // const view = new DataView(data)
+              // const keyframeBit = view.getUint8(0) & 0x01
+              // console.log(timestamp)
+              // console.log(data.byteLength)
+              controller.enqueue(encodedFrame)
+            },
+          })
+          readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+        }
+        if (track.kind === 'audio') {
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+        }
+        if (remoteVideo.srcObject !== streams[0]) {
+          remoteVideo.srcObject = streams[0]
+        }
+      }
+
+      const ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
+      const ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
+
+      ws1.onopen = async () => {
+        console.log('ws1 connected')
+        const sendOffer = async () => {
+          if (ws2.readyState === WebSocket.OPEN) {
+            const offer = await pc1.createOffer()
+            await pc1.setLocalDescription(offer)
+            ws1.send(JSON.stringify(offer))
+          } else {
+            setTimeout(await sendOffer, 100)
+          }
+        }
+        await sendOffer()
+      }
+
+      ws2.onopen = () => {
+        console.log('ws2 connected')
+      }
+
+      ws2.onmessage = async ({ data }) => {
+        const message = JSON.parse(data)
+        // console.log('ws2.onmessage: ', message)
+        if (message.type === 'offer') {
+          await pc2.setRemoteDescription(new RTCSessionDescription(message))
+          fixH264Codecs(pc2.getTransceivers())
+          const answer = await pc2.createAnswer()
+          await pc2.setLocalDescription(answer)
+          ws2.send(JSON.stringify(answer))
+        } else if (message.type === 'ice') {
+          await pc2.addIceCandidate(message.candidate)
+        }
+      }
+
+      ws1.onmessage = async ({ data }) => {
+        const message = JSON.parse(data)
+        // console.log('ws1.onmessage: ', message)
+        if (message.type === 'answer') {
+          await pc1.setRemoteDescription(new RTCSessionDescription(message))
+        } else if (message.type === 'ice') {
+          await pc1.addIceCandidate(message.candidate)
+        }
+      }
+
+      setInterval(() => {
+        pc2 && pc2.getStats(null).then((stats) => {
+
+          function resolveIds(report1) {
+            Object.keys(report1).forEach((key) => {
+              if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
+                let id_ = report1[key]
+                if (!visited.has(id_)) {
+                  visited.add(id_)
+                  const report2 = { ...stats.get(id_) }
+                  resolveIds(report2)
+                  delete report2.id
+                  if (report2.type !== 'remote-outbound-rtp') {
+                    delete report2.timestamp
+                  }
+                  delete report2.type
+                  report1[key] = report2
+                }
+              }
+            })
+          }
+
+          let statsOutput = ''
+          let visited = new Set()
+          let x = []
+
+          stats.forEach((report) => {
+            const { type, id } = report
+            // if (type === 'inbound-rtp') {
+            if (type === 'transport') {
+              let enrichedReport = { ...report }
+              resolveIds(enrichedReport)
+              x.push(enrichedReport)
+            }
+          })
+
+          document.querySelector('.stats-box').innerHTML = JSON.stringify(x, null, 2)
+        })
+      }, 1000)
+    }
+
+    // hangupButton
+    // ------------------------------------------------------
+    hangupButton.onclick = () => {
+      pc1.close()
+      pc2.close()
+      pc1 = null
+      pc2 = null
+
+      localVideo.srcObject.getTracks().forEach((track) => track.stop())
+      window.stream.getTracks().forEach((track) => track.stop())
+
       send1Button.disabled = true
       send2Button.disabled = true
       hangupButton.disabled = true
+      callButton.disabled = false
+    }
 
-      send1Button.onclick = async () => {
-        dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-      }
+    const localVideo = document.getElementById('localVideo')
+    const remoteVideo = document.getElementById('remoteVideo')
 
-      send2Button.onclick = async () => {
-        dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-      }
+    let startTime
+    let pc1
+    let pc2
+    let dc1
+    let dc2
 
-      async function setUserMedia() {
-        const Constraints = {
-          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        }
-        Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-        Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
-      }
+  </script>
+</head>
 
-      // callButton
-      // ------------------------------------------------------
-      callButton.onclick = async () => {
-        callButton.disabled = true
-        send1Button.disabled = false
-        send2Button.disabled = false
-        hangupButton.disabled = false
-
-        startTime = window.performance.now()
-
-        await setUserMedia()
-        pc1 = new RTCPeerConnection()
-        pc1.oniceconnectionstatechange = (event) => {
-          console.log('ICE State Changed:', pc1.iceConnectionState)
-          if ('connected' === pc1.iceConnectionState) {
-            // console.log(pc1.localDescription.sdp)
-          }
-        }
-        pc1.onicecandidate = ({ candidate }) => {
-          if (candidate) {
-            ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
-          }
-        }
-        dc1 = pc1.createDataChannel('pc1')
-        dc1.onopen = () => console.log('DataChannel open pc1')
-        dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
-        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-
-        pc2 = new RTCPeerConnection()
-        pc2.oniceconnectionstatechange = (event) => {
-          console.log('ICE State Changed:', pc2.iceConnectionState)
-          if ('connected' === pc2.iceConnectionState) {
-            // console.log(pc2.localDescription.sdp)
-          }
-        }
-        pc2.onicecandidate = ({ candidate }) => {
-          if (candidate) {
-            ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
-          }
-        }
-        pc2.ondatachannel = ({ channel }) => {
-          console.log('DataChannel open pc2')
-          dc2 = channel
-          dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
-        }
-        pc2.ontrack = ({ receiver, streams, track }) => {
-          if (track.kind === 'video') {
-            const { readable, writable } = receiver.createEncodedStreams()
-            let keyFrameAnalyzer = new TransformStream({
-              transform: (encodedFrame, controller) => {
-                const { type, timestamp, data } = encodedFrame
-                if (type == 'key') {
-                  console.log(encodedFrame.getMetadata())
-                } else if (type == 'delta') {
-                }
-                // const view = new DataView(data)
-                // const keyframeBit = view.getUint8(0) & 0x01
-                // console.log(timestamp)
-                // console.log(data.byteLength)
-                controller.enqueue(encodedFrame)
-              },
-            })
-            readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
-          }
-          if (track.kind === 'audio') {
-            new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-          }
-          if (remoteVideo.srcObject !== streams[0]) {
-            remoteVideo.srcObject = streams[0]
-          }
-        }
-
-        const ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
-        const ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
-
-        ws1.onopen = async () => {
-          console.log('ws1 connected')
-          const sendOffer = async () => {
-            if (ws2.readyState === WebSocket.OPEN) {
-              const offer = await pc1.createOffer()
-              await pc1.setLocalDescription(offer)
-              ws1.send(JSON.stringify(offer))
-            } else {
-              setTimeout(await sendOffer, 100)
-            }
-          }
-          await sendOffer()
-        }
-
-        ws2.onopen = () => {
-          console.log('ws2 connected')
-        }
-
-        ws2.onmessage = async ({ data }) => {
-          const message = JSON.parse(data)
-          // console.log('ws2.onmessage: ', message)
-          if (message.type === 'offer') {
-            await pc2.setRemoteDescription(new RTCSessionDescription(message))
-            fixH264Codecs(pc2.getTransceivers())
-            const answer = await pc2.createAnswer()
-            await pc2.setLocalDescription(answer)
-            ws2.send(JSON.stringify(answer))
-          } else if (message.type === 'ice') {
-            await pc2.addIceCandidate(message.candidate)
-          }
-        }
-
-        ws1.onmessage = async ({ data }) => {
-          const message = JSON.parse(data)
-          // console.log('ws1.onmessage: ', message)
-          if (message.type === 'answer') {
-            await pc1.setRemoteDescription(new RTCSessionDescription(message))
-          } else if (message.type === 'ice') {
-            await pc1.addIceCandidate(message.candidate)
-          }
-        }
-
-        setInterval(() => {
-          pc2 && pc2.getStats(null).then((stats) => {
-
-              function resolveIds(report1) {
-                Object.keys(report1).forEach((key) => {
-                  if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
-                    let id_ = report1[key]
-                    if (!visited.has(id_)) {
-                      visited.add(id_)
-                      const report2 = { ...stats.get(id_) }
-                      resolveIds(report2)
-                      delete report2.id
-                      if (report2.type !== 'remote-outbound-rtp') {
-                        delete report2.timestamp
-                      }
-                      delete report2.type
-                      report1[key] = report2
-                    }
-                  }
-                })
-              }
-
-              let statsOutput = ''
-              let visited = new Set()
-              let x = []
-
-              stats.forEach((report) => {
-                const { type, id } = report
-                if (type === 'transport' || type === 'inbound-rtp') {
-                  let enrichedReport = { ...report }
-                  resolveIds(enrichedReport)
-                  x.push(enrichedReport)
-                }
-
-                statsOutput += `<h2>Report: ${report.type}</h2>\n<strong>ID:</strong> ${report.id}<br>\n<strong>Timestamp:</strong> ${report.timestamp}<br>\n`
-
-                // Now the statistics for this report; we intentionally drop the ones we
-                // sorted to the top above
-
-                Object.keys(report).forEach((statName) => {
-                  if (statName !== 'id' && statName !== 'timestamp' && statName !== 'type') {
-                    statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`
-                  }
-                })
-              })
-
-              console.log(JSON.stringify(x))
-
-              document.querySelector('.stats-box').innerHTML = statsOutput
-            })
-        }, 1000)
-      }
-
-      // hangupButton
-      // ------------------------------------------------------
-      hangupButton.onclick = () => {
-        pc1.close()
-        pc2.close()
-        pc1 = null
-        pc2 = null
-
-        localVideo.srcObject.getTracks().forEach((track) => track.stop())
-        window.stream.getTracks().forEach((track) => track.stop())
-
-        send1Button.disabled = true
-        send2Button.disabled = true
-        hangupButton.disabled = true
-        callButton.disabled = false
-      }
-
-      const localVideo = document.getElementById('localVideo')
-      const remoteVideo = document.getElementById('remoteVideo')
-
-      let startTime
-      let pc1
-      let pc2
-      let dc1
-      let dc2
-
-      const keyFrameCountDisplay = document.querySelector('#keyframe-count')
-      const keyFrameSizeDisplay = document.querySelector('#keyframe-size')
-      const interFrameCountDisplay = document.querySelector('#interframe-count')
-      const interFrameSizeDisplay = document.querySelector('#interframe-size')
-      const videoSizeDisplay = document.querySelector('#video-size')
-      const duplicateCountDisplay = document.querySelector('#duplicate-count')
-
-      let keyFrameCount = 0
-      let interFrameCount = 0
-      let keyFrameLastSize = 0
-      let interFrameLastSize = 0
-      let duplicateCount = 0
-
-      let prevFrameType
-      let prevFrameTimestamp
-      let prevFrameSynchronizationSource
-
-      function transform(encodedFrame, controller) {
-        const { data, type, timestamp, synchronizationSource } = encodedFrame
-        const view = new DataView(data)
-        const { byteLength } = data
-        const keyframeBit = view.getUint8(0) & 0x01
-        // console.log(view.getUint8(0).toString(16));
-
-        console.log(encodedFrame)
-        // console.log(encodedFrame.getMetadata())
-        if (videoSizeDisplay.innerText === '') {
-          const { width, height, mimeType, payloadType } = encodedFrame.getMetadata()
-          videoSizeDisplay.innerText = `${width}x${height} payload:${payloadType} mime:${mimeType}`
-        }
-
-        let isKeyFrame = (view.getUint8(0) & 0x01) === 0
-
-        if (isKeyFrame) {
-          keyFrameCount++
-          keyFrameLastSize = byteLength
-        } else {
-          interFrameCount++
-          interFrameLastSize = byteLength
-        }
-        if (type === prevFrameType && timestamp === prevFrameTimestamp && synchronizationSource === prevFrameSynchronizationSource) {
-          duplicateCount++
-        }
-
-        keyFrameCountDisplay.innerText = keyFrameCount
-        keyFrameSizeDisplay.innerText = keyFrameLastSize
-        interFrameCountDisplay.innerText = interFrameCount
-        interFrameSizeDisplay.innerText = interFrameLastSize
-        duplicateCountDisplay.innerText = duplicateCount
-
-        prevFrameType = type
-        prevFrameTimestamp = timestamp
-        prevFrameSynchronizationSource = synchronizationSource
-
-        controller.enqueue(encodedFrame)
-      }
-    </script>
-  </head>
-
-  <body>
-    <div id="container">
-      <div class="select">
-        <label for="videoSource">Video source: </label
-        ><select id="videoSource"></select>
-        <label for="audioSource">Audio source: </label
-        ><select id="audioSource"></select>
-      </div>
-      <p>localVideo</p>
-      <video id="localVideo" playsinline autoplay muted></video>
-      <p>remoteVideo</p>
-      <video id="remoteVideo" playsinline autoplay muted></video>
-      <div>
-        <button id="callButton">Call</button>
-        <button id="send1Button">dc1 -> dc2</button>
-        <button id="send2Button">dc2 -> dc1</button>
-        <button id="hangupButton">Hang Up</button>
-      </div>
-      <div id="actualCodec"></div>
-      <canvas></canvas>
-      <p>View the console to see logging.</p>
-      <div class="analyzer">
-        Video size: <span id="video-size"></span><br />
-        Keyframe count: <span id="keyframe-count"></span><br />
-        Interframe count: <span id="interframe-count"></span><br />
-        Last keyframe size: <span id="keyframe-size"></span><br />
-        Last interframe size: <span id="interframe-size"></span><br />
-        Duplicate count: <span id="duplicate-count"></span><br />
-      </div>
-      <div class="stats-box"></div>
+<body>
+  <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+      <label for="audioSource">Audio source: </label><select id="audioSource"></select>
     </div>
-  </body>
+    <p>localVideo</p>
+    <video id="localVideo" playsinline autoplay muted></video>
+    <p>remoteVideo</p>
+    <video id="remoteVideo" playsinline autoplay muted></video>
+    <div>
+      <button id="callButton">Call</button>
+      <button id="send1Button">dc1 -> dc2</button>
+      <button id="send2Button">dc2 -> dc1</button>
+      <button id="hangupButton">Hang Up</button>
+    </div>
+    <div id="actualCodec"></div>
+    <canvas></canvas>
+    <pre class="stats-box"></pre>
+  </div>
+</body>
+
 </html>
