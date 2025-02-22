@@ -17,7 +17,8 @@ const decodeAudio = (decodedFrame, controller) => {
   controller.enqueue(decodedFrame)
 }
 
-function handleTransform(options, readable, writable) {
+function handleTransform(dataTransformer) {
+  const { options, readable, writable } = dataTransformer
   const { operation, kind } = options
   if (operation === 'encode') {
     let transform = kind === 'video' ? encodeVideo : encodeAudio
@@ -28,14 +29,10 @@ function handleTransform(options, readable, writable) {
   }
 }
 
-onmessage = ({ data }) => {
-  const { options, readable, writable } = data
-  handleTransform(options, readable, writable)
-}
+// Chrome
+onmessage = ({ data }) => handleTransform(data)
 
+// Safari,Firefox
 if (self.RTCTransformEvent) {
-  self.onrtctransform = ({ transformer }) => {
-    const { options, readable, writable } = transformer
-    handleTransform(options, readable, writable)
-  }
+  self.onrtctransform = ({ transformer }) => handleTransform(transformer)
 }
