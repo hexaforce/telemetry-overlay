@@ -20,7 +20,6 @@ export const SupportedType = [
 ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
 
 export class MultimediaRecorder {
-
   constructor() {
     this.mediaRecorder = null
     this.recordedBlobs = []
@@ -83,5 +82,4 @@ export class MultimediaRecorder {
       window.URL.revokeObjectURL(url)
     }, 100)
   }
-
 }

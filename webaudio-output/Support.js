@@ -71,9 +71,7 @@ export function fixH264Codecs(transceivers, profileLevelId = '42001f', packetiza
   })
 }
 
-
 export function reportAggregate(stats, remoteCandidateAddress, localCandidateAddress) {
-
   function resolveIds(report1, idNames) {
     idNames.forEach((idName) => {
       if (idName.endsWith('Id') && typeof report1[idName] === 'string' && stats.has(report1[idName])) {
@@ -81,10 +79,8 @@ export function reportAggregate(stats, remoteCandidateAddress, localCandidateAdd
         delete report2.id
         delete report2.type
         delete report2.timestamp
-        if (idName === 'localCandidateId')
-          report2.address = localCandidateAddress[report2.port]
-        if (idName === 'remoteCandidateId')
-          report2.address = remoteCandidateAddress[report2.port]
+        if (idName === 'localCandidateId') report2.address = localCandidateAddress[report2.port]
+        if (idName === 'remoteCandidateId') report2.address = remoteCandidateAddress[report2.port]
         report1[idName.slice(0, -2)] = report2
         delete report1[idName]
       }
@@ -112,6 +108,6 @@ export function reportAggregate(stats, remoteCandidateAddress, localCandidateAdd
       result.push(report0)
     }
   })
-  
+
   return result
 }
