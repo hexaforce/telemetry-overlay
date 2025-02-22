@@ -22,6 +22,9 @@
     let dc1
     let dc2
 
+    let ws1SessionId
+    let ws2SessionId
+
     const localCandidateAddress = {}
     const remoteCandidateAddress = {}
 
@@ -99,7 +102,7 @@
     ws2.onmessage = async ({ data }) => {
       const message = JSON.parse(data)
       if (message.type === 'session') {
-        console.log(message.sessionId)
+        ws2SessionId = message.sessionId
       } else if (message.type === 'info') {
         const videoSelect = document.querySelector('select#videoSource')
         const audioSelect = document.querySelector('select#audioSource')
@@ -132,9 +135,8 @@
 
     ws1.onmessage = async ({ data }) => {
       const message = JSON.parse(data)
-
       if (message.type === 'session') {
-        console.log(message.sessionId)
+        ws1SessionId = message.sessionId
       } else if (message.type === 'init') {
         let devices = await getDevices()
         ws1.send(JSON.stringify({ type: 'info', devices }))
