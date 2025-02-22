@@ -111,3 +111,29 @@ export function reportAggregate(stats, remoteCandidateAddress, localCandidateAdd
 
   return result
 }
+
+const worker = new Worker('./worker.js', { name: 'Encode/Decode worker' })
+
+export function setupSenderTransform(sender) {
+  if (window.RTCRtpScriptTransform) {
+    sender.transform = new RTCRtpScriptTransform(worker, {
+      operation: 'encode', kind: sender.track.kind
+    })
+  } else {
+    const { readable, writable } = sender.createEncodedStreams()
+    let options = { operation: 'encode', kind: sender.track.kind }
+    worker.postMessage({ options, readable, writable }, [readable, writable])
+  }
+}
+
+export function setupReceiverTransform(receiver) {
+  if (window.RTCRtpScriptTransform) {
+    receiver.transform = new RTCRtpScriptTransform(worker, {
+      operation: 'decode', kind: receiver.track.kind
+    })
+  } else {
+    const { readable, writable } = receiver.createEncodedStreams()
+    let options = { operation: 'decode', kind: receiver.track.kind }
+    worker.postMessage({ options, readable, writable }, [readable, writable])
+  }
+}
