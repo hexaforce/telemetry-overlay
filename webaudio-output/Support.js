@@ -112,7 +112,7 @@ export function reportAggregate(stats, remoteCandidateAddress, localCandidateAdd
   return result
 }
 
-const worker = new Worker('./worker.js', { name: 'Encode/Decode worker' })
+const worker = new Worker('./Transform.js', { name: 'Encode/Decode worker' })
 
 export function setupSenderTransform(sender) {
   if (window.RTCRtpScriptTransform) {

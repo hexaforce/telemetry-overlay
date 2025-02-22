@@ -7,22 +7,17 @@ const FFT_SIZE = 2048
 
 export class StreamVisualizer {
   constructor(remoteStream, canvas) {
-    // console.log('Creating StreamVisualizer with remoteStream and canvas:', remoteStream, canvas);
     this.canvas = canvas
     this.canvas.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
     this.drawContext = this.canvas.getContext('2d')
 
-    // cope with browser differences
     this.context = new (window.AudioContext || window.webkitAudioContext)()
     if (!this.context) {
       alert('Sorry! Web Audio is not supported by this browser')
       return
     }
 
-    // Create a MediaStreamAudioSourceNode from the remoteStream
     this.source = this.context.createMediaStreamSource(remoteStream)
-    // console.log('Created Web Audio source from remote stream:', this.source);
-
     this.analyser = this.context.createAnalyser()
     this.analyser.minDecibels = -140
     this.analyser.maxDecibels = 0
@@ -44,7 +39,6 @@ export class StreamVisualizer {
     this.analyser.smoothingTimeConstant = SMOOTHING
     this.analyser.fftSize = FFT_SIZE
 
-    // Get the frequency data from the currently playing music
     this.analyser.getByteFrequencyData(this.freqs)
     this.analyser.getByteTimeDomainData(this.times)
 

@@ -27,8 +27,8 @@
     let startTime
     let ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
     let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
-    let pc1
-    let pc2
+    let pc1 = new RTCPeerConnection()
+    let pc2 = new RTCPeerConnection()
     let dc1
     let dc2
 
@@ -43,11 +43,9 @@
       return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
     }
 
-    pc1 = new RTCPeerConnection()
     pc1.oniceconnectionstatechange = (event) => {
       console.log('ICE State Changed:', pc1.iceConnectionState)
       if ('connected' === pc1.iceConnectionState) {
-        // console.log(pc1.localDescription.sdp)
         startTime = window.performance.now()
       }
     }
@@ -62,11 +60,9 @@
     dc1.onopen = () => console.log('DataChannel open pc1')
     dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
 
-    pc2 = new RTCPeerConnection()
     pc2.oniceconnectionstatechange = (event) => {
       console.log('ICE State Changed:', pc2.iceConnectionState)
       if ('connected' === pc2.iceConnectionState) {
-        // console.log(pc2.localDescription.sdp)
         setInterval(() => {
           pc2.getStats(null).then((stats) => {
             let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
@@ -102,14 +98,13 @@
       }
     }
 
+    // ws1.onopen = async () => {
+    //   console.log('ws1 connected')
+    // }
 
-    ws1.onopen = async () => {
-      console.log('ws1 connected')
-    }
-
-    ws2.onopen = () => {
-      console.log('ws2 connected')
-    }
+    // ws2.onopen = () => {
+    //   console.log('ws2 connected')
+    // }
 
     ws2.onmessage = async ({ data }) => {
       const message = JSON.parse(data)
