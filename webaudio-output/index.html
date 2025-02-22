@@ -102,22 +102,24 @@
       }
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
-          const { readable, writable } = receiver.createEncodedStreams()
-          let keyFrameAnalyzer = new TransformStream({
-            transform: (encodedFrame, controller) => {
-              const { type, timestamp, data } = encodedFrame
-              if (type == 'key') {
-                console.log(encodedFrame.getMetadata())
-              } else if (type == 'delta') {
-              }
-              // const view = new DataView(data)
-              // const keyframeBit = view.getUint8(0) & 0x01
-              // console.log(timestamp)
-              // console.log(data.byteLength)
-              controller.enqueue(encodedFrame)
-            },
-          })
-          readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+          if (receiver.createEncodedStreams()){
+            const { readable, writable } = receiver.createEncodedStreams()
+            let keyFrameAnalyzer = new TransformStream({
+              transform: (encodedFrame, controller) => {
+                const { type, timestamp, data } = encodedFrame
+                if (type == 'key') {
+                  console.log(encodedFrame.getMetadata())
+                } else if (type == 'delta') {
+                }
+                // const view = new DataView(data)
+                // const keyframeBit = view.getUint8(0) & 0x01
+                // console.log(timestamp)
+                // console.log(data.byteLength)
+                controller.enqueue(encodedFrame)
+              },
+            })
+            readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+          }
         }
         if (track.kind === 'audio') {
           new StreamVisualizer(streams[0], document.querySelector('canvas')).start()

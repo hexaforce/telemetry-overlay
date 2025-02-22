@@ -148,4 +148,5 @@ server.listen(PORT, () => {
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/resolution/index.html`)
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/endtoend-encryption/index.html`)
 })
