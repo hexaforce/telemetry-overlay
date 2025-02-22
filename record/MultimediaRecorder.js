@@ -3,7 +3,7 @@ export const SupportedType = [
   'video/webm;codecs=vp8,opus',
   'video/webm;codecs=h264,opus',
   'video/webm;codecs=av01,opus',
-  'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus', // h265
+  'video/x-matroska;codecs=hvc1.1.6.L186.B0,opus', // HEVC
   'video/mp4;codecs=vp9,mp4a.40.2',
   'video/mp4;codecs=vp9,opus',
   'video/mp4;codecs=avc1.64003E,mp4a.40.2',
@@ -20,6 +20,7 @@ export const SupportedType = [
 ].filter((mimeType) => MediaRecorder.isTypeSupported(mimeType))
 
 export class MultimediaRecorder {
+
   constructor() {
     this.mediaRecorder = null
     this.recordedBlobs = []
@@ -30,18 +31,15 @@ export class MultimediaRecorder {
     this.mimeType = mimeType
     this.recordedBlobs = []
     this.mediaRecorder = new MediaRecorder(stream, { mimeType })
-
     this.mediaRecorder.onstop = (event) => {
       console.log('Recorder stopped: ', event)
       console.log('Recorded Blobs: ', this.recordedBlobs)
     }
-
     this.mediaRecorder.ondataavailable = ({ data }) => {
       if (data && data.size > 0) {
         this.recordedBlobs.push(data)
       }
     }
-
     this.mediaRecorder.start()
   }
 
@@ -59,13 +57,12 @@ export class MultimediaRecorder {
     recordedVideo.play()
   }
 
-  download() {
+  download(fileName) {
     const blob = new Blob(this.recordedBlobs, { type: this.mimeType })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.style.display = 'none'
     a.href = url
-
     switch (this.mimeType.split(';', 1)[0]) {
       case 'video/mp4':
         a.download = `test.mp4`
@@ -86,4 +83,5 @@ export class MultimediaRecorder {
       window.URL.revokeObjectURL(url)
     }, 100)
   }
+
 }

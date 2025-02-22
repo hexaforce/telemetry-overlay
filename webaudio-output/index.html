@@ -30,6 +30,13 @@
     send2Button.disabled = true
     hangupButton.disabled = true
 
+    const codecPreferences = document.querySelector('#codecPreferences')
+
+    const recorder = new MultimediaRecorder()
+    const recordButton = document.querySelector('button#record')
+    const playButton = document.querySelector('button#play')
+    const downloadButton = document.querySelector('button#download')
+
     send1Button.onclick = async () => {
       dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
     }
@@ -55,6 +62,9 @@
       send1Button.disabled = false
       send2Button.disabled = false
       hangupButton.disabled = false
+
+      codecPreferences.disabled = false
+      recordButton.disabled = false
 
       startTime = window.performance.now()
 
@@ -102,24 +112,24 @@
       }
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
-          if (receiver.createEncodedStreams()){
-            const { readable, writable } = receiver.createEncodedStreams()
-            let keyFrameAnalyzer = new TransformStream({
-              transform: (encodedFrame, controller) => {
-                const { type, timestamp, data } = encodedFrame
-                if (type == 'key') {
-                  console.log(encodedFrame.getMetadata())
-                } else if (type == 'delta') {
-                }
-                // const view = new DataView(data)
-                // const keyframeBit = view.getUint8(0) & 0x01
-                // console.log(timestamp)
-                // console.log(data.byteLength)
-                controller.enqueue(encodedFrame)
-              },
-            })
-            readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
-          }
+          // if (receiver.createEncodedStreams()) {
+          //   const { readable, writable } = receiver.createEncodedStreams()
+          //   let keyFrameAnalyzer = new TransformStream({
+          //     transform: (encodedFrame, controller) => {
+          //       const { type, timestamp, data } = encodedFrame
+          //       if (type == 'key') {
+          //         console.log(encodedFrame.getMetadata())
+          //       } else if (type == 'delta') {
+          //       }
+          //       // const view = new DataView(data)
+          //       // const keyframeBit = view.getUint8(0) & 0x01
+          //       // console.log(timestamp)
+          //       // console.log(data.byteLength)
+          //       controller.enqueue(encodedFrame)
+          //     },
+          //   })
+          //   readable.pipeThrough(keyFrameAnalyzer).pipeTo(writable)
+          // }
         }
         if (track.kind === 'audio') {
           new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
@@ -229,7 +239,7 @@
             }
             if (type === 'inbound-rtp') {
               let report0 = { ...report }
-              resolveIds(report0, ['codecId','remoteId'])
+              resolveIds(report0, ['codecId', 'remoteId'])
               x.push(report0)
             }
             // if (type === 'remote-outbound-rtp') {
@@ -258,6 +268,7 @@
       send1Button.disabled = true
       send2Button.disabled = true
       hangupButton.disabled = true
+
       callButton.disabled = false
     }
 
@@ -270,6 +281,49 @@
     let dc1
     let dc2
 
+    import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
+
+    SupportedType.forEach((mimeType) => {
+      const option = document.createElement('option')
+      option.value = mimeType.value
+      option.innerText = mimeType.label
+      codecPreferences.appendChild(option)
+    })
+
+    recordButton.onclick = async () => {
+      if (recordButton.textContent === 'Start Recording') {
+        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+        if (mimeType.split(';', 1)[0] === 'video/mp4') {
+          // Adjust sampling rate to 48khz.
+          const track = window.stream.getAudioTracks()[0]
+          if (track) {
+            const { sampleRate } = track.getSettings()
+            if (sampleRate != 48000) {
+              track.stop()
+              window.stream.removeTrack(track)
+              const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+              window.stream.addTrack(newStream.getTracks()[0])
+            }
+          }
+        }
+        recorder.start(window.stream, mimeType)
+
+        recordButton.textContent = 'Stop Recording'
+        playButton.disabled = true
+        downloadButton.disabled = true
+        codecPreferences.disabled = true
+      } else {
+        recorder.stop()
+
+        recordButton.textContent = 'Start Recording'
+        playButton.disabled = false
+        downloadButton.disabled = false
+        codecPreferences.disabled = false
+      }
+    }
+
+    playButton.onclick = async () => recorder.play()
+    downloadButton.onclick = async () => recorder.download('test')
   </script>
 </head>
 
@@ -289,9 +343,19 @@
       <button id="send2Button">dc2 -> dc1</button>
       <button id="hangupButton">Hang Up</button>
     </div>
+    <div>
+      Recording format:
+      <select id="codecPreferences" disabled></select>
+    </div>
+    <div>
+      <button id="record" disabled>Start Recording</button>
+      <button id="play" disabled>Play</button>
+      <button id="download" disabled>Download</button>
+    </div>
     <div id="actualCodec"></div>
     <canvas></canvas>
     <pre class="stats-box"></pre>
+    <video id="recorded" playsinline loop></video>
   </div>
 </body>
 
