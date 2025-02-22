@@ -1,18 +1,32 @@
 'use strict'
 
-const encodeCallback = (encodedFrame, controller) => {
+const encodeVideo = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
-const decodeCallback = (encodedFrame, controller) => {
+const encodeAudio = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
+}
+const decodeVideo = (decodedFrame, controller) => {
+  controller.enqueue(decodedFrame)
+}
+const decodeAudio = (decodedFrame, controller) => {
+  controller.enqueue(decodedFrame)
 }
 
 function handleTransform(options, readable, writable) {
   const { operation, kind } = options
   if (operation === 'encode') {
-    readable.pipeThrough(new TransformStream({ transform: encodeCallback })).pipeTo(writable)
+    if (kind === 'video') {
+      readable.pipeThrough(new TransformStream({ transform: encodeVideo })).pipeTo(writable)
+    } else if (kind === 'audio') {
+      readable.pipeThrough(new TransformStream({ transform: encodeAudio })).pipeTo(writable)
+    }
   } else if (operation === 'decode') {
-    readable.pipeThrough(new TransformStream({ transform: decodeCallback })).pipeTo(writable)
+    if (kind === 'video') {
+      readable.pipeThrough(new TransformStream({ transform: decodeVideo })).pipeTo(writable)
+    } else if (kind === 'audio') {
+      readable.pipeThrough(new TransformStream({ transform: decodeAudio })).pipeTo(writable)
+    }
   }
 }
 
