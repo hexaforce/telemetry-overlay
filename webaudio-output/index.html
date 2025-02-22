@@ -162,7 +162,6 @@
       const remoteCandidateAddress = {}
       ws2.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
-        // console.log('ws2.onmessage: ', message)
         if (message.type === 'offer') {
           await pc2.setRemoteDescription(new RTCSessionDescription(message))
           fixH264Codecs(pc2.getTransceivers())
@@ -178,7 +177,6 @@
 
       ws1.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
-        // console.log('ws1.onmessage: ', message)
         if (message.type === 'answer') {
           await pc1.setRemoteDescription(new RTCSessionDescription(message))
         } else if (message.type === 'ice') {
@@ -194,9 +192,6 @@
               if (idName.endsWith('Id') && typeof report1[idName] === 'string' && stats.has(report1[idName])) {
                 let report2 = { ...stats.get(report1[idName]) }
                 delete report2.id
-                // if (report2.type !== 'remote-outbound-rtp') {
-                //   delete report2.timestamp
-                // }
                 delete report2.type
                 if (idName === 'localCandidateId') {
                   report2.address = localCandidateAddress[report2.port]
@@ -207,22 +202,6 @@
                 report1[idName] = report2
               }
             })
-            // Object.keys(report1).forEach((key) => {
-            //   if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
-            //     let id_ = report1[key]
-            //     if (!visited.has(id_)) {
-            //       visited.add(id_)
-            //       const report2 = { ...stats.get(id_) }
-            //       resolveIds(report2)
-            //       delete report2.id
-            //       if (report2.type !== 'remote-outbound-rtp') {
-            //         delete report2.timestamp
-            //       }
-            //       delete report2.type
-            //       report1[key] = report2
-            //     }
-            //   }
-            // })
           }
 
           let visited = new Set()
@@ -355,10 +334,10 @@
       <button id="play" disabled>Play</button>
       <button id="download" disabled>Download</button>
     </div>
+    <video id="recordedPlay" playsinline loop></video>
     <div id="actualCodec"></div>
     <canvas></canvas>
     <pre class="stats-box"></pre>
-    <video id="recorded" playsinline loop></video>
   </div>
 </body>
 
