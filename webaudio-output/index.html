@@ -9,7 +9,6 @@
     import { setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
 
-
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
       window.postMessage(stream, '*', [stream])
@@ -26,7 +25,7 @@
     }
 
     let startTime
-    let ws1
+    let ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
     let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
     let pc1
     let pc2
@@ -35,6 +34,14 @@
 
     const localCandidateAddress = {}
     const remoteCandidateAddress = {}
+
+    function isIPv4(address) {
+      return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
+    }
+
+    function toICE(candidate) {
+      return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+    }
 
     pc1 = new RTCPeerConnection()
     pc1.oniceconnectionstatechange = (event) => {
@@ -46,7 +53,7 @@
     }
     pc1.onicecandidate = ({ candidate }) => {
       if (candidate) {
-        if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
+        if (isIPv4(candidate.address)) {
           ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
         }
       }
@@ -60,13 +67,19 @@
       console.log('ICE State Changed:', pc2.iceConnectionState)
       if ('connected' === pc2.iceConnectionState) {
         // console.log(pc2.localDescription.sdp)
+        setInterval(() => {
+          pc2.getStats(null).then((stats) => {
+            let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
+            document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
+          })
+        }, 1000)
       }
     }
 
     pc2.onicecandidate = ({ candidate }) => {
       if (candidate) {
-        if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
-          const ice = candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+        if (isIPv4(candidate.address)) {
+          const ice = toICE(candidate.candidate)
           if (ice) localCandidateAddress[ice[3]] = ice[2]
           ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
         }
@@ -90,6 +103,45 @@
     }
 
 
+    ws1.onopen = async () => {
+      console.log('ws1 connected')
+    }
+
+    ws2.onopen = () => {
+      console.log('ws2 connected')
+    }
+
+    ws2.onmessage = async ({ data }) => {
+      const message = JSON.parse(data)
+      if (message.type === 'offer') {
+        await pc2.setRemoteDescription(new RTCSessionDescription(message))
+        fixH264Codecs(pc2.getTransceivers())
+        // preferredCodecs(pc2.getTransceivers())
+        const answer = await pc2.createAnswer()
+        await pc2.setLocalDescription(answer)
+        ws2.send(JSON.stringify(answer))
+      } else if (message.type === 'ice') {
+        const ice = toICE(message.candidate.candidate)
+        if (ice) remoteCandidateAddress[ice[3]] = ice[2]
+        await pc2.addIceCandidate(message.candidate)
+      }
+    }
+
+    ws1.onmessage = async ({ data }) => {
+      const message = JSON.parse(data)
+      if (message.type === 'start') {
+        await setUserMedia()
+        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+        const offer = await pc1.createOffer()
+        await pc1.setLocalDescription(offer)
+        ws1.send(JSON.stringify(offer))
+      } else if (message.type === 'answer') {
+        await pc1.setRemoteDescription(new RTCSessionDescription(message))
+      } else if (message.type === 'ice') {
+        await pc1.addIceCandidate(message.candidate)
+      }
+    }
+
     // callButton
     // ------------------------------------------------------
     const callButton = document.getElementById('callButton')
@@ -102,59 +154,8 @@
       codecPreferences.disabled = false
       recordButton.disabled = false
 
-      ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
+      ws2.send(JSON.stringify({ type: 'start' }))
 
-      ws1.onopen = async () => {
-        console.log('ws1 connected')
-        await setUserMedia()
-        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-        const sendOffer = async () => {
-          if (ws2.readyState === WebSocket.OPEN) {
-            const offer = await pc1.createOffer()
-            await pc1.setLocalDescription(offer)
-            ws1.send(JSON.stringify(offer))
-          } else {
-            setTimeout(await sendOffer, 100)
-          }
-        }
-        await sendOffer()
-      }
-
-      ws2.onopen = () => {
-        console.log('ws2 connected')
-      }
-
-      ws2.onmessage = async ({ data }) => {
-        const message = JSON.parse(data)
-        if (message.type === 'offer') {
-          await pc2.setRemoteDescription(new RTCSessionDescription(message))
-          fixH264Codecs(pc2.getTransceivers())
-          // preferredCodecs(pc2.getTransceivers())
-          const answer = await pc2.createAnswer()
-          await pc2.setLocalDescription(answer)
-          ws2.send(JSON.stringify(answer))
-        } else if (message.type === 'ice') {
-          const ice = message.candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
-          if (ice) remoteCandidateAddress[ice[3]] = ice[2]
-          await pc2.addIceCandidate(message.candidate)
-        }
-      }
-
-      ws1.onmessage = async ({ data }) => {
-        const message = JSON.parse(data)
-        if (message.type === 'answer') {
-          await pc1.setRemoteDescription(new RTCSessionDescription(message))
-        } else if (message.type === 'ice') {
-          await pc1.addIceCandidate(message.candidate)
-        }
-      }
-      setInterval(() => {
-        pc2 &&
-          pc2.getStats(null).then((stats) => {
-            let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
-            document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
-          })
-      }, 1000)
     }
 
     // hangupButton
