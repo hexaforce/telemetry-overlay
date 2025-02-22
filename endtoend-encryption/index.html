@@ -91,7 +91,7 @@
       } else {
         const { readable, writable } = sender.createEncodedStreams()
         let options = { operation: 'encode', kind: sender.track.kind }
-        worker.postMessage({ options: options, readable, writable }, [readable, writable])
+        worker.postMessage({ options, readable, writable }, [readable, writable])
       }
     }
 
@@ -103,7 +103,7 @@
       } else {
         const { readable, writable } = receiver.createEncodedStreams()
         let options = { operation: 'decode', kind: receiver.track.kind }
-        worker.postMessage({ options: options, readable, writable }, [readable, writable])
+        worker.postMessage({ options, readable, writable }, [readable, writable])
       }
     }
 
