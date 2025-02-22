@@ -1,277 +1,308 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <script type="module" type="text/javascript">
-      'use strict'
 
-      import { getDevices, setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
-      import { StreamVisualizer } from './StreamVisualizer.js'
+<head>
+  <meta charset="utf-8" />
+  <script type="module" type="text/javascript">
+    'use strict'
 
-      if (!!!window.RTCRtpScriptTransform) {
-        const stream = new ReadableStream()
-        window.postMessage(stream, '*', [stream])
+    import { getDevices, setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
+    import { StreamVisualizer } from './StreamVisualizer.js'
+
+    if (!!!window.RTCRtpScriptTransform) {
+      const stream = new ReadableStream()
+      window.postMessage(stream, '*', [stream])
+    }
+
+    let startTime
+    let ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
+    let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
+    let pc1 = new RTCPeerConnection()
+    let pc2 = new RTCPeerConnection()
+    let dc1
+    let dc2
+
+    const localCandidateAddress = {}
+    const remoteCandidateAddress = {}
+
+    function isIPv4(address) {
+      return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
+    }
+
+    function toICE(candidate) {
+      return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+    }
+
+    pc1.oniceconnectionstatechange = (event) => {
+      console.log('ICE State Changed:', pc1.iceConnectionState)
+      if ('connected' === pc1.iceConnectionState) {
+        startTime = window.performance.now()
       }
-
-      getDevices()
-
-      async function setUserMedia() {
-        const c = {
-          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        }
-        c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-        c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-        console.log(JSON.stringify(c))
-        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
-      }
-
-      let startTime
-      let ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
-      let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
-      let pc1 = new RTCPeerConnection()
-      let pc2 = new RTCPeerConnection()
-      let dc1
-      let dc2
-
-      const localCandidateAddress = {}
-      const remoteCandidateAddress = {}
-
-      function isIPv4(address) {
-        return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
-      }
-
-      function toICE(candidate) {
-        return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
-      }
-
-      pc1.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc1.iceConnectionState)
-        if ('connected' === pc1.iceConnectionState) {
-          startTime = window.performance.now()
+    }
+    pc1.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        if (isIPv4(candidate.address)) {
+          ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
         }
       }
-      pc1.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (isIPv4(candidate.address)) {
-            ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+    }
+    dc1 = pc1.createDataChannel('pc1')
+    dc1.onopen = () => console.log('DataChannel open pc1')
+    dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+
+    pc2.oniceconnectionstatechange = (event) => {
+      console.log('ICE State Changed:', pc2.iceConnectionState)
+      if ('connected' === pc2.iceConnectionState) {
+        setInterval(() => {
+          pc2.getStats(null).then((stats) => {
+            let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
+            document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
+          })
+        }, 1000)
+      }
+    }
+
+    pc2.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        if (isIPv4(candidate.address)) {
+          const ice = toICE(candidate.candidate)
+          if (ice) localCandidateAddress[ice[3]] = ice[2]
+          ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+        }
+      }
+    }
+    pc2.ondatachannel = ({ channel }) => {
+      console.log('DataChannel open pc2')
+      dc2 = channel
+      dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
+    }
+    pc2.ontrack = ({ receiver, streams, track }) => {
+      if (track.kind === 'video') {
+        setupReceiverTransform(receiver)
+      }
+      if (track.kind === 'audio') {
+        new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+      }
+      if (remoteVideo.srcObject !== streams[0]) {
+        remoteVideo.srcObject = streams[0]
+      }
+    }
+
+    ws1.onopen = async () => {
+      console.log('ws1 connected')
+    }
+
+    ws2.onopen = () => {
+      console.log('ws2 connected')
+    }
+
+    ws2.onmessage = async ({ data }) => {
+      const message = JSON.parse(data)
+      if (message.type === 'info') {
+        const videoSelect = document.querySelector('select#videoSource')
+        const audioSelect = document.querySelector('select#audioSource')
+        while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+        while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+        message.devices.forEach(({ deviceId, kind, label }) => {
+          const option = document.createElement('option')
+          option.value = deviceId
+          if (kind === 'videoinput') {
+            option.text = label || `Camera ${videoSelect.length + 1}`
+            videoSelect.appendChild(option)
+          } else if (kind === 'audioinput') {
+            option.text = label || `Microphone ${audioSelect.length + 1}`
+            audioSelect.appendChild(option)
+          }
+        })
+      } else if (message.type === 'offer') {
+        await pc2.setRemoteDescription(new RTCSessionDescription(message))
+        fixH264Codecs(pc2.getTransceivers())
+        // preferredCodecs(pc2.getTransceivers())
+        const answer = await pc2.createAnswer()
+        await pc2.setLocalDescription(answer)
+        ws2.send(JSON.stringify(answer))
+      } else if (message.type === 'ice') {
+        const ice = toICE(message.candidate.candidate)
+        if (ice) remoteCandidateAddress[ice[3]] = ice[2]
+        await pc2.addIceCandidate(message.candidate)
+      }
+    }
+
+    ws1.onmessage = async ({ data }) => {
+      const message = JSON.parse(data)
+
+      if (message.type === 'init') {
+        let devices = await getDevices()
+        ws1.send(JSON.stringify({ type: 'info', devices }))
+      } else if (message.type === 'start') {
+        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
+        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+        const offer = await pc1.createOffer()
+        await pc1.setLocalDescription(offer)
+        ws1.send(JSON.stringify(offer))
+      } else if (message.type === 'answer') {
+        await pc1.setRemoteDescription(new RTCSessionDescription(message))
+      } else if (message.type === 'ice') {
+        await pc1.addIceCandidate(message.candidate)
+      }
+    }
+    // initButton
+    // ------------------------------------------------------
+    const initButton = document.getElementById('initButton')
+    initButton.onclick = async () => {
+      ws2.send(JSON.stringify({ type: 'init' }))
+    }
+
+    // startButton
+    // ------------------------------------------------------
+    const startButton = document.getElementById('startButton')
+    startButton.onclick = async () => {
+      startButton.disabled = true
+      send1Button.disabled = false
+      send2Button.disabled = false
+      hangupButton.disabled = false
+
+      codecPreferences.disabled = false
+      recordButton.disabled = false
+
+      ws2.send(JSON.stringify({
+        type: 'start', constraints: {
+          video: {
+            frameRate: { ideal: 30, max: 60 },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            deviceId: {
+              ideal: document.querySelector('select#videoSource').value
+            }
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            deviceId: { ideal: document.querySelector('select#audioSource').value }
           }
         }
-      }
-      dc1 = pc1.createDataChannel('pc1')
-      dc1.onopen = () => console.log('DataChannel open pc1')
-      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+      }))
+    }
 
-      pc2.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc2.iceConnectionState)
-        if ('connected' === pc2.iceConnectionState) {
-          setInterval(() => {
-            pc2.getStats(null).then((stats) => {
-              let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
-              document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
-            })
-          }, 1000)
-        }
-      }
+    // hangupButton
+    // ------------------------------------------------------
+    const hangupButton = document.getElementById('hangupButton')
+    hangupButton.disabled = true
+    hangupButton.onclick = () => {
+      pc1.close()
+      pc2.close()
+      pc1 = null
+      pc2 = null
 
-      pc2.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (isIPv4(candidate.address)) {
-            const ice = toICE(candidate.candidate)
-            if (ice) localCandidateAddress[ice[3]] = ice[2]
-            ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
-          }
-        }
-      }
-      pc2.ondatachannel = ({ channel }) => {
-        console.log('DataChannel open pc2')
-        dc2 = channel
-        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
-      }
-      pc2.ontrack = ({ receiver, streams, track }) => {
-        if (track.kind === 'video') {
-          setupReceiverTransform(receiver)
-        }
-        if (track.kind === 'audio') {
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-        }
-        if (remoteVideo.srcObject !== streams[0]) {
-          remoteVideo.srcObject = streams[0]
-        }
-      }
+      localVideo.srcObject.getTracks().forEach((track) => track.stop())
+      window.stream.getTracks().forEach((track) => track.stop())
 
-      // ws1.onopen = async () => {
-      //   console.log('ws1 connected')
-      // }
-
-      // ws2.onopen = () => {
-      //   console.log('ws2 connected')
-      // }
-
-      ws2.onmessage = async ({ data }) => {
-        const message = JSON.parse(data)
-        if (message.type === 'offer') {
-          await pc2.setRemoteDescription(new RTCSessionDescription(message))
-          fixH264Codecs(pc2.getTransceivers())
-          // preferredCodecs(pc2.getTransceivers())
-          const answer = await pc2.createAnswer()
-          await pc2.setLocalDescription(answer)
-          ws2.send(JSON.stringify(answer))
-        } else if (message.type === 'ice') {
-          const ice = toICE(message.candidate.candidate)
-          if (ice) remoteCandidateAddress[ice[3]] = ice[2]
-          await pc2.addIceCandidate(message.candidate)
-        }
-      }
-
-      ws1.onmessage = async ({ data }) => {
-        const message = JSON.parse(data)
-        if (message.type === 'start') {
-          await setUserMedia()
-          window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-          const offer = await pc1.createOffer()
-          await pc1.setLocalDescription(offer)
-          ws1.send(JSON.stringify(offer))
-        } else if (message.type === 'answer') {
-          await pc1.setRemoteDescription(new RTCSessionDescription(message))
-        } else if (message.type === 'ice') {
-          await pc1.addIceCandidate(message.candidate)
-        }
-      }
-
-      // callButton
-      // ------------------------------------------------------
-      const callButton = document.getElementById('callButton')
-      callButton.onclick = async () => {
-        callButton.disabled = true
-        send1Button.disabled = false
-        send2Button.disabled = false
-        hangupButton.disabled = false
-
-        codecPreferences.disabled = false
-        recordButton.disabled = false
-
-        ws2.send(JSON.stringify({ type: 'start' }))
-      }
-
-      // hangupButton
-      // ------------------------------------------------------
-      const hangupButton = document.getElementById('hangupButton')
+      send1Button.disabled = true
+      send2Button.disabled = true
       hangupButton.disabled = true
-      hangupButton.onclick = () => {
-        pc1.close()
-        pc2.close()
-        pc1 = null
-        pc2 = null
 
-        localVideo.srcObject.getTracks().forEach((track) => track.stop())
-        window.stream.getTracks().forEach((track) => track.stop())
+      codecPreferences.disabled = true
+      recordButton.disabled = true
 
-        send1Button.disabled = true
-        send2Button.disabled = true
-        hangupButton.disabled = true
+      startButton.disabled = false
+    }
 
-        codecPreferences.disabled = true
-        recordButton.disabled = true
+    const localVideo = document.getElementById('localVideo')
+    const remoteVideo = document.getElementById('remoteVideo')
 
-        callButton.disabled = false
-      }
+    import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
 
-      const localVideo = document.getElementById('localVideo')
-      const remoteVideo = document.getElementById('remoteVideo')
+    const codecPreferences = document.querySelector('#codecPreferences')
+    SupportedType.forEach((mimeType) => {
+      const option = document.createElement('option')
+      option.value = mimeType.value
+      option.innerText = mimeType.label
+      codecPreferences.appendChild(option)
+    })
 
-      import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
+    const recorder = new MultimediaRecorder()
 
-      const codecPreferences = document.querySelector('#codecPreferences')
-      SupportedType.forEach((mimeType) => {
-        const option = document.createElement('option')
-        option.value = mimeType.value
-        option.innerText = mimeType.label
-        codecPreferences.appendChild(option)
-      })
-
-      const recorder = new MultimediaRecorder()
-
-      const recordButton = document.querySelector('button#record')
-      recordButton.onclick = async () => {
-        if (recordButton.textContent === 'Start Recording') {
-          const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-          if (mimeType.split(';', 1)[0] === 'video/mp4') {
-            // Adjust sampling rate to 48khz.
-            const track = window.stream.getAudioTracks()[0]
-            if (track) {
-              const { sampleRate } = track.getSettings()
-              if (sampleRate != 48000) {
-                track.stop()
-                window.stream.removeTrack(track)
-                const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
-                window.stream.addTrack(newStream.getTracks()[0])
-              }
+    const recordButton = document.querySelector('button#record')
+    recordButton.onclick = async () => {
+      if (recordButton.textContent === 'Start Recording') {
+        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+        if (mimeType.split(';', 1)[0] === 'video/mp4') {
+          // Adjust sampling rate to 48khz.
+          const track = window.stream.getAudioTracks()[0]
+          if (track) {
+            const { sampleRate } = track.getSettings()
+            if (sampleRate != 48000) {
+              track.stop()
+              window.stream.removeTrack(track)
+              const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+              window.stream.addTrack(newStream.getTracks()[0])
             }
           }
-          recorder.start(window.stream, mimeType)
-
-          recordButton.textContent = 'Stop Recording'
-          playButton.disabled = true
-          downloadButton.disabled = true
-          codecPreferences.disabled = true
-        } else {
-          recorder.stop()
-
-          recordButton.textContent = 'Start Recording'
-          playButton.disabled = false
-          downloadButton.disabled = false
-          codecPreferences.disabled = false
         }
+        recorder.start(window.stream, mimeType)
+
+        recordButton.textContent = 'Stop Recording'
+        playButton.disabled = true
+        downloadButton.disabled = true
+        codecPreferences.disabled = true
+      } else {
+        recorder.stop()
+
+        recordButton.textContent = 'Start Recording'
+        playButton.disabled = false
+        downloadButton.disabled = false
+        codecPreferences.disabled = false
       }
+    }
 
-      const playButton = document.querySelector('button#play')
-      playButton.onclick = async () => recorder.play()
+    const playButton = document.querySelector('button#play')
+    playButton.onclick = async () => recorder.play()
 
-      const downloadButton = document.querySelector('button#download')
-      downloadButton.onclick = async () => recorder.download('test')
+    const downloadButton = document.querySelector('button#download')
+    downloadButton.onclick = async () => recorder.download('test')
 
-      const send1Button = document.getElementById('send1Button')
-      send1Button.disabled = true
-      send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    const send1Button = document.getElementById('send1Button')
+    send1Button.disabled = true
+    send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
-      const send2Button = document.getElementById('send2Button')
-      send2Button.disabled = true
-      send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-    </script>
-  </head>
+    const send2Button = document.getElementById('send2Button')
+    send2Button.disabled = true
+    send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+  </script>
+</head>
 
-  <body>
-    <div id="container">
-      <div class="select">
-        <label for="videoSource">Video source: </label
-        ><select id="videoSource"></select>
-        <label for="audioSource">Audio source: </label
-        ><select id="audioSource"></select>
-      </div>
-      <p>localVideo</p>
-      <video id="localVideo" playsinline autoplay muted></video>
-      <p>remoteVideo</p>
-      <video id="remoteVideo" playsinline autoplay muted></video>
-      <div>
-        <button id="callButton">Call</button>
-        <button id="send1Button">dc1 -> dc2</button>
-        <button id="send2Button">dc2 -> dc1</button>
-        <button id="hangupButton">Hang Up</button>
-      </div>
-      <div>
-        Recording format:
-        <select id="codecPreferences" disabled></select>
-      </div>
-      <div>
-        <button id="record" disabled>Start Recording</button>
-        <button id="play" disabled>Play</button>
-        <button id="download" disabled>Download</button>
-      </div>
-      <video id="recordedPlay" playsinline loop></video>
-      <div id="actualCodec"></div>
-      <canvas></canvas>
-      <pre class="stats-box"></pre>
+<body>
+  <div id="container">
+    <div class="select">
+      <label for="videoSource">Video source: </label><select id="videoSource"></select>
+      <label for="audioSource">Audio source: </label><select id="audioSource"></select>
     </div>
-  </body>
+    <p>localVideo</p>
+    <video id="localVideo" playsinline autoplay muted></video>
+    <p>remoteVideo</p>
+    <video id="remoteVideo" playsinline autoplay muted></video>
+    <div>
+      <button id="initButton">Init</button>
+      <button id="startButton">Start</button>
+      <button id="send1Button">dc1 -> dc2</button>
+      <button id="send2Button">dc2 -> dc1</button>
+      <button id="hangupButton">Hang Up</button>
+    </div>
+    <div>
+      Recording format:
+      <select id="codecPreferences" disabled></select>
+    </div>
+    <div>
+      <button id="record" disabled>Start Recording</button>
+      <button id="play" disabled>Play</button>
+      <button id="download" disabled>Download</button>
+    </div>
+    <video id="recordedPlay" playsinline loop></video>
+    <div id="actualCodec"></div>
+    <canvas></canvas>
+    <pre class="stats-box"></pre>
+  </div>
+</body>
+
 </html>

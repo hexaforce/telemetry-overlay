@@ -2,23 +2,9 @@ export async function getDevices() {
   let stream = null
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    const deviceArray = await navigator.mediaDevices.enumerateDevices()
-    const videoSelect = document.querySelector('select#videoSource')
-    const audioSelect = document.querySelector('select#audioSource')
-    while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-    while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-    deviceArray.forEach(({ deviceId, kind, label }) => {
-      const option = document.createElement('option')
-      option.value = deviceId
-      if (kind === 'videoinput') {
-        option.text = label || `Camera ${videoSelect.length + 1}`
-        videoSelect.appendChild(option)
-      } else if (kind === 'audioinput') {
-        option.text = label || `Microphone ${audioSelect.length + 1}`
-        audioSelect.appendChild(option)
-      }
-    })
+    return await navigator.mediaDevices.enumerateDevices()
   } catch (error) {
+    return error
   } finally {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop())
