@@ -22,6 +22,7 @@
         }
         c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
         c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+        console.log(JSON.stringify(c))
         localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
       }
 

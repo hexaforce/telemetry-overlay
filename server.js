@@ -118,12 +118,20 @@ wss.on('connection', (ws, req) => {
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
     console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
-    if (protocol === 'receiver' && transceiver) {
-      transceiver.send(text)
-      console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
-    } else if (protocol === 'transceiver' && receiver) {
-      receiver.send(text)
-      console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
+    if (protocol === 'receiver') {
+      if (transceiver && transceiver.readyState === WebSocket.OPEN) {
+        transceiver.send(text)
+        console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
+      } else {
+        ws.send({ type: 'system', meseage: 'transceiver is not open' })
+      }
+    } else if (protocol === 'transceiver') {
+      if (receiver && receiver.readyState === WebSocket.OPEN) {
+        receiver.send(text)
+        console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
+      } else {
+        ws.send({ type: 'system', meseage: 'receiver is not open' })
+      }
     }
   })
 
