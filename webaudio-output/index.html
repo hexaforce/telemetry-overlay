@@ -10,37 +10,19 @@
 
     import { StreamVisualizer } from './StreamVisualizer.js'
 
-    const OfferOptions = {
-      offerToReceiveVideo: 1,
-      offerToReceiveAudio: 1,
-    }
-
-    const c = {
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
-      // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-    }
-
-    const callButton = document.getElementById('callButton')
-    const send1Button = document.getElementById('send1Button')
-    const send2Button = document.getElementById('send2Button')
-    const hangupButton = document.getElementById('hangupButton')
-    send1Button.disabled = true
-    send2Button.disabled = true
-    hangupButton.disabled = true
-
-    const codecPreferences = document.querySelector('#codecPreferences')
-
     const recorder = new MultimediaRecorder()
     const recordButton = document.querySelector('button#record')
     const playButton = document.querySelector('button#play')
     const downloadButton = document.querySelector('button#download')
 
+    const send1Button = document.getElementById('send1Button')
+    send1Button.disabled = true
     send1Button.onclick = async () => {
       dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
     }
 
+    const send2Button = document.getElementById('send2Button')
+    send2Button.disabled = true
     send2Button.onclick = async () => {
       dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
     }
@@ -62,6 +44,7 @@
 
     // callButton
     // ------------------------------------------------------
+    const callButton = document.getElementById('callButton')
     callButton.onclick = async () => {
       callButton.disabled = true
       send1Button.disabled = false
@@ -182,6 +165,8 @@
 
     // hangupButton
     // ------------------------------------------------------
+    const hangupButton = document.getElementById('hangupButton')
+    hangupButton.disabled = true
     hangupButton.onclick = () => {
       pc1.close()
       pc2.close()
@@ -212,6 +197,7 @@
 
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
 
+    const codecPreferences = document.querySelector('#codecPreferences')
     SupportedType.forEach((mimeType) => {
       const option = document.createElement('option')
       option.value = mimeType.value
