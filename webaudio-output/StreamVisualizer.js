@@ -1,12 +1,12 @@
-const WIDTH = 600
-const HEIGHT = 150
-
-// Interesting parameters to tweak!
-const SMOOTHING = 0.8
-const FFT_SIZE = 2048
-
 export class StreamVisualizer {
   constructor(remoteStream, canvas) {
+
+    this.WIDTH = 600
+    this.HEIGHT = 150
+    // Interesting parameters to tweak!
+    this.SMOOTHING = 0.8
+    this.FFT_SIZE = 2048
+
     this.canvas = canvas
     this.canvas.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
     this.drawContext = this.canvas.getContext('2d')
@@ -36,23 +36,23 @@ export class StreamVisualizer {
 
   draw() {
     let barWidth, offset, height, percent, value
-    this.analyser.smoothingTimeConstant = SMOOTHING
-    this.analyser.fftSize = FFT_SIZE
+    this.analyser.smoothingTimeConstant = this.SMOOTHING
+    this.analyser.fftSize = this.FFT_SIZE
 
     this.analyser.getByteFrequencyData(this.freqs)
     this.analyser.getByteTimeDomainData(this.times)
 
-    this.canvas.width = WIDTH
-    this.canvas.height = HEIGHT
-    this.drawContext.clearRect(0, 0, WIDTH, HEIGHT)
+    this.canvas.width = this.WIDTH
+    this.canvas.height = this.HEIGHT
+    this.drawContext.clearRect(0, 0, this.WIDTH, this.HEIGHT)
 
     // Draw the frequency domain chart.
     for (let i = 0; i < this.analyser.frequencyBinCount; i++) {
       value = this.freqs[i]
       percent = value / 256
-      height = HEIGHT * percent
-      offset = HEIGHT - height - 1
-      barWidth = WIDTH / this.analyser.frequencyBinCount
+      height = this.HEIGHT * percent
+      offset = this.HEIGHT - height - 1
+      barWidth = this.WIDTH / this.analyser.frequencyBinCount
       let hue = (i / this.analyser.frequencyBinCount) * 360
       this.drawContext.fillStyle = `rgb(${value + 50}, 50, 255)`
       this.drawContext.fillRect(i * barWidth, offset, barWidth, height)
@@ -62,9 +62,9 @@ export class StreamVisualizer {
     for (let i = 0; i < this.analyser.frequencyBinCount; i++) {
       value = this.times[i]
       percent = value / 256
-      height = HEIGHT * percent
-      offset = HEIGHT - height - 1
-      barWidth = WIDTH / this.analyser.frequencyBinCount
+      height = this.HEIGHT * percent
+      offset = this.HEIGHT - height - 1
+      barWidth = this.WIDTH / this.analyser.frequencyBinCount
       this.drawContext.fillStyle = `rgb(125, 25, 150)`
       this.drawContext.fillRect(i * barWidth, offset, 1, 2)
     }
