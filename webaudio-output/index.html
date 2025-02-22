@@ -98,7 +98,9 @@
 
     ws2.onmessage = async ({ data }) => {
       const message = JSON.parse(data)
-      if (message.type === 'info') {
+      if (message.type === 'session') {
+        console.log(message.sessionId)
+      } else if (message.type === 'info') {
         const videoSelect = document.querySelector('select#videoSource')
         const audioSelect = document.querySelector('select#audioSource')
         while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
@@ -131,7 +133,9 @@
     ws1.onmessage = async ({ data }) => {
       const message = JSON.parse(data)
 
-      if (message.type === 'init') {
+      if (message.type === 'session') {
+        console.log(message.sessionId)
+      } else if (message.type === 'init') {
         let devices = await getDevices()
         ws1.send(JSON.stringify({ type: 'info', devices }))
       } else if (message.type === 'start') {

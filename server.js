@@ -115,6 +115,9 @@ wss.on('connection', (ws, req) => {
   }
   console.log(`${protocol} connected`)
 
+  const sessionId = crypto.randomUUID();
+  ws.send(JSON.stringify({ type: 'sessionId', sessionId }));
+
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
     console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
