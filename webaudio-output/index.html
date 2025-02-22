@@ -22,6 +22,78 @@
       window.postMessage(stream, '*', [stream])
     }
 
+    let startTime
+    let ws1
+    let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
+    let pc1
+    let pc2
+    let dc1
+    let dc2
+
+    async function setUserMedia() {
+      const c = {
+        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }
+      c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
+    }
+
+    pc1 = new RTCPeerConnection()
+    pc1.oniceconnectionstatechange = (event) => {
+      console.log('ICE State Changed:', pc1.iceConnectionState)
+      if ('connected' === pc1.iceConnectionState) {
+        // console.log(pc1.localDescription.sdp)
+        startTime = window.performance.now()
+      }
+    }
+    pc1.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
+          ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+        }
+      }
+    }
+    dc1 = pc1.createDataChannel('pc1')
+    dc1.onopen = () => console.log('DataChannel open pc1')
+    dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+
+    pc2 = new RTCPeerConnection()
+    pc2.oniceconnectionstatechange = (event) => {
+      console.log('ICE State Changed:', pc2.iceConnectionState)
+      if ('connected' === pc2.iceConnectionState) {
+        // console.log(pc2.localDescription.sdp)
+      }
+    }
+    const localCandidateAddress = {}
+    pc2.onicecandidate = ({ candidate }) => {
+      if (candidate) {
+        if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
+          const ice = candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+          if (ice) localCandidateAddress[ice[3]] = ice[2]
+          ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+        }
+      }
+    }
+    pc2.ondatachannel = ({ channel }) => {
+      console.log('DataChannel open pc2')
+      dc2 = channel
+      dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
+    }
+    pc2.ontrack = ({ receiver, streams, track }) => {
+      if (track.kind === 'video') {
+        setupReceiverTransform(receiver)
+      }
+      if (track.kind === 'audio') {
+        new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+      }
+      if (remoteVideo.srcObject !== streams[0]) {
+        remoteVideo.srcObject = streams[0]
+      }
+    }
+
+
     // callButton
     // ------------------------------------------------------
     const callButton = document.getElementById('callButton')
@@ -34,71 +106,7 @@
       codecPreferences.disabled = false
       recordButton.disabled = false
 
-      async function setUserMedia() {
-        const c = {
-          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-        }
-        c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-        c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
-      }
-
-      pc1 = new RTCPeerConnection()
-      pc1.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc1.iceConnectionState)
-        if ('connected' === pc1.iceConnectionState) {
-          // console.log(pc1.localDescription.sdp)
-          startTime = window.performance.now()
-        }
-      }
-      pc1.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
-            ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
-          }
-        }
-      }
-      dc1 = pc1.createDataChannel('pc1')
-      dc1.onopen = () => console.log('DataChannel open pc1')
-      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
-
-      pc2 = new RTCPeerConnection()
-      pc2.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc2.iceConnectionState)
-        if ('connected' === pc2.iceConnectionState) {
-          // console.log(pc2.localDescription.sdp)
-        }
-      }
-      const localCandidateAddress = {}
-      pc2.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
-            const ice = candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
-            if (ice) localCandidateAddress[ice[3]] = ice[2]
-            ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
-          }
-        }
-      }
-      pc2.ondatachannel = ({ channel }) => {
-        console.log('DataChannel open pc2')
-        dc2 = channel
-        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
-      }
-      pc2.ontrack = ({ receiver, streams, track }) => {
-        if (track.kind === 'video') {
-          setupReceiverTransform(receiver)
-        }
-        if (track.kind === 'audio') {
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-        }
-        if (remoteVideo.srcObject !== streams[0]) {
-          remoteVideo.srcObject = streams[0]
-        }
-      }
-
-      const ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
-      const ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
+      ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
 
       ws1.onopen = async () => {
         console.log('ws1 connected')
@@ -178,12 +186,6 @@
 
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
-
-    let startTime
-    let pc1
-    let pc2
-    let dc1
-    let dc2
 
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
 
