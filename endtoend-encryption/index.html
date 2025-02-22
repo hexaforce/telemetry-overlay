@@ -80,7 +80,7 @@
         this.pc2.close()
       }
 
-      const worker = new Worker('./worker.js', { name: 'E2EE worker' })
+      const worker = new Worker('./worker.js', { name: 'Encode/Decode worker' })
 
       function setupSenderTransform(sender) {
         if (window.RTCRtpScriptTransform) {

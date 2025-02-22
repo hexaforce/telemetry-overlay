@@ -23,8 +23,8 @@ onmessage = ({ data }) => {
 }
 
 if (self.RTCTransformEvent) {
-  self.onrtctransform = (event) => {
-    const { options, readable, writable } = event.transformer
+  self.onrtctransform = ({ transformer }) => {
+    const { options, readable, writable } = transformer
     handleTransform(options.operation, readable, writable)
   }
 }
