@@ -68,7 +68,9 @@
       }
       pc1.onicecandidate = ({ candidate }) => {
         if (candidate) {
-          ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+          if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
+            ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+          }
         }
       }
       dc1 = pc1.createDataChannel('pc1')
@@ -83,9 +85,14 @@
           // console.log(pc2.localDescription.sdp)
         }
       }
+      const localCandidateAddress = {}
       pc2.onicecandidate = ({ candidate }) => {
         if (candidate) {
-          ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+          if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
+            const ice = candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+            if (ice) localCandidateAddress[ice[3]] = ice[2]
+            ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+          }
         }
       }
       pc2.ondatachannel = ({ channel }) => {
@@ -140,7 +147,7 @@
       ws2.onopen = () => {
         console.log('ws2 connected')
       }
-
+      const remoteCandidateAddress = {}
       ws2.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
         // console.log('ws2.onmessage: ', message)
@@ -151,6 +158,8 @@
           await pc2.setLocalDescription(answer)
           ws2.send(JSON.stringify(answer))
         } else if (message.type === 'ice') {
+          const ice = message.candidate.candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+          if (ice) remoteCandidateAddress[ice[3]] = ice[2]
           await pc2.addIceCandidate(message.candidate)
         }
       }
@@ -167,24 +176,41 @@
 
       setInterval(() => {
         pc2 && pc2.getStats(null).then((stats) => {
-       
-          function resolveIds(report1) {
-            Object.keys(report1).forEach((key) => {
-              if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
-                let id_ = report1[key]
-                if (!visited.has(id_)) {
-                  visited.add(id_)
-                  const report2 = { ...stats.get(id_) }
-                  resolveIds(report2)
-                  delete report2.id
-                  if (report2.type !== 'remote-outbound-rtp') {
-                    delete report2.timestamp
-                  }
-                  delete report2.type
-                  report1[key] = report2
+
+          function resolveIds(report1, idNames) {
+            idNames.forEach((idName) => {
+              if (idName.endsWith('Id') && typeof report1[idName] === 'string' && stats.has(report1[idName])) {
+                let report2 = { ...stats.get(report1[idName]) }
+                delete report2.id
+                // if (report2.type !== 'remote-outbound-rtp') {
+                //   delete report2.timestamp
+                // }
+                delete report2.type
+                if (idName === 'localCandidateId') {
+                  report2.address = localCandidateAddress[report2.port]
                 }
+                if (idName === 'remoteCandidateId') {
+                  report2.address = remoteCandidateAddress[report2.port]
+                }
+                report1[idName] = report2
               }
             })
+            // Object.keys(report1).forEach((key) => {
+            //   if (key.endsWith('Id') && typeof report1[key] === 'string' && stats.has(report1[key])) {
+            //     let id_ = report1[key]
+            //     if (!visited.has(id_)) {
+            //       visited.add(id_)
+            //       const report2 = { ...stats.get(id_) }
+            //       resolveIds(report2)
+            //       delete report2.id
+            //       if (report2.type !== 'remote-outbound-rtp') {
+            //         delete report2.timestamp
+            //       }
+            //       delete report2.type
+            //       report1[key] = report2
+            //     }
+            //   }
+            // })
           }
 
           let visited = new Set()
@@ -192,11 +218,23 @@
 
           stats.forEach((report) => {
             const { type, id } = report
-            if (type === 'candidate-pair' || type === 'inbound-rtp') {
-              let enrichedReport = { ...report }
-              resolveIds(enrichedReport)
-              x.push(enrichedReport)
+            if (type === 'candidate-pair') {
+              if (report.nominated) {
+                let report0 = { ...report }
+                resolveIds(report0, ['localCandidateId', 'remoteCandidateId'])
+                x.push(report0)
+              }
             }
+            if (type === 'inbound-rtp') {
+              let report0 = { ...report }
+              resolveIds(report0, ['codecId','remoteId'])
+              x.push(report0)
+            }
+            // if (type === 'remote-outbound-rtp') {
+            //   let report0 = { ...report }
+            //   resolveIds(report0, ['codecId','localId'])
+            //   x.push(report0)
+            // }
           })
 
           document.querySelector('.stats-box').innerHTML = JSON.stringify(x, null, 2)
