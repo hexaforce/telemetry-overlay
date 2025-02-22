@@ -9,13 +9,6 @@
     import { setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
 
-    const send1Button = document.getElementById('send1Button')
-    send1Button.disabled = true
-    send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-
-    const send2Button = document.getElementById('send2Button')
-    send2Button.disabled = true
-    send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -240,6 +233,14 @@
 
     const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = async () => recorder.download('test')
+
+    const send1Button = document.getElementById('send1Button')
+    send1Button.disabled = true
+    send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+
+    const send2Button = document.getElementById('send2Button')
+    send2Button.disabled = true
+    send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
   </script>
 </head>
