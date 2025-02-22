@@ -1,156 +1,156 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-</head>
-
-<body>
-  <div id="container">
-    <span id="banner"></span>
-    <h2>Sender and receiver</h2>
-    <div id="videos">
-      <p>Sender and receiver</p>
-      <video id="video1" playsinline autoplay muted></video>
-      <video id="video2" playsinline autoplay></video>
+  <body>
+    <div id="container">
+      <span id="banner"></span>
+      <h2>Sender and receiver</h2>
+      <div id="videos">
+        <p>Sender and receiver</p>
+        <video id="video1" playsinline autoplay muted></video>
+        <video id="video2" playsinline autoplay></video>
+      </div>
+      <h2>Middlebox</h2>
+      <div id="monitor">
+        <video id="video-monitor" playsinline autoplay muted></video>
+      </div>
+      <div id="buttons">
+        <button id="startButton">Start</button>
+        <button id="callButton" disabled>Call</button>
+        <button id="hangupButton" disabled>Hang Up</button>
+      </div>
     </div>
-    <h2>Middlebox</h2>
-    <div id="monitor">
-      <video id="video-monitor" playsinline autoplay muted></video>
-    </div>
-    <div id="buttons">
-      <button id="startButton">Start</button>
-      <button id="callButton" disabled>Call</button>
-      <button id="hangupButton" disabled>Hang Up</button>
-    </div>
-  </div>
-  <script>
-    'use strict'
+    <script>
+      'use strict'
 
-    /* global RTCRtpScriptTransform */
-    /* global VideoPipe */
+      /* global RTCRtpScriptTransform */
+      /* global VideoPipe */
 
-    const video1 = document.querySelector('video#video1')
-    const video2 = document.querySelector('video#video2')
-    const videoMonitor = document.querySelector('#video-monitor')
+      const video1 = document.querySelector('video#video1')
+      const video2 = document.querySelector('video#video2')
+      const videoMonitor = document.querySelector('#video-monitor')
 
-    const startButton = document.getElementById('startButton')
-    const callButton = document.getElementById('callButton')
-    const hangupButton = document.getElementById('hangupButton')
+      const startButton = document.getElementById('startButton')
+      const callButton = document.getElementById('callButton')
+      const hangupButton = document.getElementById('hangupButton')
 
-    startButton.onclick = function start() {
-      console.log('Requesting local stream')
-      startButton.disabled = true
-      const options = { audio: true, video: true }
-      navigator.mediaDevices
-        .getUserMedia(options)
-        .then(function gotStream(stream) {
-          console.log('Received local stream')
-          video1.srcObject = stream
-          localStream = stream
-          callButton.disabled = false
-        })
-        .catch(function (e) {
-          alert('getUserMedia() failed')
-          console.log('getUserMedia() error: ', e)
-        })
-    }
-
-    function VideoPipe(stream, forceSend, forceReceive, handler) {
-      this.pc1 = new RTCPeerConnection({ encodedInsertableStreams: forceSend })
-      this.pc2 = new RTCPeerConnection({ encodedInsertableStreams: forceReceive })
-      this.pc2.ontrack = handler
-      stream.getTracks().forEach((track) => this.pc1.addTrack(track, stream))
-    }
-
-    VideoPipe.prototype.negotiate = async function () {
-      this.pc1.onicecandidate = ({ candidate }) => this.pc2.addIceCandidate(candidate)
-      this.pc2.onicecandidate = ({ candidate }) => this.pc1.addIceCandidate(candidate)
-
-      const offer = await this.pc1.createOffer()
-      await this.pc2.setRemoteDescription(offer)
-      await this.pc1.setLocalDescription(offer)
-
-      const answer = await this.pc2.createAnswer()
-      await this.pc1.setRemoteDescription(answer)
-      await this.pc2.setLocalDescription(answer)
-    }
-
-    VideoPipe.prototype.close = function () {
-      this.pc1.close()
-      this.pc2.close()
-    }
-
-    const worker = new Worker('./worker.js', { name: 'Encode/Decode worker' })
-
-    function setupSenderTransform(sender) {
-      if (window.RTCRtpScriptTransform) {
-        sender.transform = new RTCRtpScriptTransform(worker, {
-          operation: 'encode', kind: sender.track.kind
-        })
-      } else {
-        const { readable, writable } = sender.createEncodedStreams()
-        let options = { operation: 'encode', kind: sender.track.kind }
-        worker.postMessage({ options, readable, writable }, [readable, writable])
+      startButton.onclick = function start() {
+        console.log('Requesting local stream')
+        startButton.disabled = true
+        const options = { audio: true, video: true }
+        navigator.mediaDevices
+          .getUserMedia(options)
+          .then(function gotStream(stream) {
+            console.log('Received local stream')
+            video1.srcObject = stream
+            localStream = stream
+            callButton.disabled = false
+          })
+          .catch(function (e) {
+            alert('getUserMedia() failed')
+            console.log('getUserMedia() error: ', e)
+          })
       }
-    }
 
-    function setupReceiverTransform(receiver) {
-      if (window.RTCRtpScriptTransform) {
-        receiver.transform = new RTCRtpScriptTransform(worker, {
-          operation: 'decode', kind: receiver.track.kind
-        })
-      } else {
-        const { readable, writable } = receiver.createEncodedStreams()
-        let options = { operation: 'decode', kind: receiver.track.kind }
-        worker.postMessage({ options, readable, writable }, [readable, writable])
+      function VideoPipe(stream, forceSend, forceReceive, handler) {
+        this.pc1 = new RTCPeerConnection({ encodedInsertableStreams: forceSend })
+        this.pc2 = new RTCPeerConnection({ encodedInsertableStreams: forceReceive })
+        this.pc2.ontrack = handler
+        stream.getTracks().forEach((track) => this.pc1.addTrack(track, stream))
       }
-    }
 
-    let startToMiddle
-    let startToEnd
+      VideoPipe.prototype.negotiate = async function () {
+        this.pc1.onicecandidate = ({ candidate }) => this.pc2.addIceCandidate(candidate)
+        this.pc2.onicecandidate = ({ candidate }) => this.pc1.addIceCandidate(candidate)
 
-    let localStream
+        const offer = await this.pc1.createOffer()
+        await this.pc2.setRemoteDescription(offer)
+        await this.pc1.setLocalDescription(offer)
 
-    if (!!!window.RTCRtpScriptTransform) {
-      const stream = new ReadableStream()
-      window.postMessage(stream, '*', [stream])
-    }
+        const answer = await this.pc2.createAnswer()
+        await this.pc1.setRemoteDescription(answer)
+        await this.pc2.setLocalDescription(answer)
+      }
 
-    callButton.onclick = function call() {
-      callButton.disabled = true
-      hangupButton.disabled = false
-      console.log('Starting call')
-      // The real use case is where the middle box relays the packets and listens in, but since we don't have access to raw packets, we just send the same video to both places.
-      startToMiddle = new VideoPipe(localStream, true, false, ({ streams }) => {
-        // Do not setup the receiver transform.
-        videoMonitor.srcObject = streams[0]
-      })
+      VideoPipe.prototype.close = function () {
+        this.pc1.close()
+        this.pc2.close()
+      }
 
-      // startToMiddle.pc1.getSenders().forEach(setupSenderTransform)
-      startToMiddle.negotiate()
+      const worker = new Worker('./worker.js', { name: 'Encode/Decode worker' })
 
-      startToEnd = new VideoPipe(localStream, true, true, ({ receiver, streams, track }) => {
-        if (track.kind === 'video'){
-          setupReceiverTransform(receiver)
+      function setupSenderTransform(sender) {
+        if (window.RTCRtpScriptTransform) {
+          sender.transform = new RTCRtpScriptTransform(worker, {
+            operation: 'encode',
+            kind: sender.track.kind,
+          })
+        } else {
+          const { readable, writable } = sender.createEncodedStreams()
+          let options = { operation: 'encode', kind: sender.track.kind }
+          worker.postMessage({ options, readable, writable }, [readable, writable])
         }
-        video2.srcObject = streams[0]
-      })
+      }
 
-      // startToEnd.pc1.getSenders().forEach(setupSenderTransform)
-      startToEnd.negotiate()
+      function setupReceiverTransform(receiver) {
+        if (window.RTCRtpScriptTransform) {
+          receiver.transform = new RTCRtpScriptTransform(worker, {
+            operation: 'decode',
+            kind: receiver.track.kind,
+          })
+        } else {
+          const { readable, writable } = receiver.createEncodedStreams()
+          let options = { operation: 'decode', kind: receiver.track.kind }
+          worker.postMessage({ options, readable, writable }, [readable, writable])
+        }
+      }
 
-      console.log('Video pipes created')
-    }
+      let startToMiddle
+      let startToEnd
 
-    hangupButton.onclick = function hangup() {
-      console.log('Ending call')
-      startToMiddle.close()
-      startToEnd.close()
-      hangupButton.disabled = true
-      callButton.disabled = false
-    }
-  </script>
-</body>
+      let localStream
 
+      if (!!!window.RTCRtpScriptTransform) {
+        const stream = new ReadableStream()
+        window.postMessage(stream, '*', [stream])
+      }
+
+      callButton.onclick = function call() {
+        callButton.disabled = true
+        hangupButton.disabled = false
+        console.log('Starting call')
+        // The real use case is where the middle box relays the packets and listens in, but since we don't have access to raw packets, we just send the same video to both places.
+        startToMiddle = new VideoPipe(localStream, true, false, ({ streams }) => {
+          // Do not setup the receiver transform.
+          videoMonitor.srcObject = streams[0]
+        })
+
+        // startToMiddle.pc1.getSenders().forEach(setupSenderTransform)
+        startToMiddle.negotiate()
+
+        startToEnd = new VideoPipe(localStream, true, true, ({ receiver, streams, track }) => {
+          if (track.kind === 'video') {
+            setupReceiverTransform(receiver)
+          }
+          video2.srcObject = streams[0]
+        })
+
+        // startToEnd.pc1.getSenders().forEach(setupSenderTransform)
+        startToEnd.negotiate()
+
+        console.log('Video pipes created')
+      }
+
+      hangupButton.onclick = function hangup() {
+        console.log('Ending call')
+        startToMiddle.close()
+        startToEnd.close()
+        hangupButton.disabled = true
+        callButton.disabled = false
+      }
+    </script>
+  </body>
 </html>

@@ -1,21 +1,31 @@
-navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
-  const videoSelect = document.querySelector('select#videoSource')
-  const audioSelect = document.querySelector('select#audioSource')
-  while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-  while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-  for (let i = 0; i < deviceArray.length; i++) {
-    const option = document.createElement('option')
-    const { deviceId, kind, label } = deviceArray[i]
-    option.value = deviceId
-    if (kind === 'videoinput') {
-      option.text = label || `Camera ${videoSelect.length + 1}`
-      videoSelect.appendChild(option)
-    } else if (kind === 'audioinput') {
-      option.text = label || `Microphone ${audioSelect.length + 1}`
-      audioSelect.appendChild(option)
+export async function getDevices() {
+  let stream = null
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    const deviceArray = await navigator.mediaDevices.enumerateDevices()
+    const videoSelect = document.querySelector('select#videoSource')
+    const audioSelect = document.querySelector('select#audioSource')
+    while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+    while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+    deviceArray.forEach(({ deviceId, kind, label }) => {
+      const option = document.createElement('option')
+      option.value = deviceId
+      if (kind === 'videoinput') {
+        option.text = label || `Camera ${videoSelect.length + 1}`
+        videoSelect.appendChild(option)
+      } else if (kind === 'audioinput') {
+        option.text = label || `Microphone ${audioSelect.length + 1}`
+        audioSelect.appendChild(option)
+      }
+    })
+  } catch (error) {
+  } finally {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop())
+      stream = null
     }
   }
-})
+}
 
 const preferredOrderAudio = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
 const preferredOrderVideo = ['video/H264', 'video/VP9', 'video/AV1', 'video/VP8', 'video/H265']
@@ -117,7 +127,8 @@ const worker = new Worker('./Transform.js', { name: 'Encode/Decode worker' })
 export function setupSenderTransform(sender) {
   if (window.RTCRtpScriptTransform) {
     sender.transform = new RTCRtpScriptTransform(worker, {
-      operation: 'encode', kind: sender.track.kind
+      operation: 'encode',
+      kind: sender.track.kind,
     })
   } else {
     const { readable, writable } = sender.createEncodedStreams()
@@ -129,7 +140,8 @@ export function setupSenderTransform(sender) {
 export function setupReceiverTransform(receiver) {
   if (window.RTCRtpScriptTransform) {
     receiver.transform = new RTCRtpScriptTransform(worker, {
-      operation: 'decode', kind: receiver.track.kind
+      operation: 'decode',
+      kind: receiver.track.kind,
     })
   } else {
     const { readable, writable } = receiver.createEncodedStreams()
