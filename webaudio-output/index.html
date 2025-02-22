@@ -11,25 +11,11 @@
 
     const send1Button = document.getElementById('send1Button')
     send1Button.disabled = true
-    send1Button.onclick = async () => {
-      dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-    }
+    send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
     const send2Button = document.getElementById('send2Button')
     send2Button.disabled = true
-    send2Button.onclick = async () => {
-      dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
-    }
-
-    async function setUserMedia() {
-      const c = {
-        video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      }
-      c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-      c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
-    }
+    send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -48,7 +34,17 @@
       codecPreferences.disabled = false
       recordButton.disabled = false
 
+      async function setUserMedia() {
+        const c = {
+          video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        }
+        c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+        c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
+      }
       await setUserMedia()
+
       pc1 = new RTCPeerConnection()
       pc1.oniceconnectionstatechange = (event) => {
         console.log('ICE State Changed:', pc1.iceConnectionState)
