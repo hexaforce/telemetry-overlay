@@ -86,22 +86,24 @@
     function setupSenderTransform(sender) {
       if (window.RTCRtpScriptTransform) {
         sender.transform = new RTCRtpScriptTransform(worker, {
-          operation: 'encode',
+          operation: 'encode', kind: sender.track.kind
         })
       } else {
         const { readable, writable } = sender.createEncodedStreams()
-        worker.postMessage({ operation: 'encode', readable, writable }, [readable, writable])
+        let options = { operation: 'encode', kind: sender.track.kind }
+        worker.postMessage({ options: options, readable, writable }, [readable, writable])
       }
     }
 
     function setupReceiverTransform(receiver) {
       if (window.RTCRtpScriptTransform) {
         receiver.transform = new RTCRtpScriptTransform(worker, {
-          operation: 'decode',
+          operation: 'decode', kind: receiver.track.kind
         })
       } else {
         const { readable, writable } = receiver.createEncodedStreams()
-        worker.postMessage({ operation: 'decode', readable, writable }, [readable, writable])
+        let options = { operation: 'decode', kind: receiver.track.kind }
+        worker.postMessage({ options: options, readable, writable }, [readable, writable])
       }
     }
 

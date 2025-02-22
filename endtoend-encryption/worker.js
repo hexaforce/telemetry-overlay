@@ -7,7 +7,8 @@ const decodeCallback = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
 
-function handleTransform(operation, readable, writable) {
+function handleTransform(options, readable, writable) {
+  const { operation, kind } = options
   if (operation === 'encode') {
     readable.pipeThrough(new TransformStream({ transform: encodeCallback })).pipeTo(writable)
   } else if (operation === 'decode') {
@@ -16,15 +17,13 @@ function handleTransform(operation, readable, writable) {
 }
 
 onmessage = ({ data }) => {
-  const { operation, readable, writable } = data
-  if (operation === 'encode' || operation === 'decode') {
-    return handleTransform(operation, readable, writable)
-  }
+  const { options, readable, writable } = data
+  handleTransform(options, readable, writable)
 }
 
 if (self.RTCTransformEvent) {
   self.onrtctransform = ({ transformer }) => {
     const { options, readable, writable } = transformer
-    handleTransform(options.operation, readable, writable)
+    handleTransform(options, readable, writable)
   }
 }
