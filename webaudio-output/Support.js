@@ -18,9 +18,9 @@ navigator.mediaDevices.enumerateDevices().then((deviceArray) => {
 })
 
 const preferredOrderAudio = ['audio/opus', 'audio/G722', 'audio/PCMU', 'audio/PCMA']
-const preferredOrderVideo = ['video/H264', 'video/VP8', 'video/AV1', 'video/VP9', 'video/H265']
+const preferredOrderVideo = ['video/H264', 'video/VP9', 'video/AV1', 'video/VP8', 'video/H265']
 
-export function preferredVideoCodecs(transceivers) {
+export function preferredCodecs(transceivers) {
   const sort = (supportedCodecs, preferredOrder) =>
     supportedCodecs.sort((a, b) => {
       const indexA = preferredOrder.indexOf(a.mimeType)
