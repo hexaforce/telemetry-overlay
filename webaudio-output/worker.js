@@ -10,6 +10,10 @@ const encodeAudio = (encodedFrame, controller) => {
 }
 // Dec Video
 const decodeVideo = (decodedFrame, controller) => {
+  if (decodedFrame.type === 'key') {
+    console.log('Metadata:', decodedFrame.getMetadata())
+  }
+  // console.log(decodedFrame.data.byteLength)
   controller.enqueue(decodedFrame)
 }
 // Dec Audio
