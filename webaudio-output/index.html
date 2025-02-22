@@ -7,13 +7,7 @@
     'use strict'
 
     import { setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
-
     import { StreamVisualizer } from './StreamVisualizer.js'
-
-    const recorder = new MultimediaRecorder()
-    const recordButton = document.querySelector('button#record')
-    const playButton = document.querySelector('button#play')
-    const downloadButton = document.querySelector('button#download')
 
     const send1Button = document.getElementById('send1Button')
     send1Button.disabled = true
@@ -205,6 +199,9 @@
       codecPreferences.appendChild(option)
     })
 
+    const recorder = new MultimediaRecorder()
+
+    const recordButton = document.querySelector('button#record')
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
         const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
@@ -237,7 +234,10 @@
       }
     }
 
+    const playButton = document.querySelector('button#play')
     playButton.onclick = async () => recorder.play()
+
+    const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = async () => recorder.download('test')
 
   </script>
