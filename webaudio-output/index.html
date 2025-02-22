@@ -22,14 +22,6 @@
       window.postMessage(stream, '*', [stream])
     }
 
-    let startTime
-    let ws1
-    let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
-    let pc1
-    let pc2
-    let dc1
-    let dc2
-
     async function setUserMedia() {
       const c = {
         video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -39,6 +31,17 @@
       c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
       localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
     }
+
+    let startTime
+    let ws1
+    let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
+    let pc1
+    let pc2
+    let dc1
+    let dc2
+
+    const localCandidateAddress = {}
+    const remoteCandidateAddress = {}
 
     pc1 = new RTCPeerConnection()
     pc1.oniceconnectionstatechange = (event) => {
@@ -66,7 +69,7 @@
         // console.log(pc2.localDescription.sdp)
       }
     }
-    const localCandidateAddress = {}
+
     pc2.onicecandidate = ({ candidate }) => {
       if (candidate) {
         if (/^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(candidate.address)) {
@@ -127,7 +130,7 @@
       ws2.onopen = () => {
         console.log('ws2 connected')
       }
-      const remoteCandidateAddress = {}
+
       ws2.onmessage = async ({ data }) => {
         const message = JSON.parse(data)
         if (message.type === 'offer') {
