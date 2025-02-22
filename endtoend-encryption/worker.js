@@ -1,17 +1,17 @@
 'use strict'
 
-const encode = (encodedFrame, controller) => {
+const encodeCallback = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
-const decode = (encodedFrame, controller) => {
+const decodeCallback = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
 
 function handleTransform(operation, readable, writable) {
   if (operation === 'encode') {
-    readable.pipeThrough(new TransformStream({ transform: encode })).pipeTo(writable)
+    readable.pipeThrough(new TransformStream({ transform: encodeCallback })).pipeTo(writable)
   } else if (operation === 'decode') {
-    readable.pipeThrough(new TransformStream({ transform: decode })).pipeTo(writable)
+    readable.pipeThrough(new TransformStream({ transform: decodeCallback })).pipeTo(writable)
   }
 }
 
