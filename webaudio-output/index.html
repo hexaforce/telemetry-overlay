@@ -15,7 +15,7 @@
       offerToReceiveAudio: 1,
     }
 
-    const Constraints = {
+    const c = {
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 640 }, height: { ideal: 360 } },
       // video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1280 }, height: { ideal: 720 } },
       video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
@@ -46,13 +46,13 @@
     }
 
     async function setUserMedia() {
-      const Constraints = {
+      const c = {
         video: { frameRate: { ideal: 30, max: 60 }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       }
-      Constraints.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
-      Constraints.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
-      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(Constraints)
+      c.video.deviceId = { ideal: document.querySelector('select#videoSource').value }
+      c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
+      localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
     }
 
     if (!!!window.RTCRtpScriptTransform) {
@@ -71,14 +71,13 @@
       codecPreferences.disabled = false
       recordButton.disabled = false
 
-      startTime = window.performance.now()
-
       await setUserMedia()
       pc1 = new RTCPeerConnection()
       pc1.oniceconnectionstatechange = (event) => {
         console.log('ICE State Changed:', pc1.iceConnectionState)
         if ('connected' === pc1.iceConnectionState) {
           // console.log(pc1.localDescription.sdp)
+          startTime = window.performance.now()
         }
       }
       pc1.onicecandidate = ({ candidate }) => {
