@@ -122,22 +122,22 @@
       hangupButton.disabled = false
       console.log('Starting call')
       // The real use case is where the middle box relays the packets and listens in, but since we don't have access to raw packets, we just send the same video to both places.
-      startToMiddle = new VideoPipe(localStream, true, false, (e) => {
+      startToMiddle = new VideoPipe(localStream, true, false, ({ streams }) => {
         // Do not setup the receiver transform.
-        const { streams } = e
         videoMonitor.srcObject = streams[0]
       })
 
-      startToMiddle.pc1.getSenders().forEach(setupSenderTransform)
+      // startToMiddle.pc1.getSenders().forEach(setupSenderTransform)
       startToMiddle.negotiate()
 
-      startToEnd = new VideoPipe(localStream, true, true, (e) => {
-        const { receiver, streams } = e
-        setupReceiverTransform(receiver)
+      startToEnd = new VideoPipe(localStream, true, true, ({ receiver, streams, track }) => {
+        if (track.kind === 'video'){
+          setupReceiverTransform(receiver)
+        }
         video2.srcObject = streams[0]
       })
 
-      startToEnd.pc1.getSenders().forEach(setupSenderTransform)
+      // startToEnd.pc1.getSenders().forEach(setupSenderTransform)
       startToEnd.negotiate()
 
       console.log('Video pipes created')
