@@ -43,7 +43,6 @@
         c.audio.deviceId = { ideal: document.querySelector('select#audioSource').value }
         localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(c)
       }
-      await setUserMedia()
 
       pc1 = new RTCPeerConnection()
       pc1.oniceconnectionstatechange = (event) => {
@@ -63,7 +62,6 @@
       dc1 = pc1.createDataChannel('pc1')
       dc1.onopen = () => console.log('DataChannel open pc1')
       dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
-      window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
 
       pc2 = new RTCPeerConnection()
       pc2.oniceconnectionstatechange = (event) => {
@@ -104,6 +102,8 @@
 
       ws1.onopen = async () => {
         console.log('ws1 connected')
+        await setUserMedia()
+        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
         const sendOffer = async () => {
           if (ws2.readyState === WebSocket.OPEN) {
             const offer = await pc1.createOffer()
