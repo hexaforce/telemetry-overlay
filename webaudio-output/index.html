@@ -130,10 +130,15 @@
             await pc1.addIceCandidate(message.candidate)
             //
           } else if (message.type === 'position') {
-            const position = await getCurrentPosition()
-            ws1.send(JSON.stringify({ type: 'position', position, ws1Id, ws2Id }))
+            window.navigator.geolocation.getCurrentPosition(
+              ({ coords, timestamp }) => {
+                const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
+                ws1.send(JSON.stringify({ type: 'position', position: { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed }, ws1Id, ws2Id }))
+              },
+              (err) => console.error('Error:', err)
+            )
           }
-          console.log('-------------------------- ',message.type )
+          console.log('-------------------------- ', message.type)
         }
       }
     }
@@ -319,15 +324,15 @@
 
     const send1Button = document.getElementById('send1Button')
     send1Button.disabled = true
-    send1Button.onclick = async () => dc1.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    send1Button.onclick = async () => dc1.send(JSON.stringify({ type: 'test', message: 'hello' }))
 
     const send2Button = document.getElementById('send2Button')
     send2Button.disabled = true
-    send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+    send2Button.onclick = async () => dc2.send(JSON.stringify({ type: 'test', message: 'hello' }))
 
     const positionButton = document.getElementById('positionButton')
     // positionButton.disabled = true
-    positionButton.onclick = async () => ws2.send(JSON.stringify({ tyep: 'position', ws1Id: ws2.pair, ws2Id: ws2.id, }))
+    positionButton.onclick = async () => ws2.send(JSON.stringify({ type: 'position', ws1Id: ws2.pair, ws2Id: ws2.id, }))
 
   </script>
 </head>
