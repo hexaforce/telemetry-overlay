@@ -127,11 +127,13 @@ wss.on('connection', (ws, req) => {
     const { ws1Id, ws2Id } = data
 
     if (protocol === 'receiver') {
+      console.log(`### ws2Id: ${ws2Id} ➡️➡️➡️➡️ ws1Id: ${ws1Id}`)
       const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === ws1Id) || []
       transceiverWs.send(text)
       console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
       return
     } else if (protocol === 'transceiver') {
+      console.log(`### ws1Id: ${ws1Id} ➡️➡️➡️➡️ ws2Id: ${ws2Id}`)
       const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === ws2Id) || []
       receiverWs.send(text)
       console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
@@ -149,7 +151,6 @@ wss.on('connection', (ws, req) => {
   })
 })
 
-// ?mode=edit
 server.listen(PORT, () => {
   console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)
   console.log(`WebRTC transceiver page link: https://${SERVER_IP_ADDRESS}/transceiver.html`)

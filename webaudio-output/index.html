@@ -73,7 +73,7 @@
           if (isIPv4(candidate.address)) {
             const ice = toICE(candidate.candidate)
             if (ice) localCandidateAddress[ice[3]] = ice[2]
-            ws2.send(JSON.stringify({ type: 'ice', ws1Is: ws2.pair, ws2Id: ws2.id, candidate }))
+            ws2.send(JSON.stringify({ type: 'ice', ws1Id: ws2.pair, ws2Id: ws2.id, candidate }))
           }
         }
       }
