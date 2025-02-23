@@ -135,3 +135,11 @@ export function setupReceiverTransform(receiver) {
     worker.postMessage({ options, readable, writable }, [readable, writable])
   }
 }
+
+export function isIPv4(address) {
+  return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
+}
+
+export function toICE(candidate) {
+  return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
+}

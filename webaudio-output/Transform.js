@@ -1,14 +1,14 @@
 'use strict'
 
-// Enc Video
+// Encoded Video
 const encodeVideo = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
-// Enc Audio
+// Encoded Audio
 const encodeAudio = (encodedFrame, controller) => {
   controller.enqueue(encodedFrame)
 }
-// Dec Video
+// Decoded Video
 const decodeVideo = (decodedFrame, controller) => {
   if (decodedFrame.type === 'key') {
     console.log('Metadata:', decodedFrame.getMetadata())
@@ -16,7 +16,7 @@ const decodeVideo = (decodedFrame, controller) => {
   // console.log(decodedFrame.data.byteLength)
   controller.enqueue(decodedFrame)
 }
-// Dec Audio
+// Decoded Audio
 const decodeAudio = (decodedFrame, controller) => {
   controller.enqueue(decodedFrame)
 }

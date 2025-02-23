@@ -6,7 +6,10 @@
   <script type="module" type="text/javascript">
     'use strict'
 
-    import { getDevices, setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform } from './Support.js'
+    const params = new URLSearchParams(window.location.search)
+    const protocol = params.get('protocol');
+
+    import { getDevices, setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform, isIPv4, toICE } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
 
     if (!!!window.RTCRtpScriptTransform) {
@@ -15,10 +18,18 @@
     }
 
     let startTime
-    let ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'transceiver')
-    let ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', 'receiver')
-    let pc1 = new RTCPeerConnection()
-    let pc2 = new RTCPeerConnection()
+    let ws1
+    let pc1
+    if (protocol === 'transceiver') {
+      ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
+      pc1 = new RTCPeerConnection()
+    }
+    let ws2
+    let pc2
+    if (protocol === 'receiver') {
+      ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
+      pc2 = new RTCPeerConnection()
+    }
     let dc1
     let dc2
 
@@ -28,130 +39,129 @@
     const localCandidateAddress = {}
     const remoteCandidateAddress = {}
 
-    function isIPv4(address) {
-      return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
-    }
-
-    function toICE(candidate) {
-      return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
-    }
-
-    pc1.oniceconnectionstatechange = (event) => {
-      console.log('ICE State Changed:', pc1.iceConnectionState)
-      if ('connected' === pc1.iceConnectionState) {
-        startTime = window.performance.now()
-      }
-    }
-    pc1.onicecandidate = ({ candidate }) => {
-      if (candidate) {
-        if (isIPv4(candidate.address)) {
-          ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
+    if (pc1) {
+      pc1.oniceconnectionstatechange = (event) => {
+        console.log('ICE State Changed:', pc1.iceConnectionState)
+        if ('connected' === pc1.iceConnectionState) {
+          startTime = window.performance.now()
         }
       }
-    }
-    dc1 = pc1.createDataChannel('pc1')
-    dc1.onopen = () => console.log('DataChannel open pc1')
-    dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
-
-    pc2.oniceconnectionstatechange = (event) => {
-      console.log('ICE State Changed:', pc2.iceConnectionState)
-      if ('connected' === pc2.iceConnectionState) {
-        setInterval(() => {
-          pc2.getStats(null).then((stats) => {
-            let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
-            document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
-          })
-        }, 1000)
-      }
-    }
-
-    pc2.onicecandidate = ({ candidate }) => {
-      if (candidate) {
-        if (isIPv4(candidate.address)) {
-          const ice = toICE(candidate.candidate)
-          if (ice) localCandidateAddress[ice[3]] = ice[2]
-          ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
-        }
-      }
-    }
-    pc2.ondatachannel = ({ channel }) => {
-      console.log('DataChannel open pc2')
-      dc2 = channel
-      dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
-    }
-    pc2.ontrack = ({ receiver, streams, track }) => {
-      if (track.kind === 'video') {
-        setupReceiverTransform(receiver)
-      }
-      if (track.kind === 'audio') {
-        new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-      }
-      if (remoteVideo.srcObject !== streams[0]) {
-        remoteVideo.srcObject = streams[0]
-      }
-    }
-
-    ws1.onopen = async () => {
-      console.log('ws1 connected')
-    }
-
-    ws2.onopen = () => {
-      console.log('ws2 connected')
-    }
-
-    ws2.onmessage = async ({ data }) => {
-      const message = JSON.parse(data)
-      if (message.type === 'session') {
-        ws2SessionId = message.sessionId
-      } else if (message.type === 'info') {
-        const videoSelect = document.querySelector('select#videoSource')
-        const audioSelect = document.querySelector('select#audioSource')
-        while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-        while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-        message.devices.forEach(({ deviceId, kind, label }) => {
-          const option = document.createElement('option')
-          option.value = deviceId
-          if (kind === 'videoinput') {
-            option.text = label || `Camera ${videoSelect.length + 1}`
-            videoSelect.appendChild(option)
-          } else if (kind === 'audioinput') {
-            option.text = label || `Microphone ${audioSelect.length + 1}`
-            audioSelect.appendChild(option)
+      pc1.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          if (isIPv4(candidate.address)) {
+            ws1.send(JSON.stringify({ type: 'ice', target: 'pc2', candidate }))
           }
-        })
-      } else if (message.type === 'offer') {
-        await pc2.setRemoteDescription(new RTCSessionDescription(message))
-        fixH264Codecs(pc2.getTransceivers())
-        // preferredCodecs(pc2.getTransceivers())
-        const answer = await pc2.createAnswer()
-        await pc2.setLocalDescription(answer)
-        ws2.send(JSON.stringify(answer))
-      } else if (message.type === 'ice') {
-        const ice = toICE(message.candidate.candidate)
-        if (ice) remoteCandidateAddress[ice[3]] = ice[2]
-        await pc2.addIceCandidate(message.candidate)
+        }
+      }
+      dc1 = pc1.createDataChannel('pc1')
+      dc1.onopen = () => console.log('DataChannel open pc1')
+      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+    }
+
+    if (pc2) {
+      pc2.oniceconnectionstatechange = (event) => {
+        console.log('ICE State Changed:', pc2.iceConnectionState)
+        if ('connected' === pc2.iceConnectionState) {
+          setInterval(() => {
+            pc2.getStats(null).then((stats) => {
+              let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
+              document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
+            })
+          }, 1000)
+        }
+      }
+      pc2.onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          if (isIPv4(candidate.address)) {
+            const ice = toICE(candidate.candidate)
+            if (ice) localCandidateAddress[ice[3]] = ice[2]
+            ws2.send(JSON.stringify({ type: 'ice', target: 'pc1', candidate }))
+          }
+        }
+      }
+      pc2.ondatachannel = ({ channel }) => {
+        console.log('DataChannel open pc2')
+        dc2 = channel
+        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
+      }
+      pc2.ontrack = ({ receiver, streams, track }) => {
+        if (track.kind === 'video') {
+          setupReceiverTransform(receiver)
+        }
+        if (track.kind === 'audio') {
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+        }
+        if (remoteVideo.srcObject !== streams[0]) {
+          remoteVideo.srcObject = streams[0]
+        }
       }
     }
 
-    ws1.onmessage = async ({ data }) => {
-      const message = JSON.parse(data)
-      if (message.type === 'session') {
-        ws1SessionId = message.sessionId
-      } else if (message.type === 'init') {
-        let devices = await getDevices()
-        ws1.send(JSON.stringify({ type: 'info', devices }))
-      } else if (message.type === 'start') {
-        localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
-        window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-        const offer = await pc1.createOffer()
-        await pc1.setLocalDescription(offer)
-        ws1.send(JSON.stringify(offer))
-      } else if (message.type === 'answer') {
-        await pc1.setRemoteDescription(new RTCSessionDescription(message))
-      } else if (message.type === 'ice') {
-        await pc1.addIceCandidate(message.candidate)
+    if (ws1) {
+      ws1.onopen = async () => {
+        console.log('ws1 connected')
+        ws1.onmessage = async ({ data }) => {
+          const message = JSON.parse(data)
+          if (message.type === 'session') {
+            ws1SessionId = message.sessionId
+          } else if (message.type === 'init') {
+            let devices = await getDevices()
+            ws1.send(JSON.stringify({ type: 'info', devices }))
+          } else if (message.type === 'start') {
+            localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
+            window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+            const offer = await pc1.createOffer()
+            await pc1.setLocalDescription(offer)
+            ws1.send(JSON.stringify(offer))
+          } else if (message.type === 'answer') {
+            await pc1.setRemoteDescription(new RTCSessionDescription(message))
+          } else if (message.type === 'ice') {
+            await pc1.addIceCandidate(message.candidate)
+          }
+        }
       }
     }
+
+    if (ws2) {
+      ws2.onopen = () => {
+        console.log('ws2 connected')
+        ws2.onmessage = async ({ data }) => {
+          const message = JSON.parse(data)
+          if (message.type === 'session') {
+            console.log(message)
+            ws2SessionId = message.sessionId
+          } else if (message.type === 'info') {
+            const videoSelect = document.querySelector('select#videoSource')
+            const audioSelect = document.querySelector('select#audioSource')
+            while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+            while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+            message.devices.forEach(({ deviceId, kind, label }) => {
+              const option = document.createElement('option')
+              option.value = deviceId
+              if (kind === 'videoinput') {
+                option.text = label || `Camera ${videoSelect.length + 1}`
+                videoSelect.appendChild(option)
+              } else if (kind === 'audioinput') {
+                option.text = label || `Microphone ${audioSelect.length + 1}`
+                audioSelect.appendChild(option)
+              }
+            })
+          } else if (message.type === 'offer') {
+            await pc2.setRemoteDescription(new RTCSessionDescription(message))
+            fixH264Codecs(pc2.getTransceivers())
+            // preferredCodecs(pc2.getTransceivers())
+            const answer = await pc2.createAnswer()
+            await pc2.setLocalDescription(answer)
+            ws2.send(JSON.stringify(answer))
+          } else if (message.type === 'ice') {
+            const ice = toICE(message.candidate.candidate)
+            if (ice) remoteCandidateAddress[ice[3]] = ice[2]
+            await pc2.addIceCandidate(message.candidate)
+          }
+        }
+      }
+    }
+
     // initButton
     // ------------------------------------------------------
     const initButton = document.getElementById('initButton')

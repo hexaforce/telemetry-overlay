@@ -102,62 +102,77 @@ const server = https.createServer(
 
 const wss = new WebSocket.Server({ server, path: '/ws' })
 
-let receiver = null
-let transceiver = null
+const clients = new Map()
+
 const CLOSE_PAIR_ON_DISCONNECT = false
 
 wss.on('connection', (ws, req) => {
   const protocol = req.headers['sec-websocket-protocol']?.toLowerCase()
-  if (protocol === 'receiver') {
-    receiver = ws
-  } else if (protocol === 'transceiver') {
-    transceiver = ws
-  }
-  console.log(`${protocol} connected`)
+  const sessionId = crypto.randomUUID()
 
-  const sessionId = crypto.randomUUID();
-  ws.send(JSON.stringify({ type: 'sessionId', sessionId }));
+  clients.set(ws, { sessionId, protocol })
+  console.log(`connected ${protocol} sessionId: ${sessionId}`)
+
+  if (protocol === 'receiver') {
+    const transceivers = Array.from(clients.values())
+      .filter((client) => client.protocol === 'transceiver')
+      .map((client) => client.sessionId)
+
+    ws.send(JSON.stringify({ type: 'session', sessionId, transceivers }))
+  } else if (protocol === 'transceiver') {
+    ws.send(JSON.stringify({ type: 'session', sessionId }))
+  }
+
+  // if (protocol === 'receiver') {
+  //   receivers[sessionId] = ws
+  // } else if (protocol === 'transceiver') {
+  //   transceivers[sessionId] = ws
+  // }
 
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
-    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
-    if (protocol === 'receiver') {
-      if (transceiver && transceiver.readyState === WebSocket.OPEN) {
-        transceiver.send(text)
-        console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
-      } else {
-        ws.send({ type: 'system', meseage: 'transceiver is not open' })
-      }
-    } else if (protocol === 'transceiver') {
-      if (receiver && receiver.readyState === WebSocket.OPEN) {
-        receiver.send(text)
-        console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
-      } else {
-        ws.send({ type: 'system', meseage: 'receiver is not open' })
-      }
-    }
+
+    // console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
+    // if (protocol === 'receiver') {
+    //   if (transceiver && transceiver.readyState === WebSocket.OPEN) {
+    //     transceiver.send(text)
+    //     console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
+    //   } else {
+    //     ws.send({ type: 'system', meseage: 'transceiver is not open' })
+    //   }
+    // } else if (protocol === 'transceiver') {
+    //   if (receiver && receiver.readyState === WebSocket.OPEN) {
+    //     receiver.send(text)
+    //     console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
+    //   } else {
+    //     ws.send({ type: 'system', meseage: 'receiver is not open' })
+    //   }
+    // }
   })
 
   ws.on('close', () => {
-    if (ws === receiver) {
-      receiver = null
-      if (CLOSE_PAIR_ON_DISCONNECT && transceiver) transceiver.close()
-    } else if (ws === transceiver) {
-      transceiver = null
-      if (CLOSE_PAIR_ON_DISCONNECT && receiver) receiver.close()
-    }
-    console.log(`${protocol} disconnected`)
+    // if (ws === receiver) {
+    //   receiver = null
+    //   if (CLOSE_PAIR_ON_DISCONNECT && transceiver) transceiver.close()
+    // } else if (ws === transceiver) {
+    //   transceiver = null
+    //   if (CLOSE_PAIR_ON_DISCONNECT && receiver) receiver.close()
+    // }
+    const { sessionId, protocol } = clients.get(ws)
+    clients.delete(ws)
+    console.log(`disconnected ${protocol} sessionId: ${sessionId}`)
   })
 })
-
+// ?mode=edit
 server.listen(PORT, () => {
   console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)
   console.log(`WebRTC transceiver page link: https://${SERVER_IP_ADDRESS}/transceiver.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/video-analyzer/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/record/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/resolution/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/endtoend-encryption/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html?protocol=receiver`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html?protocol=transceiver`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/video-analyzer/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/record/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/resolution/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/endtoend-encryption/index.html`)
 })
