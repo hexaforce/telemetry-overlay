@@ -13,6 +13,7 @@
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
+    import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -52,8 +53,23 @@
         }
       }
       dc1 = pc1.createDataChannel('pc1')
-      dc1.onopen = () => console.log('DataChannel open pc1')
-      dc1.onmessage = ({ data }) => console.log('DataChannel1 message:', JSON.parse(data))
+      dc1.onopen = () => {
+        console.log('DataChannel open pc1')
+        dc1.onmessage = ({ data }) => {
+          const message = JSON.parse(data)
+          console.log('DataChannel1 message:', message)
+          if (message.type === 'position') {
+            //
+            window.navigator.geolocation.getCurrentPosition(
+              ({ coords, timestamp }) => {
+                dc1.send(JSON.stringify({ type: 'position', coords, timestamp }))
+              },
+              (err) => console.error('Error:', err)
+            )
+            //
+          }
+        }
+      }
     }
 
     if (pc2) {
@@ -80,7 +96,27 @@
       pc2.ondatachannel = ({ channel }) => {
         console.log('DataChannel open pc2')
         dc2 = channel
-        dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
+        dc2.onmessage = ({ data }) => {
+          const message = JSON.parse(data)
+          console.log('DataChannel2 message:', message)
+          if (message.type === 'position') {
+            //
+            console.log('position:', message.coords)
+            //
+          } else if (message.type === 'deviceorientation') {
+            //
+            console.log('deviceorientation:', message)
+            //
+          } else if (message.type === 'deviceorientationabsolute') {
+            //
+            console.log('deviceorientationabsolute:', message)
+            //
+          } else if (message.type === 'devicemotion') {
+            //
+            console.log('devicemotion:', message)
+            //
+          }
+        }
       }
       pc2.ontrack = ({ receiver, streams, track }) => {
         if (track.kind === 'video') {
@@ -129,15 +165,7 @@
             //
             await pc1.addIceCandidate(message.candidate)
             //
-          } else if (message.type === 'position') {
-            window.navigator.geolocation.getCurrentPosition(
-              ({ coords, timestamp }) => {
-                ws1.send(JSON.stringify({ type: 'position', coords, timestamp, ws1Id, ws2Id }))
-              },
-              (err) => console.error('Error:', err)
-            )
           }
-          console.log('-------------------------- ', message.type)
         }
       }
     }
@@ -192,22 +220,6 @@
             const ice = toICE(message.candidate.candidate)
             if (ice) remoteCandidateAddress[ice[3]] = ice[2]
             await pc2.addIceCandidate(message.candidate)
-            //
-          } else if (message.type === 'position') {
-            //
-            console.log('position:', message)
-            //
-          } else if (message.type === 'deviceorientation') {
-            //
-            console.log('deviceorientation:', message)
-            //
-          } else if (message.type === 'deviceorientationabsolute') {
-            //
-            console.log('deviceorientationabsolute:', message)
-            //
-          } else if (message.type === 'devicemotion') {
-            //
-            console.log('devicemotion:', message)
             //
           }
         }
@@ -267,8 +279,6 @@
       localVideo.srcObject.getTracks().forEach((track) => track.stop())
       window.stream.getTracks().forEach((track) => track.stop())
 
-      send1Button.disabled = true
-      send2Button.disabled = true
       hangupButton.disabled = true
 
       codecPreferences.disabled = true
@@ -279,8 +289,6 @@
 
     const localVideo = document.getElementById('localVideo')
     const remoteVideo = document.getElementById('remoteVideo')
-
-    import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
 
     const codecPreferences = document.querySelector('#codecPreferences')
     SupportedType.forEach((mimeType) => {
@@ -334,16 +342,12 @@
     downloadButton.onclick = async () => recorder.download('test')
 
     const send1Button = document.getElementById('send1Button')
-    send1Button.disabled = true
     send1Button.onclick = async () => dc1.send(JSON.stringify({ type: 'test', message: 'hello' }))
 
     const send2Button = document.getElementById('send2Button')
-    send2Button.disabled = true
     send2Button.onclick = async () => dc2.send(JSON.stringify({ type: 'test', message: 'hello' }))
 
-    const positionButton = document.getElementById('positionButton')
-    // positionButton.disabled = true
-    positionButton.onclick = async () => ws2.send(JSON.stringify({ type: 'position', ws1Id: ws2.pair, ws2Id: ws2.id, }))
+    document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
 
     const testButton = document.getElementById('testButton')
     // positionButton.disabled = true
