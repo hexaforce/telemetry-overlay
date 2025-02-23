@@ -13,6 +13,7 @@
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
+    import './Sensor.js'
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
