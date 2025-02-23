@@ -1,3 +1,21 @@
+export function getCurrentPosition(timeout) {
+  return new Promise((resolve, reject) => {
+    console.log('--------- getCurrentPosition():', timeout)
+    window.navigator.geolocation.getCurrentPosition(
+      ({ coords, timestamp }) => {
+        console.log('--------- OK getCurrentPosition()')
+        const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
+        resolve({ accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed })
+      },
+      (err) => {
+        console.log('--------- ERR getCurrentPosition()')
+        console.error('Error:', err)
+        reject(err)
+      },
+      timeout ? { enableHighAccuracy: true, timeout, maximumAge: 0 } : undefined,
+    )
+  })
+}
 export async function getDevices() {
   let stream = null
   try {
@@ -18,7 +36,7 @@ export function setSenderPriority(pc) {
     if (sender.track.kind === 'video') {
       const params = sender.getParameters()
       if (params.encodings.length > 0) {
-        console.log('params:',params)
+        console.log('params:', params)
         params.encodings[0].priority = 'high'
         params.encodings[0].networkPriority = 'high'
         params.encodings[0].maxBitrate = 10 * 1000 * 1000

@@ -109,7 +109,7 @@ wss.on('connection', (ws, req) => {
   const sessionId = crypto.randomUUID()
 
   clients.set(ws, { sessionId, protocol })
-  console.log(`connected ${protocol} sessionId: ${sessionId}`)
+  console.log(`----- connected ${protocol} sessionId: ${sessionId}`)
 
   if (protocol === 'receiver') {
     const transceivers = Array.from(clients.values())
@@ -128,27 +128,24 @@ wss.on('connection', (ws, req) => {
 
     if (protocol === 'receiver') {
       const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === ws1Id) || []
-      if (transceiverWs && transceiverWs.readyState === WebSocket.OPEN) {
-        transceiverWs.send(text)
-        console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
-      } else {
-        ws.send(JSON.stringify({ type: 'system', meseage: 'transceiver is not open' }))
-      }
+      transceiverWs.send(text)
+      console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
+      return
     } else if (protocol === 'transceiver') {
       const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === ws2Id) || []
-      if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
-        receiverWs.send(text)
-        console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
-      } else {
-        ws.send(JSON.stringify({ type: 'system', meseage: 'receiver is not open' }))
-      }
+      receiverWs.send(text)
+      console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
+      return
     }
+    const errorMessage = JSON.stringify({ type: 'system', meseage: `socket is not open` })
+    console.error(errorMessage)
+    ws.send(errorMessage)
   })
 
   ws.on('close', () => {
     const { sessionId, protocol } = clients.get(ws)
+    console.log(`----- disconnected ${protocol} sessionId: ${sessionId}`)
     clients.delete(ws)
-    console.log(`disconnected ${protocol} sessionId: ${sessionId}`)
   })
 })
 

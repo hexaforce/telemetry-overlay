@@ -9,7 +9,7 @@
     const params = new URLSearchParams(window.location.search)
     const protocol = params.get('protocol');
 
-    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE } from './Support.js'
+    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE, getCurrentPosition } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
@@ -128,7 +128,11 @@
             //
             await pc1.addIceCandidate(message.candidate)
             //
+          } else if (message.type === 'position') {
+            const position = await getCurrentPosition()
+            ws1.send(JSON.stringify({ type: 'position', position, ws1Id, ws2Id }))
           }
+          console.log('-------------------------- ',message.type )
         }
       }
     }
@@ -182,6 +186,10 @@
             const ice = toICE(message.candidate.candidate)
             if (ice) remoteCandidateAddress[ice[3]] = ice[2]
             await pc2.addIceCandidate(message.candidate)
+            //
+          } else if (message.type === 'position') {
+            //
+            console.log('position:', message.position)
             //
           }
         }
@@ -315,6 +323,10 @@
     send2Button.disabled = true
     send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
 
+    const positionButton = document.getElementById('positionButton')
+    // positionButton.disabled = true
+    positionButton.onclick = async () => ws2.send(JSON.stringify({ tyep: 'position', ws1Is: ws2.pair, ws2Id: ws2.id, }))
+
   </script>
 </head>
 
@@ -334,6 +346,7 @@
       <button id="startButton">Start</button>
       <button id="send1Button">dc1 -> dc2</button>
       <button id="send2Button">dc2 -> dc1</button>
+      <button id="positionButton">position</button>
       <button id="hangupButton">Hang Up</button>
     </div>
     <div>
