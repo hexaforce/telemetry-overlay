@@ -98,6 +98,7 @@
     if (ws1) {
       ws1.onopen = async () => {
         console.log('ws1 connected')
+        ws1.onclose = () => console.log('ws1 closed -------')
         ws1.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
           const { ws1Id, ws2Id } = message
@@ -140,6 +141,7 @@
     if (ws2) {
       ws2.onopen = () => {
         console.log('ws2 connected')
+        ws2.onclose = () => console.log('ws2 closed -------')
         ws2.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
           const { ws1Id, ws2Id } = message
@@ -325,7 +327,7 @@
 
     const positionButton = document.getElementById('positionButton')
     // positionButton.disabled = true
-    positionButton.onclick = async () => ws2.send(JSON.stringify({ tyep: 'position', ws1Is: ws2.pair, ws2Id: ws2.id, }))
+    positionButton.onclick = async () => ws2.send(JSON.stringify({ tyep: 'position', ws1Id: ws2.pair, ws2Id: ws2.id, }))
 
   </script>
 </head>
