@@ -354,6 +354,14 @@
       requestPermission(dc1)
     }
   </script>
+  <style>
+    .select {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 300px;
+    }
+  </style>
 </head>
 
 <body>
@@ -364,25 +372,25 @@
       <button id="initButton">Init</button>
       <label for="videoSource">Video source: </label><select id="videoSource"></select>
       <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+      <button id="startButton">Start</button>
+      <button id="hangupButton">Hang Up</button>
     </div>
     <p>localVideo</p>
     <video id="localVideo" playsinline autoplay muted></video>
     <p>remoteVideo</p>
     <video id="remoteVideo" playsinline autoplay muted></video>
     <div>
-      <button id="startButton">Start</button>
       <button id="positionButton">position</button>
-      <button id="hangupButton">Hang Up</button>
       <button id="testButton">test</button>
     </div>
-    <div>
+    <div class="select">
       Recording format:
       <select id="codecPreferences" disabled></select>
       <button id="record" disabled>Start Recording</button>
       <button id="play" disabled>Play</button>
       <button id="download" disabled>Download</button>
+      <video id="recordedPlay" playsinline loop></video>
     </div>
-    <video id="recordedPlay" playsinline loop></video>
     <canvas></canvas>
     <pre class="stats-box"></pre>
   </div>
