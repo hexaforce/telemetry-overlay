@@ -9,8 +9,10 @@
     const params = new URLSearchParams(window.location.search)
     const protocol = params.get('protocol');
 
-    import { getDevices, setSenderPriority, fixH264Codecs, preferredCodecs, reportAggregate, setupReceiverTransform, isIPv4, toICE } from './Support.js'
+    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
+    import { reportAggregate } from './Report.js'
+    import { fixH264Codecs, preferredCodecs } from './Codec.js'
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -81,12 +83,12 @@
         dc2.onmessage = ({ data }) => console.log('DataChannel2 message:', JSON.parse(data))
       }
       pc2.ontrack = ({ receiver, streams, track }) => {
-        // if (track.kind === 'video') {
-        //   setupReceiverTransform(receiver)
-        // }
-        // if (track.kind === 'audio') {
-        //   new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
-        // }
+        if (track.kind === 'video') {
+          setupReceiverTransform(receiver)
+        }
+        if (track.kind === 'audio') {
+          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+        }
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
         }
