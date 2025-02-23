@@ -132,7 +132,7 @@ wss.on('connection', (ws, req) => {
         transceiverWs.send(text)
         console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
       } else {
-        ws.send({ type: 'system', meseage: 'transceiver is not open' })
+        ws.send(JSON.stringify({ type: 'system', meseage: 'transceiver is not open' }))
       }
     } else if (protocol === 'transceiver') {
       const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === ws2Id) || []
@@ -140,7 +140,7 @@ wss.on('connection', (ws, req) => {
         receiverWs.send(text)
         console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
       } else {
-        ws.send({ type: 'system', meseage: 'receiver is not open' })
+        ws.send(JSON.stringify({ type: 'system', meseage: 'receiver is not open' }))
       }
     }
   })
