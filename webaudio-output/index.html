@@ -9,7 +9,7 @@
     const params = new URLSearchParams(window.location.search)
     const protocol = params.get('protocol');
 
-    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE, getCurrentPosition } from './Support.js'
+    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE, requestPermission } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
@@ -132,7 +132,11 @@
             //
           } else if (message.type === 'position') {
             window.navigator.geolocation.getCurrentPosition(
-              ({ coords, timestamp }) => ws1.send(JSON.stringify({ type: 'position', coords, timestamp, ws1Id, ws2Id })),
+              ({ coords, timestamp }) => {
+                const position = JSON.stringify({ type: 'position', coords, timestamp, ws1Id, ws2Id })
+                console.log(position)
+                ws1.send(position)
+              },
               (err) => console.error('Error:', err)
             )
           }
@@ -194,7 +198,19 @@
             //
           } else if (message.type === 'position') {
             //
-            console.log('position:', message.position)
+            console.log('position:', message)
+            //
+          } else if (message.type === 'ondeviceorientation') {
+            //
+            console.log('ondeviceorientation:', message)
+            //
+          } else if (message.type === 'ondeviceorientationabsolute') {
+            //
+            console.log('ondeviceorientationabsolute:', message)
+            //
+          } else if (message.type === 'ondevicemotion') {
+            //
+            console.log('ondevicemotion:', message)
             //
           }
         }
@@ -332,6 +348,11 @@
     // positionButton.disabled = true
     positionButton.onclick = async () => ws2.send(JSON.stringify({ type: 'position', ws1Id: ws2.pair, ws2Id: ws2.id, }))
 
+    const testButton = document.getElementById('testButton')
+    // positionButton.disabled = true
+    testButton.onclick = async () => {
+      await requestPermission(ws1)
+    }
   </script>
 </head>
 
@@ -353,6 +374,7 @@
       <button id="send2Button">dc2 -> dc1</button>
       <button id="positionButton">position</button>
       <button id="hangupButton">Hang Up</button>
+      <button id="testButton">test</button>
     </div>
     <div>
       Recording format:

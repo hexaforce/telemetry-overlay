@@ -1,21 +1,20 @@
-export function getCurrentPosition(timeout) {
-  return new Promise((resolve, reject) => {
-    console.log('--------- getCurrentPosition():', timeout)
-    window.navigator.geolocation.getCurrentPosition(
-      ({ coords, timestamp }) => {
-        console.log('--------- OK getCurrentPosition()')
-        const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
-        resolve({ accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed })
-      },
-      (err) => {
-        console.log('--------- ERR getCurrentPosition()')
-        console.error('Error:', err)
-        reject(err)
-      },
-      timeout ? { enableHighAccuracy: true, timeout, maximumAge: 0 } : undefined,
-    )
-  })
+export async function requestPermission(ws1) {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    const response = await DeviceOrientationEvent.requestPermission()
+    if (response === 'granted') {
+      window.ondeviceorientation = (event) => {
+        ws1.send(JSON.stringify({ type: 'ondeviceorientation', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+      }
+      window.ondeviceorientationabsolute = (event) => {
+        ws1.send(JSON.stringify({ type: 'ondeviceorientationabsolute', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+      }
+      window.ondevicemotion = (event) => {
+        ws1.send(JSON.stringify({ type: 'ondevicemotion', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+      }
+    }
+  }
 }
+
 export async function getDevices() {
   let stream = null
   try {
