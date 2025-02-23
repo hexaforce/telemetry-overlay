@@ -238,8 +238,6 @@
     const startButton = document.getElementById('startButton')
     startButton.onclick = async () => {
       startButton.disabled = true
-      send1Button.disabled = false
-      send2Button.disabled = false
       hangupButton.disabled = false
 
       codecPreferences.disabled = false
@@ -341,18 +339,11 @@
     const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = async () => recorder.download('test')
 
-    const send1Button = document.getElementById('send1Button')
-    send1Button.onclick = async () => dc1.send(JSON.stringify({ type: 'test', message: 'hello' }))
-
-    const send2Button = document.getElementById('send2Button')
-    send2Button.onclick = async () => dc2.send(JSON.stringify({ type: 'test', message: 'hello' }))
-
     document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
 
     const testButton = document.getElementById('testButton')
-    // positionButton.disabled = true
     testButton.onclick = async () => {
-      requestPermission(ws1)
+      requestPermission(dc1)
     }
   </script>
 </head>
@@ -371,8 +362,6 @@
     <div>
       <button id="initButton">Init</button>
       <button id="startButton">Start</button>
-      <button id="send1Button">dc1 -> dc2</button>
-      <button id="send2Button">dc2 -> dc1</button>
       <button id="positionButton">position</button>
       <button id="hangupButton">Hang Up</button>
       <button id="testButton">test</button>
