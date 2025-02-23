@@ -104,8 +104,6 @@ const wss = new WebSocket.Server({ server, path: '/ws' })
 
 const clients = new Map()
 
-const CLOSE_PAIR_ON_DISCONNECT = false
-
 wss.on('connection', (ws, req) => {
   const protocol = req.headers['sec-websocket-protocol']?.toLowerCase()
   const sessionId = crypto.randomUUID()
@@ -117,52 +115,43 @@ wss.on('connection', (ws, req) => {
     const transceivers = Array.from(clients.values())
       .filter((client) => client.protocol === 'transceiver')
       .map((client) => client.sessionId)
-
     ws.send(JSON.stringify({ type: 'session', sessionId, transceivers }))
   } else if (protocol === 'transceiver') {
     ws.send(JSON.stringify({ type: 'session', sessionId }))
   }
 
-  // if (protocol === 'receiver') {
-  //   receivers[sessionId] = ws
-  // } else if (protocol === 'transceiver') {
-  //   transceivers[sessionId] = ws
-  // }
-
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
+    const data = JSON.parse(text)
+    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, data)
+    const { receiverId, transceiverId } = data
 
-    // console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, JSON.parse(text))
-    // if (protocol === 'receiver') {
-    //   if (transceiver && transceiver.readyState === WebSocket.OPEN) {
-    //     transceiver.send(text)
-    //     console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
-    //   } else {
-    //     ws.send({ type: 'system', meseage: 'transceiver is not open' })
-    //   }
-    // } else if (protocol === 'transceiver') {
-    //   if (receiver && receiver.readyState === WebSocket.OPEN) {
-    //     receiver.send(text)
-    //     console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
-    //   } else {
-    //     ws.send({ type: 'system', meseage: 'receiver is not open' })
-    //   }
-    // }
+    if (protocol === 'receiver') {
+      const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === transceiverId) || []
+      if (transceiverWs && transceiverWs.readyState === WebSocket.OPEN) {
+        transceiverWs.send(text)
+        console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
+      } else {
+        ws.send({ type: 'system', meseage: 'transceiver is not open' })
+      }
+    } else if (protocol === 'transceiver') {
+      const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === receiverId) || []
+      if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
+        receiverWs.send(text)
+        console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
+      } else {
+        ws.send({ type: 'system', meseage: 'receiver is not open' })
+      }
+    }
   })
 
   ws.on('close', () => {
-    // if (ws === receiver) {
-    //   receiver = null
-    //   if (CLOSE_PAIR_ON_DISCONNECT && transceiver) transceiver.close()
-    // } else if (ws === transceiver) {
-    //   transceiver = null
-    //   if (CLOSE_PAIR_ON_DISCONNECT && receiver) receiver.close()
-    // }
     const { sessionId, protocol } = clients.get(ws)
     clients.delete(ws)
     console.log(`disconnected ${protocol} sessionId: ${sessionId}`)
   })
 })
+
 // ?mode=edit
 server.listen(PORT, () => {
   console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)

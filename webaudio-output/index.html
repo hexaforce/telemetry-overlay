@@ -33,8 +33,8 @@
     let dc1
     let dc2
 
-    let ws1SessionId
-    let ws2SessionId
+    let transceiverId
+    let receiverId
 
     const localCandidateAddress = {}
     const remoteCandidateAddress = {}
@@ -102,11 +102,12 @@
         console.log('ws1 connected')
         ws1.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
+          const { receiverId, transceiverId } = message
           if (message.type === 'session') {
-            ws1SessionId = message.sessionId
+            transceiverId = message.sessionId
           } else if (message.type === 'init') {
             let devices = await getDevices()
-            ws1.send(JSON.stringify({ type: 'info', devices }))
+            ws1.send(JSON.stringify({ type: 'info', devices, receiverId, transceiverId }))
           } else if (message.type === 'start') {
             localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
             window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
@@ -122,14 +123,20 @@
       }
     }
 
+    const transceivers = document.querySelector('#transceivers')
     if (ws2) {
       ws2.onopen = () => {
         console.log('ws2 connected')
         ws2.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
           if (message.type === 'session') {
-            console.log(message)
-            ws2SessionId = message.sessionId
+            message.transceivers.forEach((value) => {
+              const option = document.createElement('option')
+              option.value = value
+              option.innerText = value
+              transceivers.appendChild(option)
+            })
+            receiverId = message.sessionId
           } else if (message.type === 'info') {
             const videoSelect = document.querySelector('select#videoSource')
             const audioSelect = document.querySelector('select#audioSource')
@@ -166,7 +173,8 @@
     // ------------------------------------------------------
     const initButton = document.getElementById('initButton')
     initButton.onclick = async () => {
-      ws2.send(JSON.stringify({ type: 'init' }))
+      const transceiverId = transceivers.options[transceivers.selectedIndex].value
+      ws2.send(JSON.stringify({ type: 'init', receiverId, transceiverId }))
     }
 
     // startButton
@@ -285,11 +293,13 @@
     const send2Button = document.getElementById('send2Button')
     send2Button.disabled = true
     send2Button.onclick = async () => dc2.send(JSON.stringify({ tyep: 'test', message: 'hello' }))
+
   </script>
 </head>
 
 <body>
   <div id="container">
+    <select id="transceivers"></select>
     <div class="select">
       <label for="videoSource">Video source: </label><select id="videoSource"></select>
       <label for="audioSource">Audio source: </label><select id="audioSource"></select>
