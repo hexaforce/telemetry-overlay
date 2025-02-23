@@ -3,13 +3,26 @@ export async function requestPermission(ws1) {
     const response = await DeviceOrientationEvent.requestPermission()
     if (response === 'granted') {
       window.ondeviceorientation = (event) => {
-        ws1.send(JSON.stringify({ type: 'ondeviceorientation', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+        const { alpha, beta, bubbles, cancelable, composed, currentTarget, defaultPrevented, eventPhase, gamma, isTrusted, timeStamp, type, webkitCompassAccuracy, webkitCompassHeading } = event
+        const deviceorientation = { alpha, beta, bubbles, cancelable, composed, currentTarget, defaultPrevented, eventPhase, gamma, isTrusted, timeStamp, type, webkitCompassAccuracy, webkitCompassHeading }
+        ws1.send(JSON.stringify({ type: 'deviceorientation', ws1Id: ws1.id, ws2Id: ws1.pair, deviceorientation }))
       }
       window.ondeviceorientationabsolute = (event) => {
-        ws1.send(JSON.stringify({ type: 'ondeviceorientationabsolute', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+        console.log('ondeviceorientationabsolute: ', event)
+        ws1.send(JSON.stringify({ type: 'deviceorientationabsolute', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
       }
       window.ondevicemotion = (event) => {
-        ws1.send(JSON.stringify({ type: 'ondevicemotion', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
+        const { acceleration, accelerationIncludingGravity, bubbles, cancelable, composed, defaultPrevented, eventPhase, interval, isTrusted, rotationRate, timeStamp, type } = event
+        const devicemotion = { acceleration, accelerationIncludingGravity, bubbles, cancelable, composed, defaultPrevented, eventPhase, interval, isTrusted, rotationRate, timeStamp, type }
+        const conv = (v) => {
+          const { x, y, z } = v
+          return { x, y, z }
+        }
+        devicemotion.acceleration = conv(devicemotion.acceleration)
+        devicemotion.accelerationIncludingGravity = conv(devicemotion.accelerationIncludingGravity)
+        const { alpha, beta, gamma } = devicemotion.rotationRate
+        devicemotion.rotationRate = { alpha, beta, gamma }
+        ws1.send(JSON.stringify({ type: 'devicemotion', ws1Id: ws1.id, ws2Id: ws1.pair, devicemotion }))
       }
     }
   }

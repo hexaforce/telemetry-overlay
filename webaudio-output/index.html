@@ -13,7 +13,6 @@
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
-    import './Sensor.js'
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -200,17 +199,17 @@
             //
             console.log('position:', message)
             //
-          } else if (message.type === 'ondeviceorientation') {
+          } else if (message.type === 'deviceorientation') {
             //
-            console.log('ondeviceorientation:', message)
+            console.log('deviceorientation:', message)
             //
-          } else if (message.type === 'ondeviceorientationabsolute') {
+          } else if (message.type === 'deviceorientationabsolute') {
             //
-            console.log('ondeviceorientationabsolute:', message)
+            console.log('deviceorientationabsolute:', message)
             //
-          } else if (message.type === 'ondevicemotion') {
+          } else if (message.type === 'devicemotion') {
             //
-            console.log('ondevicemotion:', message)
+            console.log('devicemotion:', message)
             //
           }
         }
