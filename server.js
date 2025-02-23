@@ -122,12 +122,12 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
+    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, text)
     const data = JSON.parse(text)
-    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, data)
-    const { receiverId, transceiverId } = data
+    const { ws1Id, ws2Id } = data
 
     if (protocol === 'receiver') {
-      const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === transceiverId) || []
+      const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === ws1Id) || []
       if (transceiverWs && transceiverWs.readyState === WebSocket.OPEN) {
         transceiverWs.send(text)
         console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
@@ -135,7 +135,7 @@ wss.on('connection', (ws, req) => {
         ws.send({ type: 'system', meseage: 'transceiver is not open' })
       }
     } else if (protocol === 'transceiver') {
-      const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === receiverId) || []
+      const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === ws2Id) || []
       if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
         receiverWs.send(text)
         console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
