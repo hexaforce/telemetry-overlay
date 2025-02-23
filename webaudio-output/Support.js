@@ -2,29 +2,31 @@ export async function requestPermission(ws1) {
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
     const response = await DeviceOrientationEvent.requestPermission()
     if (response === 'granted') {
-      window.ondeviceorientation = (event) => {
-        const { alpha, beta, bubbles, cancelable, composed, currentTarget, defaultPrevented, eventPhase, gamma, isTrusted, timeStamp, type, webkitCompassAccuracy, webkitCompassHeading } = event
-        const deviceorientation = { alpha, beta, bubbles, cancelable, composed, currentTarget, defaultPrevented, eventPhase, gamma, isTrusted, timeStamp, type, webkitCompassAccuracy, webkitCompassHeading }
-        ws1.send(JSON.stringify({ type: 'deviceorientation', ws1Id: ws1.id, ws2Id: ws1.pair, deviceorientation }))
-      }
-      window.ondeviceorientationabsolute = (event) => {
-        console.log('ondeviceorientationabsolute: ', event)
-        ws1.send(JSON.stringify({ type: 'deviceorientationabsolute', ws1Id: ws1.id, ws2Id: ws1.pair, event }))
-      }
-      window.ondevicemotion = (event) => {
-        const { acceleration, accelerationIncludingGravity, bubbles, cancelable, composed, defaultPrevented, eventPhase, interval, isTrusted, rotationRate, timeStamp, type } = event
-        const devicemotion = { acceleration, accelerationIncludingGravity, bubbles, cancelable, composed, defaultPrevented, eventPhase, interval, isTrusted, rotationRate, timeStamp, type }
-        const conv = (v) => {
-          const { x, y, z } = v
-          return { x, y, z }
-        }
-        devicemotion.acceleration = conv(devicemotion.acceleration)
-        devicemotion.accelerationIncludingGravity = conv(devicemotion.accelerationIncludingGravity)
-        const { alpha, beta, gamma } = devicemotion.rotationRate
-        devicemotion.rotationRate = { alpha, beta, gamma }
-        ws1.send(JSON.stringify({ type: 'devicemotion', ws1Id: ws1.id, ws2Id: ws1.pair, devicemotion }))
-      }
+      sensorInfo(ws1)
     }
+  } else sensorInfo(ws1)
+}
+
+function sensorInfo(ws1) {
+  window.ondeviceorientation = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
+    ws1.send(JSON.stringify({ ws1Id: ws1.id, ws2Id: ws1.pair, type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }))
+  }
+  window.ondeviceorientationabsolute = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
+    ws1.send(JSON.stringify({ ws1Id: ws1.id, ws2Id: ws1.pair, type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }))
+  }
+  window.ondevicemotion = ({ type, acceleration, accelerationIncludingGravity, rotationRate }) => {
+    const conv1 = (v) => {
+      const { x, y, z } = v
+      return { x, y, z }
+    }
+    acceleration = conv1(acceleration)
+    accelerationIncludingGravity = conv1(accelerationIncludingGravity)
+    const conv2 = (v) => {
+      const { alpha, beta, gamma } = v
+      return { alpha, beta, gamma }
+    }
+    rotationRate = conv2(rotationRate)
+    ws1.send(JSON.stringify({ ws1Id: ws1.id, ws2Id: ws1.pair, type, acceleration, accelerationIncludingGravity, rotationRate }))
   }
 }
 
