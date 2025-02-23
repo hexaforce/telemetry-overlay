@@ -66,7 +66,8 @@
         dc1.onmessage = ({ data }) => {
           const message = JSON.parse(data)
           console.log('DataChannel1 message:', message)
-          if (message.type === 'position') {
+          const { type } = message
+          if (type === 'position') {
             //
             window.navigator.geolocation.getCurrentPosition(
               ({ coords, timestamp }) => {
@@ -107,19 +108,20 @@
         dc2.onmessage = ({ data }) => {
           const message = JSON.parse(data)
           console.log('DataChannel2 message:', message)
-          if (message.type === 'position') {
+          const { type } = message
+          if (type === 'position') {
             //
             console.log('position:', message.coords)
             //
-          } else if (message.type === 'deviceorientation') {
+          } else if (type === 'deviceorientation') {
             //
             console.log('deviceorientation:', message)
             //
-          } else if (message.type === 'deviceorientationabsolute') {
+          } else if (type === 'deviceorientationabsolute') {
             //
             console.log('deviceorientationabsolute:', message)
             //
-          } else if (message.type === 'devicemotion') {
+          } else if (type === 'devicemotion') {
             //
             console.log('devicemotion:', message)
             //
@@ -145,17 +147,17 @@
         ws1.onclose = () => console.log('ws1 closed')
         ws1.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
-          const { ws1Id, ws2Id } = message
-          if (message.type === 'session') {
+          const { type, ws1Id, ws2Id } = message
+          if (type === 'session') {
             //
             ws1.id = message.sessionId
             //
-          } else if (message.type === 'init') {
+          } else if (type === 'init') {
             //
             let devices = await getDevices()
             ws1.send('info', ws1Id, ws2Id, { devices })
             //
-          } else if (message.type === 'start') {
+          } else if (type === 'start') {
             //
             localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
             window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
@@ -165,11 +167,11 @@
             ws1.pair = ws2Id
             ws1.send('offer', ws1Id, ws2Id, { offer })
             //
-          } else if (message.type === 'answer') {
+          } else if (type === 'answer') {
             //
             await pc1.setRemoteDescription(new RTCSessionDescription(message.answer))
             //
-          } else if (message.type === 'ice') {
+          } else if (type === 'ice') {
             //
             await pc1.addIceCandidate(message.candidate)
             //
@@ -184,8 +186,8 @@
         ws2.onclose = () => console.log('ws2 closed')
         ws2.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
-          const { ws1Id, ws2Id } = message
-          if (message.type === 'session') {
+          const { type, ws1Id, ws2Id } = message
+          if (type === 'session') {
             //
             ws2.id = message.sessionId
             message.transceivers.forEach((value) => {
@@ -195,7 +197,7 @@
               transceivers.appendChild(option)
             })
             //
-          } else if (message.type === 'info') {
+          } else if (type === 'info') {
             //
             const videoSelect = document.querySelector('select#videoSource')
             const audioSelect = document.querySelector('select#audioSource')
@@ -213,7 +215,7 @@
               }
             })
             //
-          } else if (message.type === 'offer') {
+          } else if (type === 'offer') {
             //
             await pc2.setRemoteDescription(new RTCSessionDescription(message.offer))
             fixH264Codecs(pc2.getTransceivers())
@@ -223,7 +225,7 @@
             ws2.send('answer', ws1Id, ws2Id, { answer })
             ws2.pair = ws1Id
             //
-          } else if (message.type === 'ice') {
+          } else if (type === 'ice') {
             //
             const ice = toICE(message.candidate.candidate)
             if (ice) remoteCandidateAddress[ice[3]] = ice[2]
