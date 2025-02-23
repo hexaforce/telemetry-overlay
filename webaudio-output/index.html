@@ -7,13 +7,20 @@
     'use strict'
 
     const params = new URLSearchParams(window.location.search)
-    const protocol = params.get('protocol');
+    const protocol = params.get('protocol')
 
     import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE, requestPermission } from './Support.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
+
+    const recorder = new MultimediaRecorder()
+
+    WebSocket.prototype.originalSend = WebSocket.prototype.send
+    WebSocket.prototype.send = function (type, ws1Id, ws2Id, data) {
+      this.originalSend(JSON.stringify({ type, ws1Id, ws2Id, ...data }))
+    }
 
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
@@ -48,8 +55,9 @@
       }
       pc1.onicecandidate = ({ candidate }) => {
         if (candidate) {
-          if (isIPv4(candidate.address))
-            ws1.send(JSON.stringify({ type: 'ice', ws1Id: ws1.id, ws2Id: ws1.pair, candidate }))
+          if (isIPv4(candidate.address)) {
+            ws1.send('ice', ws1.id, ws1.pair, { candidate })
+          }
         }
       }
       dc1 = pc1.createDataChannel('pc1')
@@ -64,7 +72,7 @@
               ({ coords, timestamp }) => {
                 dc1.send(JSON.stringify({ type: 'position', coords, timestamp }))
               },
-              (err) => console.error('Error:', err)
+              (err) => console.error('Error:', err),
             )
             //
           }
@@ -89,7 +97,7 @@
           if (isIPv4(candidate.address)) {
             const ice = toICE(candidate.candidate)
             if (ice) localCandidateAddress[ice[3]] = ice[2]
-            ws2.send(JSON.stringify({ type: 'ice', ws1Id: ws2.pair, ws2Id: ws2.id, candidate }))
+            ws2.send('ice', ws2.pair, ws2.id, { candidate })
           }
         }
       }
@@ -145,7 +153,7 @@
           } else if (message.type === 'init') {
             //
             let devices = await getDevices()
-            ws1.send(JSON.stringify({ type: 'info', ws1Id, ws2Id, devices }))
+            ws1.send('info', ws1Id, ws2Id, { devices })
             //
           } else if (message.type === 'start') {
             //
@@ -155,7 +163,7 @@
             const offer = await pc1.createOffer()
             await pc1.setLocalDescription(offer)
             ws1.pair = ws2Id
-            ws1.send(JSON.stringify({ type: 'offer', offer, ws1Id, ws2Id }))
+            ws1.send('offer', ws1Id, ws2Id, { offer })
             //
           } else if (message.type === 'answer') {
             //
@@ -212,7 +220,7 @@
             preferredCodecs(pc2.getTransceivers())
             const answer = await pc2.createAnswer()
             await pc2.setLocalDescription(answer)
-            ws2.send(JSON.stringify({ type: 'answer', answer, ws1Id, ws2Id }))
+            ws2.send('answer', ws1Id, ws2Id, { answer })
             ws2.pair = ws1Id
             //
           } else if (message.type === 'ice') {
@@ -230,7 +238,7 @@
     // ------------------------------------------------------
     const initButton = document.getElementById('initButton')
     initButton.onclick = async () => {
-      ws2.send(JSON.stringify({ type: 'init', ws1Id: transceivers.options[transceivers.selectedIndex].value, ws2Id: ws2.id }))
+      ws2.send('init', transceivers.options[transceivers.selectedIndex].value, ws2.id)
     }
 
     // startButton
@@ -243,31 +251,28 @@
       codecPreferences.disabled = false
       recordButton.disabled = false
 
-      const x = {
-        type: 'start', ws1Id: transceivers.options[transceivers.selectedIndex].value, ws2Id: ws2.id, constraints: {
-          video: {
-            frameRate: { ideal: 30, max: 60 },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-            deviceId: {
-              ideal: document.querySelector('select#videoSource').value
-            }
+      const constraints = {
+        video: {
+          frameRate: { ideal: 30, max: 60 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          deviceId: {
+            ideal: document.querySelector('select#videoSource').value,
           },
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            deviceId: { ideal: document.querySelector('select#audioSource').value }
-          }
-        }
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          deviceId: { ideal: document.querySelector('select#audioSource').value },
+        },
       }
-      ws2.send(JSON.stringify(x))
+      ws2.send('start', transceivers.options[transceivers.selectedIndex].value, ws2.id, { constraints })
     }
 
     // hangupButton
     // ------------------------------------------------------
     const hangupButton = document.getElementById('hangupButton')
-    hangupButton.disabled = true
     hangupButton.onclick = () => {
       pc1.close()
       pc2.close()
@@ -295,8 +300,6 @@
       option.innerText = mimeType.label
       codecPreferences.appendChild(option)
     })
-
-    const recorder = new MultimediaRecorder()
 
     const recordButton = document.querySelector('button#record')
     recordButton.onclick = async () => {

@@ -8,7 +8,7 @@ export async function requestPermission(dc1) {
 }
 
 function sensorInfo(dc1) {
-  const sendOrientation  = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
+  const sendOrientation = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
     dc1.send(JSON.stringify({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }))
   }
   window.ondeviceorientation = sendOrientation
