@@ -132,9 +132,7 @@
           } else if (message.type === 'position') {
             window.navigator.geolocation.getCurrentPosition(
               ({ coords, timestamp }) => {
-                const position = JSON.stringify({ type: 'position', coords, timestamp, ws1Id, ws2Id })
-                console.log(position)
-                ws1.send(position)
+                ws1.send(JSON.stringify({ type: 'position', coords, timestamp, ws1Id, ws2Id }))
               },
               (err) => console.error('Error:', err)
             )
