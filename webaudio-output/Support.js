@@ -18,6 +18,7 @@ export function setSenderPriority(pc) {
     if (sender.track.kind === 'video') {
       const params = sender.getParameters()
       if (params.encodings.length > 0) {
+        console.log('params:',params)
         params.encodings[0].priority = 'high'
         params.encodings[0].networkPriority = 'high'
         params.encodings[0].maxBitrate = 10 * 1000 * 1000

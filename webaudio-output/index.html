@@ -114,6 +114,7 @@
             //
             localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
             window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+            setSenderPriority(pc1)
             const offer = await pc1.createOffer()
             await pc1.setLocalDescription(offer)
             ws1.pair = ws2Id
