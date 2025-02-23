@@ -22,6 +22,11 @@
       this.originalSend(JSON.stringify({ type, ws1Id, ws2Id, ...data }))
     }
 
+    RTCDataChannel.prototype.originalSend = RTCDataChannel.prototype.send
+    RTCDataChannel.prototype.send = function (type, data) {
+      this.originalSend(JSON.stringify({ type, ...data }))
+    }
+
     if (!!!window.RTCRtpScriptTransform) {
       const stream = new ReadableStream()
       window.postMessage(stream, '*', [stream])
@@ -70,9 +75,7 @@
           if (type === 'position') {
             //
             window.navigator.geolocation.getCurrentPosition(
-              ({ coords, timestamp }) => {
-                dc1.send(JSON.stringify({ type: 'position', coords, timestamp }))
-              },
+              ({ coords, timestamp }) => dc1.send('position', { coords, timestamp }),
               (err) => console.error('Error:', err),
             )
             //
