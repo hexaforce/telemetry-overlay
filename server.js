@@ -123,17 +123,18 @@ wss.on('connection', (ws, req) => {
   ws.on('message', (message) => {
     const text = message.toString('utf-8')
     const data = JSON.parse(text)
-    console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, data)
     const { ws1Id, ws2Id } = data
 
     if (protocol === 'receiver') {
-      console.log(`ws1Id: ${ws1Id} ⬅︎⬅︎⬅︎ ws2Id: ${ws2Id}`)
+      console.log(`\nws1 ⬅︎⬅︎⬅︎  ws2`)
+      console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, data)
       const [transceiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'transceiver' && client.sessionId === ws1Id) || []
       transceiverWs.send(text)
       console.log(`⬆️⬆️⬆️ Outgoing message transceiver`)
       return
     } else if (protocol === 'transceiver') {
-      console.log(`ws2Id: ${ws2Id} ⬅︎⬅︎⬅︎ ws1Id: ${ws1Id}`)
+      console.log(`\nws2 ⬅︎⬅︎⬅︎  ws1`)
+      console.log(`⬇️⬇️⬇️ Incoming message ${protocol} :`, data)
       const [receiverWs] = Array.from(clients.entries()).find(([ws, client]) => client.protocol === 'receiver' && client.sessionId === ws2Id) || []
       receiverWs.send(text)
       console.log(`⬆️⬆️⬆️ Outgoing message receiver`)
