@@ -131,10 +131,7 @@
             //
           } else if (message.type === 'position') {
             window.navigator.geolocation.getCurrentPosition(
-              ({ coords, timestamp }) => {
-                const { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed } = coords
-                ws1.send(JSON.stringify({ type: 'position', position: { accuracy, altitude, altitudeAccuracy, heading, latitude, longitude, speed }, ws1Id, ws2Id }))
-              },
+              ({ coords, timestamp }) => ws1.send(JSON.stringify({ type: 'position', position: coords, ws1Id, ws2Id })),
               (err) => console.error('Error:', err)
             )
           }
