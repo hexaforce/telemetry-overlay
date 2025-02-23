@@ -133,7 +133,6 @@
       }
     }
 
-    const transceivers = document.querySelector('#transceivers')
     if (ws2) {
       ws2.onopen = () => {
         console.log('ws2 connected')
@@ -299,6 +298,8 @@
         codecPreferences.disabled = false
       }
     }
+
+    const transceivers = document.querySelector('#transceivers')
 
     const playButton = document.querySelector('button#play')
     playButton.onclick = async () => recorder.play()
