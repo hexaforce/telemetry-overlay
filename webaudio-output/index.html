@@ -358,8 +358,10 @@
 
 <body>
   <div id="container">
-    <select id="transceivers"></select>
     <div class="select">
+      Transceiver:
+      <select id="transceivers"></select>
+      <button id="initButton">Init</button>
       <label for="videoSource">Video source: </label><select id="videoSource"></select>
       <label for="audioSource">Audio source: </label><select id="audioSource"></select>
     </div>
@@ -368,7 +370,6 @@
     <p>remoteVideo</p>
     <video id="remoteVideo" playsinline autoplay muted></video>
     <div>
-      <button id="initButton">Init</button>
       <button id="startButton">Start</button>
       <button id="positionButton">position</button>
       <button id="hangupButton">Hang Up</button>
@@ -377,14 +378,11 @@
     <div>
       Recording format:
       <select id="codecPreferences" disabled></select>
-    </div>
-    <div>
       <button id="record" disabled>Start Recording</button>
       <button id="play" disabled>Play</button>
       <button id="download" disabled>Download</button>
     </div>
     <video id="recordedPlay" playsinline loop></video>
-    <div id="actualCodec"></div>
     <canvas></canvas>
     <pre class="stats-box"></pre>
   </div>

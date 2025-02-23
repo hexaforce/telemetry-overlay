@@ -63,11 +63,13 @@ const worker = new Worker('./Transform.js', { name: 'Encode/Decode worker' })
 
 export function setupSenderTransform(sender) {
   if (window.RTCRtpScriptTransform) {
+    // Safari,Firefox
     sender.transform = new RTCRtpScriptTransform(worker, {
       operation: 'encode',
       kind: sender.track.kind,
     })
   } else {
+    // Chrome
     const { readable, writable } = sender.createEncodedStreams()
     let options = { operation: 'encode', kind: sender.track.kind }
     worker.postMessage({ options, readable, writable }, [readable, writable])
@@ -76,11 +78,13 @@ export function setupSenderTransform(sender) {
 
 export function setupReceiverTransform(receiver) {
   if (window.RTCRtpScriptTransform) {
+    // Safari,Firefox
     receiver.transform = new RTCRtpScriptTransform(worker, {
       operation: 'decode',
       kind: receiver.track.kind,
     })
   } else {
+    // Chrome
     const { readable, writable } = receiver.createEncodedStreams()
     let options = { operation: 'decode', kind: receiver.track.kind }
     worker.postMessage({ options, readable, writable }, [readable, writable])
