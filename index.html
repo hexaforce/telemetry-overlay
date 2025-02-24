@@ -130,7 +130,7 @@
             if (type === 'position') {
               //
               console.log('position:', message.coords)
-              const {longitude, latitude} = message.coords
+              const { longitude, latitude } = message.coords
               renderMap([longitude, latitude])
               //
             } else if (type === 'deviceorientation') {
@@ -387,12 +387,11 @@
       // document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
     </script>
     <style>
-body {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-}
-
+      body {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
 
       .side {
         display: flex;
@@ -453,30 +452,28 @@ body {
         stroke-width: 0.5;
       }
 
-/* --- map -------------------------- */
+      /* --- map -------------------------- */
 
-.map {
-  width: 400px;
-  height: 280px;
-  opacity: 0.7;
-}
+      .map {
+        width: 400px;
+        height: 280px;
+        opacity: 0.7;
+      }
 
-/* .navigation-map {
+      /* .navigation-map {
   position: absolute;
   top: 0;
   right: 0;
   color: white;
   background: rgba(0, 0, 0, 0.3);
 } */
-
     </style>
   </head>
 
   <body>
-
     <div id="map" class="map"></div>
     <div id="gui"></div>
-    
+
     <div class="container">
       <div class="transceiver">
         <p>LocalVideo</p>

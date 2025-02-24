@@ -112,7 +112,7 @@ const renderMap = (position) => {
     stats.dom.style.right = '400px'
 
     animate()
-    
+
     const gui = new GUI({ container: document.querySelector('div#gui'), width: '100%' })
     const onChangedGUI = () => {
       if (api.buildings) {
