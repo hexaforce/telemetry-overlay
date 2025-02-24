@@ -1,35 +1,63 @@
 <!doctype html>
-<html lang="ja">
+<html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Absolute Orientation Sensor Demo</title>
-
+    <title>Absolute orientation sensor demo</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <!-- Origin Trial Token, feature = Generic Sensors, origin = https://intel.github.io, expires = 2018-02-27 -->
+    <meta http-equiv="origin-trial" data-feature="Generic Sensors" data-expires="2018-02-27" content="AjL+UlBzLjx+0FPXrML6IMA/Ax9GsO/7rUvV/aaKkh3KknUSwDBgymn0d3NhGeRMNS7FlYD73ernqvZNoqzNMw4AAABWeyJvcmlnaW4iOiJodHRwczovL2ludGVsLmdpdGh1Yi5pbzo0NDMiLCJmZWF0dXJlIjoiR2VuZXJpY1NlbnNvciIsImV4cGlyeSI6MTUxOTczOTAwNX0=" />
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #console {
+        margin: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
   </head>
 
   <body>
-    <script src="three.min.js"></script>
-    <script src="OBJLoader.js"></script>
-    <script src="MTLLoader.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/MTLLoader.js"></script>
 
     <script type="module">
-
       import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '../sensor-polyfills/motion-sensors.js'
 
-      const params = new URLSearchParams(window.location.search)
+      const params = new URLSearchParams(new URL(window.location.href).search.slice(1))
       const relative = !!Number(params.get('relative'))
       const coordinateSystem = params.get('coord')
 
-      let sensor, camera, scene, renderer, model
+      let container, sensor, camera, scene, renderer, model
 
-      document.addEventListener('DOMContentLoaded', () => {
-        initScene()
-        checkPermissions().then(initSensor)
-        renderScene()
-      })
+      initScene()
+      if (navigator.permissions) {
+        // https://w3c.github.io/orientation-sensor/#model
+        Promise.all([navigator.permissions.query({ name: 'accelerometer' }), navigator.permissions.query({ name: 'magnetometer' }), navigator.permissions.query({ name: 'gyroscope' })])
+          .then((results) => {
+            if (results.every((result) => result.state === 'granted')) {
+              initSensor()
+            } else {
+              console.log('Permission to use sensor was denied.')
+            }
+          })
+          .catch((err) => {
+            console.log('Integration with Permissions API is not enabled, still try to start app.')
+            initSensor()
+          })
+      } else {
+        console.log('No Permissions API, still try to start app.')
+        initSensor()
+      }
+
+      renderScene()
 
       function initScene() {
-        const container = document.createElement('div')
+        container = document.createElement('div')
         document.body.appendChild(container)
 
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200)
@@ -37,15 +65,15 @@
 
         scene = new THREE.Scene()
 
-        const ambientLight = new THREE.AmbientLight(0x404040, 6)
+        var ambientLight = new THREE.AmbientLight(0x404040, 6)
         scene.add(ambientLight)
 
-        const manager = new THREE.LoadingManager()
-        const mtlLoader = new THREE.MTLLoader(manager)
+        var manager = new THREE.LoadingManager()
+        var mtlLoader = new THREE.MTLLoader(manager)
         mtlLoader.setTexturePath('resources/')
         mtlLoader.load('resources/phone.mtl', (materials) => {
           materials.preload()
-          const objLoader = new THREE.OBJLoader(manager)
+          var objLoader = new THREE.OBJLoader(manager)
           objLoader.setMaterials(materials)
           objLoader.load('resources/phone.obj', (object) => {
             model = object
@@ -58,62 +86,34 @@
         renderer.setSize(window.innerWidth, window.innerHeight)
         container.appendChild(renderer.domElement)
 
-        window.addEventListener('resize', resizeHandler, false)
-        document.addEventListener('mousedown', requestFullscreen)
-        document.addEventListener('fullscreenchange', lockScreenOrientation)
-      }
+        window.addEventListener(
+          'resize',
+          () => {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+          },
+          false,
+        )
 
-      function resizeHandler() {
-        camera.aspect = window.innerWidth / window.innerHeight
-        camera.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
-      }
-
-      function requestFullscreen() {
-        document.documentElement.requestFullscreen()
-      }
-
-      function lockScreenOrientation() {
-        if (document.fullscreenElement) {
-          screen.orientation.lock('natural')
-        }
-      }
-
-      async function checkPermissions() {
-        if (!navigator.permissions) {
-          updateConsole('No Permissions API, still trying to start app.')
-          return
-        }
-        try {
-          const results = await Promise.all([navigator.permissions.query({ name: 'accelerometer' }), navigator.permissions.query({ name: 'magnetometer' }), navigator.permissions.query({ name: 'gyroscope' })])
-          if (results.every((result) => result.state === 'granted')) {
-            return
-          } else {
-            updateConsole('Permission to use sensors was denied.')
+        document.addEventListener('mousedown', () => document.documentElement.requestFullscreen())
+        document.addEventListener('fullscreenchange', () => {
+          if (document.fullscreenElement != null) {
+            screen.orientation.lock('natural')
           }
-        } catch {
-          updateConsole('Integration with Permissions API is not enabled, still trying to start app.')
-        }
+        })
       }
 
       function initSensor() {
         const options = { frequency: 60, coordinateSystem }
-        updateConsole(`Sensor options: ${JSON.stringify(options)}`)
-
+        console.log(JSON.stringify(options))
         sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
-
-        sensor.onreading = () => {
-          if (model) {
-            model.quaternion.fromArray(sensor.quaternion).inverse()
-          }
-        }
-
+        sensor.onreading = () => model.quaternion.fromArray(sensor.quaternion).inverse()
         sensor.onerror = (event) => {
-          if (event.error.name === 'NotReadableError') {
-            updateConsole('Sensor is not available.')
+          if (event.error.name == 'NotReadableError') {
+            console.log('Sensor is not available.')
           }
         }
-
         sensor.start()
       }
 
@@ -123,10 +123,11 @@
         renderer.render(scene, camera)
       }
 
-      function updateConsole(message) {
-        const consoleDiv = document.getElementById('console')
-        if (consoleDiv) consoleDiv.innerText = message
-        console.log(message)
+      let log = console.log
+      console.log = (message, ...rest) => {
+        const div = document.querySelector('#console')
+        div.innerText = message
+        log.call(console, message, ...rest)
       }
     </script>
     <div id="console"></div>
