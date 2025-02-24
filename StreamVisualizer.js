@@ -1,6 +1,6 @@
 export class StreamVisualizer {
   constructor(remoteStream, canvas) {
-    this.WIDTH = 600
+    this.WIDTH = 720
     this.HEIGHT = 150
     // Interesting parameters to tweak!
     this.SMOOTHING = 0.8

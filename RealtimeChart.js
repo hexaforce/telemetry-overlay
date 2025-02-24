@@ -4,7 +4,7 @@ const random = d3.random.normal(0, 0.2)
 
 const margin = { top: 6, right: 6, bottom: 20, left: 25 }
 const width = 720 - margin.right
-const height = 120 - margin.top - margin.bottom
+const height = 150 - margin.top - margin.bottom
 
 const $ = (id) => document.getElementById(id)
 
