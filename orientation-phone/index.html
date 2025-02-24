@@ -97,19 +97,23 @@
               navigator.permissions.query({ name: 'accelerometer' }), 
               navigator.permissions.query({ name: 'magnetometer' }), 
               navigator.permissions.query({ name: 'gyroscope' }), 
+              navigator.permissions.query({ name: 'geolocation' }), 
             ])
             if (results.every((result) => result.state === 'granted')) {
               initSensor()
+              initGPS()
             } else {
               console.log('Permission to use sensor was denied.')
             }
           } catch (err) {
             console.log('Integration with Permissions API is not enabled, still try to start app.')
             initSensor()
+            initGPS()
           }
         } else {
           console.log('No Permissions API, still try to start app.')
           initSensor()
+          initGPS()
         }
       }
 
@@ -128,6 +132,24 @@
           }
         }
         sensor.start()
+      }
+
+      // initGPS
+      // ----------------------------------------
+      function initGPS() {
+        function success(pos) {
+          const crd = pos.coords
+          console.log(`SUCCESS: latitude ${crd.latitude} longitude ${crd.longitude}`)
+        }
+        function error(err) {
+          console.error(`ERROR(${err.code}): ${err.message}`)
+        }
+        let options = {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+        navigator.geolocation.watchPosition(success, error, options)
       }
 
       // initScene
