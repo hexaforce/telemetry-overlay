@@ -38,12 +38,14 @@
     if (protocol === 'transceiver') {
       ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
       pc1 = new RTCPeerConnection()
+      document.querySelector('.receiver').style.display = 'none'
     }
     let ws2
     let pc2
     if (protocol === 'receiver') {
       ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
       pc2 = new RTCPeerConnection()
+      document.querySelector('.transceiver').style.display = 'none'
     }
     let dc1
     let dc2
@@ -138,6 +140,7 @@
         if (track.kind === 'audio') {
           new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
         }
+        const remoteVideo = document.getElementById('video#remote')
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
         }
@@ -162,7 +165,8 @@
             //
           } else if (type === 'start') {
             //
-            localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
+            window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
+            document.getElementById('video#local').srcObject = window.stream
             window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
             setSenderPriority(pc1)
             const offer = await pc1.createOffer()
@@ -239,23 +243,16 @@
       }
     }
 
-    // initButton
+    // init
     // ------------------------------------------------------
-    const initButton = document.getElementById('initButton')
-    initButton.onclick = async () => {
-      ws2.send('init', transceivers.options[transceivers.selectedIndex].value, ws2.id)
+    async function init() {
+      const ws1Id = transceivers.options[transceivers.selectedIndex].value
+      ws2.send('init', ws1Id, ws2.id)
     }
 
-    // startButton
+    // start
     // ------------------------------------------------------
-    const startButton = document.getElementById('startButton')
-    startButton.onclick = async () => {
-      startButton.disabled = true
-      hangupButton.disabled = false
-
-      codecPreferences.disabled = false
-      recordButton.disabled = false
-
+    async function start() {
       const constraints = {
         video: {
           frameRate: { ideal: 30, max: 60 },
@@ -272,65 +269,109 @@
           deviceId: { ideal: document.querySelector('select#audioSource').value },
         },
       }
-      ws2.send('start', transceivers.options[transceivers.selectedIndex].value, ws2.id, { constraints })
+      const ws1Id = transceivers.options[transceivers.selectedIndex].value
+      ws2.send('start', ws1Id, ws2.id, { constraints })
+
+      SupportedType.forEach((mimeType) => {
+        const option = document.createElement('option')
+        option.value = mimeType.value
+        option.innerText = mimeType.label
+        codecPreferences.appendChild(option)
+      })
     }
 
-    // hangupButton
+    // hangup
     // ------------------------------------------------------
-    const hangupButton = document.getElementById('hangupButton')
-    hangupButton.onclick = () => {
-      pc1.close()
-      pc2.close()
-      pc1 = null
-      pc2 = null
-
-      localVideo.srcObject.getTracks().forEach((track) => track.stop())
+    async function hangup() {
+      // localVideo.srcObject.getTracks().forEach((track) => track.stop())
       window.stream.getTracks().forEach((track) => track.stop())
-
-      hangupButton.disabled = true
-
-      codecPreferences.disabled = true
-      recordButton.disabled = true
-
-      startButton.disabled = false
     }
 
-    const localVideo = document.getElementById('localVideo')
-    const remoteVideo = document.getElementById('remoteVideo')
+    // recordStart
+    // ------------------------------------------------------
+    async function recordStart() {
+      const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+      if (mimeType.split(';', 1)[0] === 'video/mp4') {
+        // Adjust sampling rate to 48khz.
+        const track = window.stream.getAudioTracks()[0]
+        if (track) {
+          const { sampleRate } = track.getSettings()
+          if (sampleRate != 48000) {
+            track.stop()
+            window.stream.removeTrack(track)
+            const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+            window.stream.addTrack(newStream.getTracks()[0])
+          }
+        }
+      }
+      recorder.start(window.stream, mimeType)
+    }
+
+    // recordStop
+    // ------------------------------------------------------
+    async function recordStop() {
+      recorder.stop()
+    }
+
+    // recordDownload
+    // ------------------------------------------------------
+    async function recordDownload() {
+      recorder.download('test')
+    }
+
+    // recordPlay
+    // ------------------------------------------------------
+    async function recordPlay() {
+      recorder.play()
+    }
+
+    const initButton = document.getElementById('initButton')
+    initButton.onclick = init
+
+    const startButton = document.getElementById('startButton')
+    startButton.onclick = start
+    // startButton.onclick = async () => {
+    //   startButton.disabled = true
+    //   hangupButton.disabled = false
+    //   codecPreferences.disabled = false
+    //   recordButton.disabled = false
+    // }
+
+    const hangupButton = document.getElementById('hangupButton')
+    hangupButton.disabled = true
+    hangupButton.onclick = hangup
+    // hangupButton.onclick = () => {
+    //   pc1.close()
+    //   pc2.close()
+    //   pc1 = null
+    //   pc2 = null
+
+    //   localVideo.srcObject.getTracks().forEach((track) => track.stop())
+    //   window.stream.getTracks().forEach((track) => track.stop())
+
+    //   hangupButton.disabled = true
+
+    //   codecPreferences.disabled = true
+    //   recordButton.disabled = true
+
+    //   startButton.disabled = false
+    // }
+
+
 
     const codecPreferences = document.querySelector('#codecPreferences')
-    SupportedType.forEach((mimeType) => {
-      const option = document.createElement('option')
-      option.value = mimeType.value
-      option.innerText = mimeType.label
-      codecPreferences.appendChild(option)
-    })
 
     const recordButton = document.querySelector('button#record')
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
-        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-        if (mimeType.split(';', 1)[0] === 'video/mp4') {
-          // Adjust sampling rate to 48khz.
-          const track = window.stream.getAudioTracks()[0]
-          if (track) {
-            const { sampleRate } = track.getSettings()
-            if (sampleRate != 48000) {
-              track.stop()
-              window.stream.removeTrack(track)
-              const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
-              window.stream.addTrack(newStream.getTracks()[0])
-            }
-          }
-        }
-        recorder.start(window.stream, mimeType)
+        recordStart()
 
         recordButton.textContent = 'Stop Recording'
         playButton.disabled = true
         downloadButton.disabled = true
         codecPreferences.disabled = true
       } else {
-        recorder.stop()
+        recordStop()
 
         recordButton.textContent = 'Start Recording'
         playButton.disabled = false
@@ -342,10 +383,10 @@
     const transceivers = document.querySelector('#transceivers')
 
     const playButton = document.querySelector('button#play')
-    playButton.onclick = async () => recorder.play()
+    playButton.onclick = recordPlay
 
     const downloadButton = document.querySelector('button#download')
-    downloadButton.onclick = async () => recorder.download('test')
+    downloadButton.onclick = recordDownload
 
     document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
 
@@ -355,7 +396,7 @@
     }
   </script>
   <style>
-    .select {
+    .receiver {
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -365,34 +406,43 @@
 </head>
 
 <body>
-  <div id="container">
-    <div class="select">
-      Transceiver:
-      <select id="transceivers"></select>
-      <button id="initButton">Init</button>
-      <label for="videoSource">Video source: </label><select id="videoSource"></select>
-      <label for="audioSource">Audio source: </label><select id="audioSource"></select>
-      <button id="startButton">Start</button>
-      <button id="hangupButton">Hang Up</button>
+  <div class="container">
+    <div class="transceiver">
+      <p>LocalVideo</p>
+      <video id="local" playsinline autoplay muted></video>
     </div>
-    <p>localVideo</p>
-    <video id="localVideo" playsinline autoplay muted></video>
-    <p>remoteVideo</p>
-    <video id="remoteVideo" playsinline autoplay muted></video>
-    <div>
-      <button id="positionButton">position</button>
-      <button id="testButton">test</button>
+
+    <div class="receiver">
+      <p>RemoteVideo</p>
+      <video id="remote" playsinline autoplay muted></video>
+      <script>
+
+      </script>
+      <canvas></canvas>
+      <pre class="stats-box"></pre>
+
+      <div class="select">
+        Transceiver:
+        <select id="transceivers"></select>
+        <button id="initButton">Init</button>
+        <label for="videoSource">Video source: </label><select id="videoSource"></select>
+        <label for="audioSource">Audio source: </label><select id="audioSource"></select>
+        <button id="startButton">Start</button>
+        <button id="hangupButton">Hang Up</button>
+      </div>
+      <div>
+        <button id="positionButton">position</button>
+        <button id="testButton">test</button>
+      </div>
+      <div class="select">
+        Recording format:
+        <select id="codecPreferences" disabled></select>
+        <button id="record" disabled>Start Recording</button>
+        <button id="play" disabled>Play</button>
+        <button id="download" disabled>Download</button>
+        <video id="recordedPlay" playsinline loop></video>
+      </div>
     </div>
-    <div class="select">
-      Recording format:
-      <select id="codecPreferences" disabled></select>
-      <button id="record" disabled>Start Recording</button>
-      <button id="play" disabled>Play</button>
-      <button id="download" disabled>Download</button>
-      <video id="recordedPlay" playsinline loop></video>
-    </div>
-    <canvas></canvas>
-    <pre class="stats-box"></pre>
   </div>
 </body>
 
