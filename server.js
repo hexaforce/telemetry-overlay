@@ -60,7 +60,7 @@ const server = https.createServer(
   (request, response) => {
     try {
       let pathname = url.parse(request.url).pathname
-      pathname = pathname === '/' ? '/receiver.html' : pathname
+      pathname = pathname === '/' ? '/index.html' : pathname
       let fsPath = path.join(baseDirectory, path.normalize(pathname))
       let ext = path.extname(fsPath)
 
@@ -171,15 +171,13 @@ wss.on('connection', (ws, req) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/`)
-  // console.log(`WebRTC transceiver page link: https://${SERVER_IP_ADDRESS}/transceiver.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html?protocol=receiver`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/webaudio-output/index.html?protocol=transceiver`)
+  console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/?protocol=receiver`)
+  console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/?protocol=transceiver`)
 
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/orientation-phone/index.html`)
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/punchmeter/index.html`)
 
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
+  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/endtoend-encryption/index.html`)
 })
