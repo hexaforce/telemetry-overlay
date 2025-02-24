@@ -46,7 +46,11 @@
       ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
       pc2 = new RTCPeerConnection()
       document.querySelector('.transceiver').style.display = 'none'
+      document.querySelector('.device').style.display = 'none'
+      document.querySelector('.recordding').style.display = 'none'
     }
+
+
     let dc1
     let dc2
 
@@ -142,7 +146,7 @@
         }
         const remoteVideo = document.querySelector('video#remote')
         if (remoteVideo.srcObject !== streams[0]) {
-          remoteVideo.srcObject = streams[0]
+          window.stream = remoteVideo.srcObject = streams[0]
         }
       }
     }
@@ -189,6 +193,7 @@
 
     const transceivers = document.querySelector('select#transceivers')
     function changeTransceiverEntries(entries) {
+      initButton.disabled = entries.length === 0
       while (transceivers.firstChild) transceivers.removeChild(transceivers.firstChild)
       entries.forEach((value) => {
         const option = document.createElement('option')
@@ -235,6 +240,7 @@
           } else if (type === 'info') {
             //
             updateDeviceList(message.devices)
+            document.querySelector('.device').style.display = 'block'
             //
           } else if (type === 'offer') {
             //
@@ -262,6 +268,8 @@
     async function init() {
       ws2.send('init', transceivers.value, ws2.id)
     }
+    const initButton = document.getElementById('initButton')
+    initButton.onclick = init
 
     // start
     // ------------------------------------------------------
@@ -276,9 +284,9 @@
           },
         },
         audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
+          echoCancellation: document.querySelector('input#echoCancellation').checked,
+          noiseSuppression: document.querySelector('input#noiseSuppression').checked,
+          autoGainControl: document.querySelector('input#noiseSuppression').checked,
           deviceId: { ideal: audioSelect.value },
         },
       }
@@ -292,12 +300,61 @@
       })
     }
 
+
     // hangup
     // ------------------------------------------------------
     async function hangup() {
       // localVideo.srcObject.getTracks().forEach((track) => track.stop())
       window.stream.getTracks().forEach((track) => track.stop())
     }
+
+
+    const controleButton = document.querySelector('button#controleButton')
+    controleButton.onclick = async () => {
+      if (controleButton.textContent === 'Start') {
+        start()
+
+        controleButton.textContent = 'Hang Up'
+        document.querySelector('.recordding').style.display = 'block'
+
+      } else {
+        hangup()
+
+        controleButton.textContent = 'Start'
+        document.querySelector('.recordding').style.display = 'none'
+
+
+      }
+    }
+
+    // const startButton = document.getElementById('startButton')
+    // startButton.onclick = start
+    // startButton.onclick = async () => {
+    //   startButton.disabled = true
+    //   hangupButton.disabled = false
+    //   codecPreferences.disabled = false
+    //   recordButton.disabled = false
+    // }
+
+    // const hangupButton = document.getElementById('hangupButton')
+    // hangupButton.disabled = true
+    // hangupButton.onclick = hangup
+    // hangupButton.onclick = () => {
+    //   pc1.close()
+    //   pc2.close()
+    //   pc1 = null
+    //   pc2 = null
+
+    //   localVideo.srcObject.getTracks().forEach((track) => track.stop())
+    //   window.stream.getTracks().forEach((track) => track.stop())
+
+    //   hangupButton.disabled = true
+
+    //   codecPreferences.disabled = true
+    //   recordButton.disabled = true
+
+    //   startButton.disabled = false
+    // }
 
     // recordStart
     // ------------------------------------------------------
@@ -337,39 +394,7 @@
       recorder.play()
     }
 
-    const initButton = document.getElementById('initButton')
-    initButton.onclick = init
-
-    const startButton = document.getElementById('startButton')
-    startButton.onclick = start
-    // startButton.onclick = async () => {
-    //   startButton.disabled = true
-    //   hangupButton.disabled = false
-    //   codecPreferences.disabled = false
-    //   recordButton.disabled = false
-    // }
-
-    const hangupButton = document.getElementById('hangupButton')
-    hangupButton.disabled = true
-    hangupButton.onclick = hangup
-    // hangupButton.onclick = () => {
-    //   pc1.close()
-    //   pc2.close()
-    //   pc1 = null
-    //   pc2 = null
-
-    //   localVideo.srcObject.getTracks().forEach((track) => track.stop())
-    //   window.stream.getTracks().forEach((track) => track.stop())
-
-    //   hangupButton.disabled = true
-
-    //   codecPreferences.disabled = true
-    //   recordButton.disabled = true
-
-    //   startButton.disabled = false
-    // }
-
-    const codecPreferences = document.querySelector('#codecPreferences')
+    const codecPreferences = document.querySelector('select#codecPreferences')
 
     const recordButton = document.querySelector('button#record')
     recordButton.onclick = async () => {
@@ -396,12 +421,12 @@
     const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = recordDownload
 
-    document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
+    // document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
 
-    const testButton = document.getElementById('testButton')
-    testButton.onclick = async () => {
-      requestPermission(dc1)
-    }
+    // const testButton = document.getElementById('testButton')
+    // testButton.onclick = async () => {
+    //   requestPermission(dc1)
+    // }
   </script>
   <style>
     .side {
@@ -441,18 +466,7 @@
     </div>
 
     <div class="receiver">
-      <p>RemoteVideo</p>
-      <video id="remote" playsinline autoplay muted></video>
-
-      <canvas id="audio"></canvas>
-      <pre id="report"></pre>
-
-      <script type="module" type="text/javascript">
-
-      </script>
-
       <div class="session">
-
         <div class="side">
           <label for="transceivers">Transceiver:</label>
           <select id="transceivers"></select>
@@ -461,24 +475,38 @@
         <div class="device">
           <div class="side"><label for="videoSource">Video source:</label><select id="videoSource"></select></div>
           <div class="side"> <label for="audioSource">Audio source:</label><select id="audioSource"></select></div>
-          <button id="startButton">Start</button>
-          <button id="hangupButton">Hang Up</button>
+          <div class="side"> <label for="echoCancellation">Echo Cancellation:</label><input type="checkbox"
+              id="echoCancellation" checked /></div>
+          <div class="side"> <label for="noiseSuppression">Noise Suppression:</label><input type="checkbox"
+              id="noiseSuppression" checked /></div>
+          <div class="side"> <label for="autoGainControl">Auto GainControl:</label><input type="checkbox"
+              id="autoGainControl" checked /></div>
+          <button id="controleButton">Start</button>
         </div>
       </div>
-
-      <div>
-        <button id="positionButton">position</button>
-        <button id="testButton">test</button>
-      </div>
-
       <div class="recordding">
         <label for="codecPreferences">Recording format:</label>
         <select id="codecPreferences"></select>
         <button id="record">Start Recording</button>
         <button id="play">Play</button>
         <button id="download">Download</button>
-        <video id="recordedPlay" playsinline loop></video>
       </div>
+
+      <p>RemoteVideo</p>
+      <video id="remote" playsinline autoplay muted></video>
+      <video id="recordedPlay" playsinline loop></video>
+      <canvas id="audio"></canvas>
+      <pre id="report"></pre>
+
+      <script type="module" type="text/javascript">
+
+      </script>
+
+      <!-- <div>
+        <button id="positionButton">position</button>
+        <button id="testButton">test</button>
+      </div> -->
+
     </div>
   </div>
 </body>

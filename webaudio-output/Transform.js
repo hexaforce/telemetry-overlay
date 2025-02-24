@@ -1,24 +1,24 @@
 'use strict'
 
 // Encoded Video
-const encodeVideo = (encodedFrame, controller) => {
-  controller.enqueue(encodedFrame)
+const encodeVideo = (chunk, controller) => {
+  controller.enqueue(chunk)
 }
 // Encoded Audio
-const encodeAudio = (encodedFrame, controller) => {
-  controller.enqueue(encodedFrame)
+const encodeAudio = (chunk, controller) => {
+  controller.enqueue(chunk)
 }
 // Decoded Video
-const decodeVideo = (decodedFrame, controller) => {
-  if (decodedFrame.type === 'key') {
-    console.log('Metadata:', decodedFrame.getMetadata())
+const decodeVideo = (chunk, controller) => {
+  if (chunk.type === 'key') {
+    const { width, height, mimeType, payloadType } = chunk.getMetadata()
+    console.log(`Keyframe detection resolution:${width}x${height} codec:${mimeType} payload:${payloadType} size:${chunk.data.byteLength}`)
   }
-  // console.log(decodedFrame.data.byteLength)
-  controller.enqueue(decodedFrame)
+  controller.enqueue(chunk)
 }
 // Decoded Audio
-const decodeAudio = (decodedFrame, controller) => {
-  controller.enqueue(decodedFrame)
+const decodeAudio = (chunk, controller) => {
+  controller.enqueue(chunk)
 }
 
 function handleTransform(dataTransformer) {
