@@ -179,10 +179,7 @@ server.listen(PORT, () => {
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/orientation-phone/index.html`)
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/punchmeter/index.html`)
 
-  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/video-analyzer/index.html`)
-  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/record/index.html`)
-  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/resolution/index.html`)
-  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
-  // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/endtoend-encryption/index.html`)
 })
