@@ -187,6 +187,35 @@
       }
     }
 
+    const transceivers = document.querySelector('select#transceivers')
+    function changeTransceiverEntries(entries) {
+      while (transceivers.firstChild) transceivers.removeChild(transceivers.firstChild)
+      entries.forEach((value) => {
+        const option = document.createElement('option')
+        option.value = value
+        option.innerText = value
+        transceivers.appendChild(option)
+      })
+    }
+
+    const videoSelect = document.querySelector('select#videoSource')
+    const audioSelect = document.querySelector('select#audioSource')
+    function updateDeviceList(devices) {
+      while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+      while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+      devices.forEach(({ deviceId, kind, label }) => {
+        const option = document.createElement('option')
+        option.value = deviceId
+        if (kind === 'videoinput') {
+          option.text = label || `Camera ${videoSelect.length + 1}`
+          videoSelect.appendChild(option)
+        } else if (kind === 'audioinput') {
+          option.text = label || `Microphone ${audioSelect.length + 1}`
+          audioSelect.appendChild(option)
+        }
+      })
+    }
+
     if (ws2) {
       ws2.onopen = () => {
         console.log('ws2 connected')
@@ -197,30 +226,15 @@
           if (type === 'session') {
             //
             ws2.id = message.sessionId
-            message.transceivers.forEach((value) => {
-              const option = document.createElement('option')
-              option.value = value
-              option.innerText = value
-              transceivers.appendChild(option)
-            })
+            changeTransceiverEntries(message.transceivers)
+            //
+          } else if (type === 'change') {
+            //
+            changeTransceiverEntries(message.transceivers)
             //
           } else if (type === 'info') {
             //
-            const videoSelect = document.querySelector('select#videoSource')
-            const audioSelect = document.querySelector('select#audioSource')
-            while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-            while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-            message.devices.forEach(({ deviceId, kind, label }) => {
-              const option = document.createElement('option')
-              option.value = deviceId
-              if (kind === 'videoinput') {
-                option.text = label || `Camera ${videoSelect.length + 1}`
-                videoSelect.appendChild(option)
-              } else if (kind === 'audioinput') {
-                option.text = label || `Microphone ${audioSelect.length + 1}`
-                audioSelect.appendChild(option)
-              }
-            })
+            updateDeviceList(message.devices)
             //
           } else if (type === 'offer') {
             //
@@ -246,8 +260,7 @@
     // init
     // ------------------------------------------------------
     async function init() {
-      const ws1Id = transceivers.options[transceivers.selectedIndex].value
-      ws2.send('init', ws1Id, ws2.id)
+      ws2.send('init', transceivers.value, ws2.id)
     }
 
     // start
@@ -259,18 +272,17 @@
           width: { ideal: 1920 },
           height: { ideal: 1080 },
           deviceId: {
-            ideal: document.querySelector('select#videoSource').value,
+            ideal: videoSelect.value,
           },
         },
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          deviceId: { ideal: document.querySelector('select#audioSource').value },
+          deviceId: { ideal: audioSelect.value },
         },
       }
-      const ws1Id = transceivers.options[transceivers.selectedIndex].value
-      ws2.send('start', ws1Id, ws2.id, { constraints })
+      ws2.send('start', transceivers.value, ws2.id, { constraints })
 
       SupportedType.forEach((mimeType) => {
         const option = document.createElement('option')
@@ -357,8 +369,6 @@
     //   startButton.disabled = false
     // }
 
-
-
     const codecPreferences = document.querySelector('#codecPreferences')
 
     const recordButton = document.querySelector('button#record')
@@ -379,8 +389,6 @@
         codecPreferences.disabled = false
       }
     }
-
-    const transceivers = document.querySelector('#transceivers')
 
     const playButton = document.querySelector('button#play')
     playButton.onclick = recordPlay
@@ -415,9 +423,7 @@
     <div class="receiver">
       <p>RemoteVideo</p>
       <video id="remote" playsinline autoplay muted></video>
-      <script>
-
-      </script>
+      <script></script>
       <canvas></canvas>
       <pre class="stats-box"></pre>
 

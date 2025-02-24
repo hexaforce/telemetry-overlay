@@ -104,6 +104,20 @@ const wss = new WebSocket.Server({ server, path: '/ws' })
 
 const clients = new Map()
 
+const getCurrentTransceivers = () =>
+  Array.from(clients.values())
+    .filter((client) => client.protocol === 'transceiver')
+    .map((client) => client.sessionId)
+
+const notifyReceivers = () => {
+  const transceivers = getCurrentTransceivers()
+  Array.from(clients.entries())
+    .filter(([ws, client]) => client.protocol === 'receiver')
+    .forEach(([receiverWs]) => {
+      receiverWs.send(JSON.stringify({ type: 'change', transceivers }))
+    })
+}
+
 wss.on('connection', (ws, req) => {
   const protocol = req.headers['sec-websocket-protocol']?.toLowerCase()
   const sessionId = crypto.randomUUID()
@@ -112,11 +126,12 @@ wss.on('connection', (ws, req) => {
   console.log(`----- connected ${protocol} sessionId: ${sessionId}`)
 
   if (protocol === 'receiver') {
-    const transceivers = Array.from(clients.values())
-      .filter((client) => client.protocol === 'transceiver')
-      .map((client) => client.sessionId)
+    //
+    const transceivers = getCurrentTransceivers()
     ws.send(JSON.stringify({ type: 'session', sessionId, transceivers }))
+    //
   } else if (protocol === 'transceiver') {
+    notifyReceivers()
     ws.send(JSON.stringify({ type: 'session', sessionId }))
   }
 
@@ -148,6 +163,9 @@ wss.on('connection', (ws, req) => {
   ws.on('close', () => {
     const { sessionId, protocol } = clients.get(ws)
     console.log(`----- disconnected ${protocol} sessionId: ${sessionId}`)
+    if (protocol === 'transceiver') {
+      notifyReceivers()
+    }
     clients.delete(ws)
   })
 })
