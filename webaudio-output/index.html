@@ -21,7 +21,6 @@
       import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
       import { renderMap } from './NavigationMap.js'
       import { chartBar } from './RealtimeChart.js'
-      chartBar('div#barChart')
 
       const recorder = new MultimediaRecorder()
 
@@ -56,6 +55,7 @@
         document.querySelector('.transceiver').style.display = 'none'
         document.querySelector('.device').style.display = 'none'
         document.querySelector('.recordding').style.display = 'none'
+        chartBar('div#barChart')
       }
 
       let dc1
@@ -187,7 +187,7 @@
               // const [track] = ([window.track] = stream.getVideoTracks())
               // const capabilities = track.getCapabilities()
               // const settings = track.getSettings()
-        
+
               setSenderPriority(pc1)
               const offer = await pc1.createOffer()
               await pc1.setLocalDescription(offer)
@@ -415,39 +415,37 @@
         /* max-width: 300px; */
       }
 
+      /* --- chart -------------------------- */
 
-/* --- chart -------------------------- */
+      svg {
+        font: 10px sans-serif;
+      }
 
-svg {
-  font: 10px sans-serif;
-}
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+      .x.axis line {
+        shape-rendering: auto;
+      }
 
-.x.axis line {
-  shape-rendering: auto;
-}
+      .line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 1.5px;
+      }
 
-.line {
-  fill: none;
-  stroke: #000;
-  stroke-width: 1.5px;
-}
+      .bar {
+        fill: steelblue;
+      }
 
-.bar {
-  fill: steelblue;
-}
-
-.grid-line {
-  stroke: lightgray;
-  stroke-width: 0.5;
-}
-
+      .grid-line {
+        stroke: lightgray;
+        stroke-width: 0.5;
+      }
     </style>
   </head>
 
@@ -493,10 +491,10 @@ svg {
         <video id="remote" playsinline autoplay muted></video>
         <video id="recordedPlay" playsinline loop></video>
         <canvas id="audio"></canvas>
+        <div id="barChart"></div>
         <pre id="report"></pre>
 
         <button id="positionButton">position</button>
-        <div id="barChart"></div>
       </div>
     </div>
   </body>
