@@ -6,10 +6,14 @@
   <script type="module" type="text/javascript">
     'use strict'
 
+    // const sensor = new AbsoluteOrientationSensor();
+    console.log(window)
+
     const params = new URLSearchParams(window.location.search)
     const protocol = params.get('protocol')
 
-    import { getDevices, setSenderPriority, setupReceiverTransform, isIPv4, toICE, requestPermission } from './Support.js'
+    import { setSenderPriority, setupReceiverTransform, isIPv4, toICE, requestPermission } from './Support.js'
+    import { getDevices } from './Device.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
     import { fixH264Codecs, preferredCodecs } from './Codec.js'
@@ -370,7 +374,7 @@
 
     document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
     document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
-    
+
   </script>
   <style>
     .side {
