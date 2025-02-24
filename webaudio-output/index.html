@@ -2,6 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link href="//api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
     <script type="module" type="text/javascript">
       'use strict'
 
@@ -17,6 +19,9 @@
       import { reportAggregate } from './Report.js'
       import { fixH264Codecs, preferredCodecs } from './Codec.js'
       import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
+      import { renderMap } from './NavigationMap.js'
+      import { chartBar } from './RealtimeChart.js'
+      chartBar('div#barChart')
 
       const recorder = new MultimediaRecorder()
 
@@ -127,6 +132,7 @@
             if (type === 'position') {
               //
               console.log('position:', message.coords)
+              // renderMap([msg.longitude, msg.latitude])
               //
             } else if (type === 'deviceorientation') {
               //
@@ -178,6 +184,10 @@
               window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
               document.querySelector('video#local').srcObject = window.stream
               window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+              // const [track] = ([window.track] = stream.getVideoTracks())
+              // const capabilities = track.getCapabilities()
+              // const settings = track.getSettings()
+        
               setSenderPriority(pc1)
               const offer = await pc1.createOffer()
               await pc1.setLocalDescription(offer)
@@ -338,6 +348,9 @@
           if (mimeType.split(';', 1)[0] === 'video/mp4') {
             // Adjust sampling rate to 48khz.
             const track = window.stream.getAudioTracks()[0]
+            // const [track] = ([window.track] = stream.getAudioTracks())
+            // const capabilities = track.getCapabilities()
+            // const settings = track.getSettings()
             if (track) {
               const { sampleRate } = track.getSettings()
               if (sampleRate != 48000) {
@@ -401,6 +414,40 @@
         gap: 10px;
         /* max-width: 300px; */
       }
+
+
+/* --- chart -------------------------- */
+
+svg {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis line {
+  shape-rendering: auto;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.grid-line {
+  stroke: lightgray;
+  stroke-width: 0.5;
+}
+
     </style>
   </head>
 
@@ -449,6 +496,7 @@
         <pre id="report"></pre>
 
         <button id="positionButton">position</button>
+        <div id="barChart"></div>
       </div>
     </div>
   </body>
