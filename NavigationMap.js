@@ -40,7 +40,10 @@ const glb = {
   anchor: 'top',
 }
 
+let render = false
 const renderMap = (position) => {
+  if (render) return
+  render = true
   document.body.addEventListener('keydown', (e) => {
     const key = e.code.replace('Key', '').toLowerCase()
     if (keys[key] !== undefined) keys[key] = true
@@ -109,8 +112,8 @@ const renderMap = (position) => {
     stats.dom.style.right = '400px'
 
     animate()
-
-    const gui = new GUI({ container: document.getElementById('gui'), width: '100%' })
+    
+    const gui = new GUI({ container: document.querySelector('div#gui'), width: '100%' })
     const onChangedGUI = () => {
       if (api.buildings) {
         if (!map.getLayer(layerId)) {

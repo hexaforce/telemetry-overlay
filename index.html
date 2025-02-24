@@ -7,9 +7,6 @@
     <script type="module" type="text/javascript">
       'use strict'
 
-      // const sensor = new AbsoluteOrientationSensor();
-      console.log(window)
-
       const params = new URLSearchParams(window.location.search)
       const protocol = params.get('protocol')
 
@@ -110,6 +107,7 @@
                 let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
                 document.querySelector('pre#report').innerHTML = JSON.stringify(result, null, 2)
               })
+              dc2.send('position')
             }, 1000)
           }
         }
@@ -132,7 +130,8 @@
             if (type === 'position') {
               //
               console.log('position:', message.coords)
-              // renderMap([msg.longitude, msg.latitude])
+              const {longitude, latitude} = message.coords
+              renderMap([longitude, latitude])
               //
             } else if (type === 'deviceorientation') {
               //
@@ -384,8 +383,8 @@
       const downloadButton = document.querySelector('button#download')
       downloadButton.onclick = () => recorder.download('test')
 
-      document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
-      document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
+      // document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
+      // document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
     </script>
     <style>
       .side {
@@ -446,6 +445,23 @@
         stroke: lightgray;
         stroke-width: 0.5;
       }
+
+/* --- map -------------------------- */
+
+.map {
+  width: 400px;
+  height: 280px;
+  opacity: 0.7;
+}
+
+.navigation-map {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+}
+
     </style>
   </head>
 
@@ -486,7 +502,6 @@
           <button id="play">Play</button>
           <button id="download">Download</button>
         </div>
-
         <p>RemoteVideo</p>
         <video id="remote" playsinline autoplay muted></video>
         <video id="recordedPlay" playsinline loop></video>
@@ -494,6 +509,9 @@
         <div id="barChart"></div>
         <pre id="report"></pre>
 
+        <div id="map"></div>
+        <div id="gui"></div>
+        
         <button id="positionButton">position</button>
       </div>
     </div>
