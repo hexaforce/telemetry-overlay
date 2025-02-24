@@ -84,6 +84,10 @@
               (err) => console.error('Error:', err),
             )
             //
+          } else if (type === 'hangup') {
+            //
+            window.stream.getTracks().forEach((track) => track.stop())
+            //
           }
         }
       }
@@ -302,7 +306,7 @@
     // hangup
     // ------------------------------------------------------
     async function hangup() {
-      // localVideo.srcObject.getTracks().forEach((track) => track.stop())
+      dc2.send('hangup')
       window.stream.getTracks().forEach((track) => track.stop())
     }
 
@@ -364,12 +368,9 @@
     const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = () => recorder.download('test')
 
-    // document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
-
-    // const testButton = document.getElementById('testButton')
-    // testButton.onclick = async () => {
-    //   requestPermission(dc1)
-    // }
+    document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
+    document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
+    
   </script>
   <style>
     .side {
@@ -406,6 +407,7 @@
     <div class="transceiver">
       <p>LocalVideo</p>
       <video id="local" playsinline autoplay muted></video>
+      <button id="testButton">test</button>
     </div>
 
     <div class="receiver">
@@ -445,12 +447,7 @@
       <canvas id="audio"></canvas>
       <pre id="report"></pre>
 
-      <script type="module" type="text/javascript"></script>
-
-      <!-- <div>
-        <button id="positionButton">position</button>
-        <button id="testButton">test</button>
-      </div> -->
+      <button id="positionButton">position</button>
     </div>
   </div>
 </body>
