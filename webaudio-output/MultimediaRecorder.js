@@ -49,9 +49,8 @@ export class MultimediaRecorder {
     }
   }
 
-  play() {
+  play(recordedVideo) {
     const superBuffer = new Blob(this.recordedBlobs, { type: this.mimeType })
-    const recordedVideo = document.querySelector('video#recordedPlay')
     recordedVideo.src = window.URL.createObjectURL(superBuffer)
     recordedVideo.controls = true
     recordedVideo.play()

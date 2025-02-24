@@ -50,7 +50,6 @@
       document.querySelector('.recordding').style.display = 'none'
     }
 
-
     let dc1
     let dc2
 
@@ -300,14 +299,12 @@
       })
     }
 
-
     // hangup
     // ------------------------------------------------------
     async function hangup() {
       // localVideo.srcObject.getTracks().forEach((track) => track.stop())
       window.stream.getTracks().forEach((track) => track.stop())
     }
-
 
     const controleButton = document.querySelector('button#controleButton')
     controleButton.onclick = async () => {
@@ -316,82 +313,12 @@
 
         controleButton.textContent = 'Hang Up'
         document.querySelector('.recordding').style.display = 'block'
-
       } else {
         hangup()
 
         controleButton.textContent = 'Start'
         document.querySelector('.recordding').style.display = 'none'
-
-
       }
-    }
-
-    // const startButton = document.getElementById('startButton')
-    // startButton.onclick = start
-    // startButton.onclick = async () => {
-    //   startButton.disabled = true
-    //   hangupButton.disabled = false
-    //   codecPreferences.disabled = false
-    //   recordButton.disabled = false
-    // }
-
-    // const hangupButton = document.getElementById('hangupButton')
-    // hangupButton.disabled = true
-    // hangupButton.onclick = hangup
-    // hangupButton.onclick = () => {
-    //   pc1.close()
-    //   pc2.close()
-    //   pc1 = null
-    //   pc2 = null
-
-    //   localVideo.srcObject.getTracks().forEach((track) => track.stop())
-    //   window.stream.getTracks().forEach((track) => track.stop())
-
-    //   hangupButton.disabled = true
-
-    //   codecPreferences.disabled = true
-    //   recordButton.disabled = true
-
-    //   startButton.disabled = false
-    // }
-
-    // recordStart
-    // ------------------------------------------------------
-    async function recordStart() {
-      const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-      if (mimeType.split(';', 1)[0] === 'video/mp4') {
-        // Adjust sampling rate to 48khz.
-        const track = window.stream.getAudioTracks()[0]
-        if (track) {
-          const { sampleRate } = track.getSettings()
-          if (sampleRate != 48000) {
-            track.stop()
-            window.stream.removeTrack(track)
-            const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
-            window.stream.addTrack(newStream.getTracks()[0])
-          }
-        }
-      }
-      recorder.start(window.stream, mimeType)
-    }
-
-    // recordStop
-    // ------------------------------------------------------
-    async function recordStop() {
-      recorder.stop()
-    }
-
-    // recordDownload
-    // ------------------------------------------------------
-    async function recordDownload() {
-      recorder.download('test')
-    }
-
-    // recordPlay
-    // ------------------------------------------------------
-    async function recordPlay() {
-      recorder.play()
     }
 
     const codecPreferences = document.querySelector('select#codecPreferences')
@@ -399,14 +326,30 @@
     const recordButton = document.querySelector('button#record')
     recordButton.onclick = async () => {
       if (recordButton.textContent === 'Start Recording') {
-        recordStart()
+        // ------------------------------------------------------
+        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+        if (mimeType.split(';', 1)[0] === 'video/mp4') {
+          // Adjust sampling rate to 48khz.
+          const track = window.stream.getAudioTracks()[0]
+          if (track) {
+            const { sampleRate } = track.getSettings()
+            if (sampleRate != 48000) {
+              track.stop()
+              window.stream.removeTrack(track)
+              const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+              window.stream.addTrack(newStream.getTracks()[0])
+            }
+          }
+        }
+        recorder.start(window.stream, mimeType)
 
         recordButton.textContent = 'Stop Recording'
         playButton.disabled = true
         downloadButton.disabled = true
         codecPreferences.disabled = true
       } else {
-        recordStop()
+        // ------------------------------------------------------
+        recorder.stop()
 
         recordButton.textContent = 'Start Recording'
         playButton.disabled = false
@@ -416,10 +359,10 @@
     }
 
     const playButton = document.querySelector('button#play')
-    playButton.onclick = recordPlay
+    playButton.onclick = () => recorder.play(document.querySelector('video#recordedPlay'))
 
     const downloadButton = document.querySelector('button#download')
-    downloadButton.onclick = recordDownload
+    downloadButton.onclick = () => recorder.download('test')
 
     // document.getElementById('positionButton').onclick = async () => dc2.send(JSON.stringify({ type: 'position' }))
 
@@ -473,13 +416,17 @@
           <button id="initButton">Init</button>
         </div>
         <div class="device">
-          <div class="side"><label for="videoSource">Video source:</label><select id="videoSource"></select></div>
-          <div class="side"> <label for="audioSource">Audio source:</label><select id="audioSource"></select></div>
-          <div class="side"> <label for="echoCancellation">Echo Cancellation:</label><input type="checkbox"
+          <div class="side">
+            <label for="videoSource">Video source:</label><select id="videoSource"></select>
+          </div>
+          <div class="side">
+            <label for="audioSource">Audio source:</label><select id="audioSource"></select>
+          </div>
+          <div class="side"><label for="echoCancellation">Echo Cancellation:</label><input type="checkbox"
               id="echoCancellation" checked /></div>
-          <div class="side"> <label for="noiseSuppression">Noise Suppression:</label><input type="checkbox"
+          <div class="side"><label for="noiseSuppression">Noise Suppression:</label><input type="checkbox"
               id="noiseSuppression" checked /></div>
-          <div class="side"> <label for="autoGainControl">Auto GainControl:</label><input type="checkbox"
+          <div class="side"><label for="autoGainControl">Auto GainControl:</label><input type="checkbox"
               id="autoGainControl" checked /></div>
           <button id="controleButton">Start</button>
         </div>
@@ -498,15 +445,12 @@
       <canvas id="audio"></canvas>
       <pre id="report"></pre>
 
-      <script type="module" type="text/javascript">
-
-      </script>
+      <script type="module" type="text/javascript"></script>
 
       <!-- <div>
         <button id="positionButton">position</button>
         <button id="testButton">test</button>
       </div> -->
-
     </div>
   </div>
 </body>
