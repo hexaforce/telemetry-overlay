@@ -93,7 +93,7 @@
           setInterval(() => {
             pc2.getStats(null).then((stats) => {
               let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
-              document.querySelector('.stats-box').innerHTML = JSON.stringify(result, null, 2)
+              document.querySelector('pre#report').innerHTML = JSON.stringify(result, null, 2)
             })
           }, 1000)
         }
@@ -138,9 +138,9 @@
           setupReceiverTransform(receiver)
         }
         if (track.kind === 'audio') {
-          new StreamVisualizer(streams[0], document.querySelector('canvas')).start()
+          new StreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
         }
-        const remoteVideo = document.getElementById('video#remote')
+        const remoteVideo = document.querySelector('video#remote')
         if (remoteVideo.srcObject !== streams[0]) {
           remoteVideo.srcObject = streams[0]
         }
@@ -166,7 +166,7 @@
           } else if (type === 'start') {
             //
             window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
-            document.getElementById('video#local').srcObject = window.stream
+            document.querySelector('video#local').srcObject = window.stream
             window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
             setSenderPriority(pc1)
             const offer = await pc1.createOffer()
@@ -404,11 +404,31 @@
     }
   </script>
   <style>
-    .receiver {
+    .side {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .session {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-width: 300px;
+      /* max-width: 300px; */
+    }
+
+    .device {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      /* max-width: 300px; */
+    }
+
+    .recordding {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      /* max-width: 300px; */
     }
   </style>
 </head>
@@ -423,29 +443,40 @@
     <div class="receiver">
       <p>RemoteVideo</p>
       <video id="remote" playsinline autoplay muted></video>
-      <script></script>
-      <canvas></canvas>
-      <pre class="stats-box"></pre>
 
-      <div class="select">
-        Transceiver:
-        <select id="transceivers"></select>
-        <button id="initButton">Init</button>
-        <label for="videoSource">Video source: </label><select id="videoSource"></select>
-        <label for="audioSource">Audio source: </label><select id="audioSource"></select>
-        <button id="startButton">Start</button>
-        <button id="hangupButton">Hang Up</button>
+      <canvas id="audio"></canvas>
+      <pre id="report"></pre>
+
+      <script type="module" type="text/javascript">
+
+      </script>
+
+      <div class="session">
+
+        <div class="side">
+          <label for="transceivers">Transceiver:</label>
+          <select id="transceivers"></select>
+          <button id="initButton">Init</button>
+        </div>
+        <div class="device">
+          <div class="side"><label for="videoSource">Video source:</label><select id="videoSource"></select></div>
+          <div class="side"> <label for="audioSource">Audio source:</label><select id="audioSource"></select></div>
+          <button id="startButton">Start</button>
+          <button id="hangupButton">Hang Up</button>
+        </div>
       </div>
+
       <div>
         <button id="positionButton">position</button>
         <button id="testButton">test</button>
       </div>
-      <div class="select">
-        Recording format:
-        <select id="codecPreferences" disabled></select>
-        <button id="record" disabled>Start Recording</button>
-        <button id="play" disabled>Play</button>
-        <button id="download" disabled>Download</button>
+
+      <div class="recordding">
+        <label for="codecPreferences">Recording format:</label>
+        <select id="codecPreferences"></select>
+        <button id="record">Start Recording</button>
+        <button id="play">Play</button>
+        <button id="download">Download</button>
         <video id="recordedPlay" playsinline loop></video>
       </div>
     </div>
