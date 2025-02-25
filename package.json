@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "fmt": "prettier --write \"./**/*.{js,jsx,css,html}\""
+    "fmt": "prettier --write \"./**/*.{js,jsx,css,html,vue}\""
   },
   "author": "",
   "license": "MIT",
