@@ -8,6 +8,6 @@ import './plugins/rockiot.radial'
 
 Vue.use(vueCustomElement)
 Vue.customElement('rockiot-ui', RockiotContainer)
-Vue.component('rockiot-animated-number',RockiotAnimatedNumber)
+Vue.component('rockiot-animated-number', RockiotAnimatedNumber)
 
 Vue.config.productionTip = false
