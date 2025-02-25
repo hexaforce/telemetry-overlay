@@ -1,164 +1,161 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-  <title>Absolute orientation sensor demo</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-  <style>
-    body {
-      margin: 0px;
-      overflow: hidden;
-    }
-
-    #console {
-      margin: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
-</head>
-
-<body>
-  <script src="three.min.js"></script>
-  <script src="OBJLoader.js"></script>
-  <script src="MTLLoader.js"></script>
-
-  <script type="module">
-    import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '../sensor-polyfills/motion-sensors.js'
-
-    const params = new URLSearchParams(new URL(window.location.href).search.slice(1))
-
-    let container, sensor, camera, scene, renderer, model
-
-    initScene()
-
-    checkPermissions_initSensor()
-
-    renderScene()
-
-    // initScene
-    // ----------------------------------------
-    function initScene() {
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200)
-      camera.position.z = 10
-
-      scene = new THREE.Scene()
-
-      var ambientLight = new THREE.AmbientLight(0x404040, 6)
-      scene.add(ambientLight)
-
-      var manager = new THREE.LoadingManager()
-      var mtlLoader = new THREE.MTLLoader(manager)
-      mtlLoader.setTexturePath('resources/')
-      mtlLoader.load('resources/phone.mtl', (materials) => {
-        materials.preload()
-        var objLoader = new THREE.OBJLoader(manager)
-        objLoader.setMaterials(materials)
-        objLoader.load('resources/phone.obj', (object) => {
-          model = object
-          scene.add(model)
-        })
-      })
-
-      renderer = new THREE.WebGLRenderer({ alpha: true })
-      renderer.setPixelRatio(window.devicePixelRatio)
-      renderer.setSize(window.innerWidth, window.innerHeight)
-
-      container = document.createElement('div')
-      document.body.appendChild(container)
-      container.appendChild(renderer.domElement)
-
-      const resize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight
-        camera.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
+  <head>
+    <title>Absolute orientation sensor demo</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
       }
-      window.addEventListener('resize', resize, false)
 
-      document.onmousedown = () => document.documentElement.requestFullscreen()
-      document.onfullscreenchange = () => {
-        if (document.fullscreenElement != null) {
-          screen.orientation.lock('natural')
+      #console {
+        margin: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="three.min.js"></script>
+    <script src="OBJLoader.js"></script>
+    <script src="MTLLoader.js"></script>
+
+    <script type="module">
+      import { AbsoluteOrientationSensor, RelativeOrientationSensor } from '../sensor-polyfills/motion-sensors.js'
+
+      const params = new URLSearchParams(new URL(window.location.href).search.slice(1))
+
+      let container, sensor, camera, scene, renderer, model
+
+      initScene()
+
+      checkPermissions_initSensor()
+
+      renderScene()
+
+      // initScene
+      // ----------------------------------------
+      function initScene() {
+        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200)
+        camera.position.z = 10
+
+        scene = new THREE.Scene()
+
+        var ambientLight = new THREE.AmbientLight(0x404040, 6)
+        scene.add(ambientLight)
+
+        var manager = new THREE.LoadingManager()
+        var mtlLoader = new THREE.MTLLoader(manager)
+        mtlLoader.setTexturePath('resources/')
+        mtlLoader.load('resources/phone.mtl', (materials) => {
+          materials.preload()
+          var objLoader = new THREE.OBJLoader(manager)
+          objLoader.setMaterials(materials)
+          objLoader.load('resources/phone.obj', (object) => {
+            model = object
+            scene.add(model)
+          })
+        })
+
+        renderer = new THREE.WebGLRenderer({ alpha: true })
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.setSize(window.innerWidth, window.innerHeight)
+
+        container = document.createElement('div')
+        document.body.appendChild(container)
+        container.appendChild(renderer.domElement)
+
+        const resize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight
+          camera.updateProjectionMatrix()
+          renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+        window.addEventListener('resize', resize, false)
+
+        document.onmousedown = () => document.documentElement.requestFullscreen()
+        document.onfullscreenchange = () => {
+          if (document.fullscreenElement != null) {
+            screen.orientation.lock('natural')
+          }
         }
       }
 
-    }
-
-    // checkPermissions_initSensor
-    // ----------------------------------------
-    async function checkPermissions_initSensor() {
-      if (navigator.permissions) {
-        try {
-          // https://w3c.github.io/orientation-sensor/#model
-          const results = await Promise.all([
-            navigator.permissions.query({ name: 'accelerometer' }),
-            navigator.permissions.query({ name: 'magnetometer' }),
-            navigator.permissions.query({ name: 'gyroscope' }),
-            navigator.permissions.query({ name: 'geolocation' }),
-          ])
-          if (results.every((result) => result.state === 'granted')) {
+      // checkPermissions_initSensor
+      // ----------------------------------------
+      async function checkPermissions_initSensor() {
+        if (navigator.permissions) {
+          try {
+            // https://w3c.github.io/orientation-sensor/#model
+            const results = await Promise.all([
+              navigator.permissions.query({ name: 'accelerometer' }), //
+              navigator.permissions.query({ name: 'magnetometer' }), //
+              navigator.permissions.query({ name: 'gyroscope' }), //
+              navigator.permissions.query({ name: 'geolocation' }), //
+            ])
+            if (results.every((result) => result.state === 'granted')) {
+              initSensor()
+              initGPS()
+            } else {
+              console.log('Permission to use sensor was denied.')
+            }
+          } catch (err) {
+            console.log('Integration with Permissions API is not enabled, still try to start app.')
             initSensor()
             initGPS()
-          } else {
-            console.log('Permission to use sensor was denied.')
           }
-        } catch (err) {
-          console.log('Integration with Permissions API is not enabled, still try to start app.')
+        } else {
+          console.log('No Permissions API, still try to start app.')
           initSensor()
           initGPS()
         }
-      } else {
-        console.log('No Permissions API, still try to start app.')
-        initSensor()
-        initGPS()
       }
-    }
 
-    // initSensor
-    // ----------------------------------------
-    function initSensor() {
-      const coordinateSystem = params.get('coord')
-      const options = { frequency: 60, coordinateSystem }
-      const relative = !!Number(params.get('relative'))
+      // initSensor
+      // ----------------------------------------
+      function initSensor() {
+        const coordinateSystem = params.get('coord')
+        const options = { frequency: 60, coordinateSystem }
+        const relative = !!Number(params.get('relative'))
 
-      sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
-      sensor.onreading = () => model.quaternion.fromArray(sensor.quaternion).inverse()
-      sensor.onerror = (event) => {
-        if (event.error.name == 'NotReadableError') {
-          console.log('Sensor is not available.')
+        sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
+        sensor.onreading = () => model.quaternion.fromArray(sensor.quaternion).inverse()
+        sensor.onerror = (event) => {
+          if (event.error.name == 'NotReadableError') {
+            console.log('Sensor is not available.')
+          }
         }
+        sensor.start()
       }
-      sensor.start()
-    }
 
-    // initGPS
-    // ----------------------------------------
-    function initGPS() {
-      function success(pos) {
-        const crd = pos.coords
-        console.log(`SUCCESS: latitude ${crd.latitude} longitude ${crd.longitude}`)
+      // initGPS
+      // ----------------------------------------
+      function initGPS() {
+        function success(pos) {
+          const crd = pos.coords
+          console.log(`SUCCESS: latitude ${crd.latitude} longitude ${crd.longitude}`)
+        }
+        function error(err) {
+          console.error(`ERROR(${err.code}): ${err.message}`)
+        }
+        let options = {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+        navigator.geolocation.watchPosition(success, error, options)
       }
-      function error(err) {
-        console.error(`ERROR(${err.code}): ${err.message}`)
-      }
-      let options = {
-        enableHighAccuracy: false,
-        timeout: 5000,
-        maximumAge: 0,
-      }
-      navigator.geolocation.watchPosition(success, error, options)
-    }
 
-    // initScene
-    // ----------------------------------------
-    function renderScene() {
-      requestAnimationFrame(renderScene)
-      camera.lookAt(scene.position)
-      renderer.render(scene, camera)
-    }
-  </script>
-</body>
-
+      // initScene
+      // ----------------------------------------
+      function renderScene() {
+        requestAnimationFrame(renderScene)
+        camera.lookAt(scene.position)
+        renderer.render(scene, camera)
+      }
+    </script>
+  </body>
 </html>

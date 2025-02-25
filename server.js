@@ -175,7 +175,9 @@ server.listen(PORT, () => {
   console.log(`WebRTC receiver page link: https://${SERVER_IP_ADDRESS}/?protocol=transceiver`)
 
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/orientation-phone/index.html`)
-  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/punchmeter/index.html`)
+
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/demo/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/dist/index.html`)
 
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)
