@@ -9,7 +9,15 @@
         margin: 0px;
         overflow: hidden;
       }
-
+      #phone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
       #requestPermission {
         display: none;
         padding: 10px 20px;
@@ -39,15 +47,11 @@
       renderScene()
 
       function initScene() {
-        let container = document.querySelector('div#phone')
-
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200)
         camera.position.z = 10
 
         scene = new THREE.Scene()
-
-        var ambientLight = new THREE.AmbientLight(0x404040, 6)
-        scene.add(ambientLight)
+        scene.add(new THREE.AmbientLight(0x404040, 6))
 
         var manager = new THREE.LoadingManager()
         var mtlLoader = new THREE.MTLLoader(manager)
@@ -65,22 +69,17 @@
         renderer = new THREE.WebGLRenderer({ alpha: true })
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
-        container.appendChild(renderer.domElement)
+        document.querySelector('div#phone').appendChild(renderer.domElement)
 
-        window.addEventListener( 'resize', () => {
+        window.addEventListener(
+          'resize',
+          () => {
             camera.aspect = window.innerWidth / window.innerHeight
             camera.updateProjectionMatrix()
             renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
           },
           false,
         )
-
-        document.addEventListener('mousedown', () => document.documentElement.requestFullscreen())
-        document.addEventListener('fullscreenchange', () => {
-          if (document.fullscreenElement != null) {
-            screen.orientation.lock('natural')
-          }
-        })
       }
 
       function initSensor() {
