@@ -45,7 +45,7 @@
       }
       if (isIOS()) requestPermission.style.display = 'block'
 
-      let sensor, camera, scene, renderer, model
+      let camera, scene, renderer, model
 
       initScene()
       initSensor()
@@ -90,7 +90,7 @@
       function initSensor() {
         const options = { frequency: 60, coordinateSystem }
         console.log(JSON.stringify(options))
-        sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
+        let sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
         sensor.onreading = () => {
           if (model) model.quaternion.fromArray(sensor.quaternion).inverse()
         }

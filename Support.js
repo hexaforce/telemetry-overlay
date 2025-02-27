@@ -1,33 +1,33 @@
-export async function requestPermission(dc1) {
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    const response = await DeviceOrientationEvent.requestPermission()
-    if (response === 'granted') {
-      sensorInfo(dc1)
-    }
-  } else sensorInfo(dc1)
-}
+// export async function requestPermission(dc1) {
+//   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+//     const response = await DeviceOrientationEvent.requestPermission()
+//     if (response === 'granted') {
+//       sensorInfo(dc1)
+//     }
+//   } else sensorInfo(dc1)
+// }
 
-function sensorInfo(dc1) {
-  const sendOrientation = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
-    dc1.send(type, { webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma })
-  }
-  window.ondeviceorientation = sendOrientation
-  window.ondeviceorientationabsolute = sendOrientation
-  window.ondevicemotion = ({ type, acceleration, accelerationIncludingGravity, rotationRate }) => {
-    const conv1 = (v) => {
-      const { x, y, z } = v
-      return { x, y, z }
-    }
-    acceleration = conv1(acceleration)
-    accelerationIncludingGravity = conv1(accelerationIncludingGravity)
-    const conv2 = (v) => {
-      const { alpha, beta, gamma } = v
-      return { alpha, beta, gamma }
-    }
-    rotationRate = conv2(rotationRate)
-    dc1.send(type, { acceleration, accelerationIncludingGravity, rotationRate })
-  }
-}
+// function sensorInfo(dc1) {
+//   const sendOrientation = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
+//     dc1.send(type, { webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma })
+//   }
+//   window.ondeviceorientation = sendOrientation
+//   window.ondeviceorientationabsolute = sendOrientation
+//   window.ondevicemotion = ({ type, acceleration, accelerationIncludingGravity, rotationRate }) => {
+//     const conv1 = (v) => {
+//       const { x, y, z } = v
+//       return { x, y, z }
+//     }
+//     acceleration = conv1(acceleration)
+//     accelerationIncludingGravity = conv1(accelerationIncludingGravity)
+//     const conv2 = (v) => {
+//       const { alpha, beta, gamma } = v
+//       return { alpha, beta, gamma }
+//     }
+//     rotationRate = conv2(rotationRate)
+//     dc1.send(type, { acceleration, accelerationIncludingGravity, rotationRate })
+//   }
+// }
 
 export function setSenderPriority(pc) {
   pc.getSenders().forEach((sender) => {

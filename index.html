@@ -10,7 +10,8 @@
       const params = new URLSearchParams(window.location.search)
       const protocol = params.get('protocol')
 
-      import { setSenderPriority, setupReceiverTransform, isIPv4, toICE, requestPermission } from './Support.js'
+      import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
+      import { setSenderPriority, setupReceiverTransform, isIPv4, toICE } from './Support.js'
       import { getDevices } from './Device.js'
       import { StreamVisualizer } from './StreamVisualizer.js'
       import { reportAggregate } from './Report.js'
@@ -133,17 +134,17 @@
               const { longitude, latitude } = message.coords
               renderMap([longitude, latitude])
               //
-            } else if (type === 'deviceorientation') {
+            // } else if (type === 'deviceorientation') {
+            //   //
+            //   console.log('deviceorientation:', message)
+            //   //
+            // } else if (type === 'deviceorientationabsolute') {
+            //   //
+            //   console.log('deviceorientationabsolute:', message)
+            //   //
+            } else if (type === 'quaternion') {
               //
-              console.log('deviceorientation:', message)
-              //
-            } else if (type === 'deviceorientationabsolute') {
-              //
-              console.log('deviceorientationabsolute:', message)
-              //
-            } else if (type === 'devicemotion') {
-              //
-              console.log('devicemotion:', message)
+              console.log('quaternion:', message)
               //
             }
           }
@@ -280,6 +281,26 @@
 
       // init
       // ------------------------------------------------------
+      function initSensor() {
+        let relative = null
+        const options = { frequency: 60, coordinateSystem: null }
+        console.log(JSON.stringify(options))
+        let sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
+        sensor.onreading = () => {
+          dc1.send('quaternion', { quaternion: sensor.quaternion })
+        }
+        sensor.onerror = ({error}) => {
+          if (error.name == 'NotReadableError') {
+            console.log('Sensor is not available.')
+          }
+        }
+        sensor.start()
+      }
+      const sensorReadingButton = document.querySelector('button#sensorReading')
+      sensorReadingButton.onclick = initSensor
+
+      // init
+      // ------------------------------------------------------
       async function init() {
         ws2.send('init', transceivers.value, ws2.id)
       }
@@ -383,6 +404,21 @@
       const downloadButton = document.querySelector('button#download')
       downloadButton.onclick = () => recorder.download('test')
 
+      let requestPermissionButton = document.querySelector('button#requestPermission')
+      function isIOS() {
+        return ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1)
+      }
+      if (isIOS()) requestPermissionButton.style.display = 'block'
+      requestPermissionButton.onclick = async () => {
+        if (typeof DeviceMotionEvent.requestPermission === 'function') {
+          let permissionState = await DeviceMotionEvent.requestPermission()
+          if (permissionState === 'granted') {
+            console.log('Motion permission granted!')
+          } else {
+            console.log('Motion permission denied.')
+          }
+        }
+      }
       // document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
       // document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
     </script>
@@ -467,6 +503,11 @@
   color: white;
   background: rgba(0, 0, 0, 0.3);
 } */
+button {
+        /* display: none; */
+        padding: 10px 20px;
+        font-size: 16px;
+      }
     </style>
   </head>
 
@@ -475,10 +516,13 @@
     <div id="gui"></div>
 
     <div class="container">
+
       <div class="transceiver">
         <p>LocalVideo</p>
         <video id="local" playsinline autoplay muted></video>
         <button id="testButton">test</button>
+        <button id="requestPermission">Request Permission</button>
+        <button id="sensorReading">Sensor Reading</button>
       </div>
 
       <div class="receiver">
