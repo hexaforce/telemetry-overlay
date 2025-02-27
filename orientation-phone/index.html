@@ -19,7 +19,6 @@
         transform: translate(-50%, -50%);
       }
       #requestPermission {
-        display: none;
         padding: 10px 20px;
         font-size: 16px;
       }
@@ -68,7 +67,7 @@
 
         renderer = new THREE.WebGLRenderer({ alpha: true })
         renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
+        renderer.setSize(window.innerWidth, window.innerHeight)
         document.querySelector('div#phone').appendChild(renderer.domElement)
 
         window.addEventListener(
@@ -76,7 +75,7 @@
           () => {
             camera.aspect = window.innerWidth / window.innerHeight
             camera.updateProjectionMatrix()
-            renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
+            renderer.setSize(window.innerWidth, window.innerHeight)
           },
           false,
         )
@@ -85,20 +84,16 @@
       function initSensor() {
         const options = { frequency: 60, coordinateSystem }
         console.log(JSON.stringify(options))
-        try {
-          sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
-          sensor.onreading = () => {
-            if (model) model.quaternion.fromArray(sensor.quaternion).inverse()
-          }
-          sensor.onerror = (event) => {
-            if (event.error.name == 'NotReadableError') {
-              console.log('Sensor is not available.')
-            }
-          }
-          sensor.start()
-        } catch (error) {
-          requestPermission.style.display = 'block'
+        sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
+        sensor.onreading = () => {
+          if (model) model.quaternion.fromArray(sensor.quaternion).inverse()
         }
+        sensor.onerror = (event) => {
+          if (event.error.name == 'NotReadableError') {
+            console.log('Sensor is not available.')
+          }
+        }
+        sensor.start()
       }
 
       function renderScene() {
