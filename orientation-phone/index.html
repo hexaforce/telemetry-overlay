@@ -19,6 +19,7 @@
         transform: translate(-50%, -50%);
       }
       #requestPermission {
+        display: none;
         padding: 10px 20px;
         font-size: 16px;
       }
@@ -38,6 +39,11 @@
       const coordinateSystem = params.get('coord')
 
       let requestPermission = document.querySelector('button#requestPermission')
+
+      function isIOS() {
+        return ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1)
+      }
+      if (isIOS()) requestPermission.style.display = 'block'
 
       let sensor, camera, scene, renderer, model
 
