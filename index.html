@@ -14,11 +14,10 @@
     const params = new URLSearchParams(window.location.search)
     const protocol = params.get('protocol')
 
-    import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
     import {
       setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission,
       changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs, getDevices,
-      AudioStreamVisualizer, reportAggregate, RecorderSupportedMediaType, MultimediaRecorder
+      AudioStreamVisualizer, reportAggregate, RecorderSupportedMediaType, MultimediaRecorder, sendSensor
     } from './Support.js'
 
     import { renderMap } from './NavigationMap.js'
@@ -265,32 +264,11 @@
       }
     }
 
-    // init
-    // ------------------------------------------------------
-    function initSensor() {
-      let relative = false
-      const options = { frequency: 60, coordinateSystem: null }
-      let sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
-      sensor.onreading = () => {
-        dc1.send('quaternion', { quaternion: sensor.quaternion })
-      }
-      sensor.onerror = ({ error }) => {
-        if (error.name == 'NotReadableError') {
-          console.log('Sensor is not available.')
-        }
-      }
-      sensor.start()
-    }
     const sensorReadingButton = document.querySelector('button#sensorReading')
-    sensorReadingButton.onclick = initSensor
+    sensorReadingButton.onclick = () => sendSensor(dc1, false)
 
-    // init
-    // ------------------------------------------------------
-    async function init() {
-      ws2.send('init', transceivers.value, ws2.id)
-    }
     const initButton = document.getElementById('initButton')
-    initButton.onclick = init
+    initButton.onclick = () => ws2.send('init', transceivers.value, ws2.id)
 
     // start
     // ------------------------------------------------------

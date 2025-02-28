@@ -377,6 +377,23 @@ export class MultimediaRecorder {
   }
 }
 
+import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
+
+// Sending sensor values
+export function sendSensor(dc1, relative) {
+  const options = { frequency: 60, coordinateSystem: null }
+  let sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
+  sensor.onreading = () => {
+    dc1.send('quaternion', { quaternion: sensor.quaternion })
+  }
+  sensor.onerror = ({ error }) => {
+    if (error.name == 'NotReadableError') {
+      console.log('Sensor is not available.')
+    }
+  }
+  sensor.start()
+}
+
 export function isIPv4(address) {
   return /^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/.test(address)
 }
