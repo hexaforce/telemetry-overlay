@@ -17,12 +17,12 @@
     import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
     import {
       setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission,
-      changeTransceiverEntries, updateDeviceList
+      changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs
     } from './Support.js'
     import { getDevices } from './Device.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
-    import { fixedCodecH264, preferredCodecs } from './Codec.js'
+
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
     import { renderMap } from './NavigationMap.js'
     import { chartBar } from './RealtimeChart.js'
