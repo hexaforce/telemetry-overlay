@@ -17,11 +17,9 @@
     import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
     import {
       setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission,
-      changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs
+      changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs, getDevices,
+      AudioStreamVisualizer, reportAggregate
     } from './Support.js'
-    import { getDevices } from './Device.js'
-    import { StreamVisualizer } from './StreamVisualizer.js'
-    import { reportAggregate } from './Report.js'
 
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
     import { renderMap } from './NavigationMap.js'
@@ -189,7 +187,7 @@
           setupReceiverTransform(receiver)
         }
         if (track.kind === 'audio') {
-          new StreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
+          new AudioStreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
         }
         if (remoteVideo.srcObject !== streams[0]) {
           window.stream = remoteVideo.srcObject = streams[0]
@@ -399,7 +397,7 @@
     const requestPermissionButton = document.querySelector('button#requestPermission')
     if (isIOS()) requestPermissionButton.style.display = 'block'
     requestPermissionButton.onclick = requestPermission
-    
+
   </script>
   <style>
     body {
