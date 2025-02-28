@@ -311,6 +311,22 @@ export class MultimediaRecorder {
 
   async start(stream, mimeType) {
     this.mimeType = mimeType
+
+    if (mimeType.split(';', 1)[0] === 'video/mp4') {
+      // Adjust sampling rate to 48khz.
+      const [track] = window.stream.getAudioTracks()
+      if (track) {
+        const { sampleRate } = track.getSettings()
+        if (sampleRate != 48000) {
+          track.stop()
+          window.stream.removeTrack(track)
+          const newStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 48000 } })
+          const [newTrack] = newStream.getTracks()
+          window.stream.addTrack(newTrack)
+        }
+      }
+    }
+
     this.recordedBlobs = []
     this.mediaRecorder = new MediaRecorder(stream, { mimeType })
     this.mediaRecorder.onstop = (event) => {
