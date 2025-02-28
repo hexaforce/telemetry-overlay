@@ -1,4 +1,3 @@
-
 function loadProperties(refreshValuesOnly) {
   const track = window.track
   const capabilities = track.getCapabilities()

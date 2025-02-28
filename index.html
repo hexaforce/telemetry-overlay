@@ -1,504 +1,496 @@
 <!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <link href="//api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="js/three.min.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/MTLLoader.js"></script>
+    <script type="module" type="text/javascript">
+      'use strict'
 
-<head>
-  <meta charset="utf-8" />
-  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <link href="//api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
-  <script src="js/three.min.js"></script>
-  <script src="js/OBJLoader.js"></script>
-  <script src="js/MTLLoader.js"></script>
-  <script type="module" type="text/javascript">
-    'use strict'
+      const params = new URLSearchParams(window.location.search)
+      const protocol = params.get('protocol')
 
-    const params = new URLSearchParams(window.location.search)
-    const protocol = params.get('protocol')
+      import { setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission, changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs, getDevices, AudioStreamVisualizer, reportAggregate, RecorderSupportedMediaType, MultimediaRecorder, sendSensor } from './Support.js'
 
-    import {
-      setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission,
-      changeTransceiverEntries, updateDeviceList, fixedCodecH264, preferredCodecs, getDevices,
-      AudioStreamVisualizer, reportAggregate, RecorderSupportedMediaType, MultimediaRecorder, sendSensor
-    } from './Support.js'
+      import { renderMap } from './NavigationMap.js'
+      import { chartBar } from './RealtimeChart.js'
 
-    import { renderMap } from './NavigationMap.js'
-    import { chartBar } from './RealtimeChart.js'
+      const recorder = new MultimediaRecorder()
 
-    const recorder = new MultimediaRecorder()
+      WebSocket.prototype.originalSend = WebSocket.prototype.send
+      WebSocket.prototype.send = function (type, ws1Id, ws2Id, data) {
+        this.originalSend(JSON.stringify({ type, ws1Id, ws2Id, ...data }))
+      }
 
-    WebSocket.prototype.originalSend = WebSocket.prototype.send
-    WebSocket.prototype.send = function (type, ws1Id, ws2Id, data) {
-      this.originalSend(JSON.stringify({ type, ws1Id, ws2Id, ...data }))
-    }
+      RTCDataChannel.prototype.originalSend = RTCDataChannel.prototype.send
+      RTCDataChannel.prototype.send = function (type, data) {
+        this.originalSend(JSON.stringify({ type, ...data }))
+      }
 
-    RTCDataChannel.prototype.originalSend = RTCDataChannel.prototype.send
-    RTCDataChannel.prototype.send = function (type, data) {
-      this.originalSend(JSON.stringify({ type, ...data }))
-    }
+      if (!!!window.RTCRtpScriptTransform) {
+        const stream = new ReadableStream()
+        window.postMessage(stream, '*', [stream])
+      }
 
-    if (!!!window.RTCRtpScriptTransform) {
-      const stream = new ReadableStream()
-      window.postMessage(stream, '*', [stream])
-    }
+      let camera, scene, renderer, model
 
-    let camera, scene, renderer, model
+      function initScene() {
+        let Width = 300
+        let Height = 600
 
-    function initScene() {
-      let Width = 300
-      let Height = 600
+        camera = new THREE.PerspectiveCamera(50, Width / Height, 1, 200)
+        camera.position.z = 10
 
-      camera = new THREE.PerspectiveCamera(50, Width / Height, 1, 200)
-      camera.position.z = 10
+        scene = new THREE.Scene()
+        scene.add(new THREE.AmbientLight(0x404040, 6))
 
-      scene = new THREE.Scene()
-      scene.add(new THREE.AmbientLight(0x404040, 6))
-
-      var manager = new THREE.LoadingManager()
-      var mtlLoader = new THREE.MTLLoader(manager)
-      console.log(mtlLoader)
-      mtlLoader.setTexturePath('resources/')
-      mtlLoader.load('resources/phone.mtl', (materials) => {
-        materials.preload()
-        var objLoader = new THREE.OBJLoader(manager)
-        objLoader.setMaterials(materials)
-        objLoader.load('resources/phone.obj', (object) => {
-          model = object
-          scene.add(model)
+        var manager = new THREE.LoadingManager()
+        var mtlLoader = new THREE.MTLLoader(manager)
+        console.log(mtlLoader)
+        mtlLoader.setTexturePath('resources/')
+        mtlLoader.load('resources/phone.mtl', (materials) => {
+          materials.preload()
+          var objLoader = new THREE.OBJLoader(manager)
+          objLoader.setMaterials(materials)
+          objLoader.load('resources/phone.obj', (object) => {
+            model = object
+            scene.add(model)
+          })
         })
-      })
 
-      renderer = new THREE.WebGLRenderer({ alpha: true })
-      renderer.setPixelRatio(window.devicePixelRatio)
-      renderer.setSize(Width, Height)
-      document.querySelector('div#phone').appendChild(renderer.domElement)
+        renderer = new THREE.WebGLRenderer({ alpha: true })
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.setSize(Width, Height)
+        document.querySelector('div#phone').appendChild(renderer.domElement)
 
-      window.addEventListener(
-        'resize',
-        () => {
-          camera.aspect = Width / Height
-          camera.updateProjectionMatrix()
-          renderer.setSize(Width, Height)
-        },
-        false,
-      )
-    }
-
-    function renderScene() {
-      requestAnimationFrame(renderScene)
-      camera.lookAt(scene.position)
-      renderer.render(scene, camera)
-    }
-
-    let startTime
-    let ws1
-    let pc1
-    if (protocol === 'transceiver') {
-      ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
-      pc1 = new RTCPeerConnection()
-      document.querySelector('.receiver').style.display = 'none'
-    }
-    let ws2
-    let pc2
-    if (protocol === 'receiver') {
-      ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
-      pc2 = new RTCPeerConnection()
-      document.querySelector('.transceiver').style.display = 'none'
-      document.querySelector('.device').style.display = 'none'
-      document.querySelector('.recordding').style.display = 'none'
-      chartBar('div#barChart')
-      initScene()
-      renderScene()
-    }
-
-    let dc1
-    let dc2
-
-    const localCandidateAddress = {}
-    const remoteCandidateAddress = {}
-
-    if (pc1) {
-      pc1.oniceconnectionstatechange = (event) => {
-        if ('connected' === pc1.iceConnectionState) {
-          startTime = window.performance.now()
-        }
-      }
-      pc1.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (isIPv4(candidate.address)) {
-            ws1.send('ice', ws1.id, ws1.pair, { candidate })
-          }
-        }
-      }
-      dc1 = pc1.createDataChannel('pc1')
-      dc1.onopen = () => {
-        dc1.onmessage = ({ data }) => {
-          const message = JSON.parse(data)
-          const { type } = message
-          if (type === 'position') {
-            window.navigator.geolocation.getCurrentPosition(
-              ({ coords, timestamp }) => dc1.send('position', { coords, timestamp }),
-              (err) => console.error('Error:', err),
-            )
-          } else if (type === 'hangup') {
-            window.stream.getTracks().forEach((track) => track.stop())
-          }
-        }
-      }
-    }
-
-    const remoteVideo = document.querySelector('video#remote')
-    if (pc2) {
-      pc2.oniceconnectionstatechange = (event) => {
-        if ('connected' === pc2.iceConnectionState) {
-          setInterval(() => {
-            pc2.getStats(null).then((stats) => {
-              let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
-              document.querySelector('pre#report').innerHTML = JSON.stringify(result, null, 2)
-            })
-            dc2.send('position')
-          }, 1000)
-        }
-      }
-      pc2.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          if (isIPv4(candidate.address)) {
-            const ice = toICE(candidate.candidate)
-            if (ice) localCandidateAddress[ice[3]] = ice[2]
-            ws2.send('ice', ws2.pair, ws2.id, { candidate })
-          }
-        }
-      }
-      pc2.ondatachannel = ({ channel }) => {
-        dc2 = channel
-        dc2.onmessage = ({ data }) => {
-          const message = JSON.parse(data)
-          const { type } = message
-          if (type === 'position') {
-            const { longitude, latitude } = message.coords
-            renderMap([longitude, latitude])
-          } else if (type === 'quaternion') {
-            if (model) model.quaternion.fromArray(message.quaternion).inverse()
-          }
-        }
-      }
-      pc2.ontrack = ({ receiver, streams, track }) => {
-        if (track.kind === 'video') {
-          setupReceiverTransform(receiver)
-        }
-        if (track.kind === 'audio') {
-          new AudioStreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
-        }
-        if (remoteVideo.srcObject !== streams[0]) {
-          window.stream = remoteVideo.srcObject = streams[0]
-        }
-      }
-    }
-
-    const localVideo = document.querySelector('video#local')
-    if (ws1) {
-      ws1.onopen = async () => {
-        ws1.onmessage = async ({ data }) => {
-          const message = JSON.parse(data)
-          const { type, ws1Id, ws2Id } = message
-          switch (type) {
-            case 'session':
-              ws1.id = message.sessionId
-              break
-            case 'init':
-              let devices = await getDevices()
-              ws1.send('info', ws1Id, ws2Id, { devices })
-              break
-            case 'start':
-              localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
-              window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-              setSenderPriority(pc1)
-              const offer = await pc1.createOffer()
-              await pc1.setLocalDescription(offer)
-              ws1.pair = ws2Id
-              ws1.send('offer', ws1Id, ws2Id, { offer })
-              break
-            case 'answer':
-              await pc1.setRemoteDescription(new RTCSessionDescription(message.answer))
-              break
-            case 'ice':
-              await pc1.addIceCandidate(message.candidate)
-              break
-          }
-        }
-      }
-    }
-
-    const transceivers = document.querySelector('select#transceivers')
-    const videoSelect = document.querySelector('select#videoSource')
-    const audioSelect = document.querySelector('select#audioSource')
-
-    if (ws2) {
-      ws2.onopen = () => {
-        ws2.onmessage = async ({ data }) => {
-          const message = JSON.parse(data)
-          const { type, ws1Id, ws2Id } = message
-          switch (type) {
-            case 'session':
-              ws2.id = message.sessionId
-            case 'change':
-              changeTransceiverEntries(transceivers, message.transceivers)
-              break
-            case 'info':
-              updateDeviceList(videoSelect, audioSelect, message.devices)
-              document.querySelector('.device').style.display = 'block'
-              break
-            case 'offer':
-              await pc2.setRemoteDescription(new RTCSessionDescription(message.offer))
-              fixedCodecH264(pc2.getTransceivers())
-              const answer = await pc2.createAnswer()
-              await pc2.setLocalDescription(answer)
-              ws2.send('answer', ws1Id, ws2Id, { answer })
-              ws2.pair = ws1Id
-              break
-            case 'ice':
-              const ice = toICE(message.candidate.candidate)
-              if (ice) remoteCandidateAddress[ice[3]] = ice[2]
-              await pc2.addIceCandidate(message.candidate)
-              break
-          }
-        }
-      }
-    }
-
-    const sensorReadingButton = document.querySelector('button#sensorReading')
-    sensorReadingButton.onclick = () => sendSensor(dc1, false)
-
-    const initButton = document.getElementById('initButton')
-    initButton.onclick = () => ws2.send('init', transceivers.value, ws2.id)
-
-    // start
-    // ------------------------------------------------------
-    async function start() {
-      const constraints = {
-        video: {
-          frameRate: { ideal: 30, max: 60 },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          deviceId: {
-            ideal: videoSelect.value,
+        window.addEventListener(
+          'resize',
+          () => {
+            camera.aspect = Width / Height
+            camera.updateProjectionMatrix()
+            renderer.setSize(Width, Height)
           },
-        },
-        audio: {
-          echoCancellation: document.querySelector('input#echoCancellation').checked,
-          noiseSuppression: document.querySelector('input#noiseSuppression').checked,
-          autoGainControl: document.querySelector('input#noiseSuppression').checked,
-          deviceId: { ideal: audioSelect.value },
-        },
+          false,
+        )
       }
-      ws2.send('start', transceivers.value, ws2.id, { constraints })
 
-      RecorderSupportedMediaType.forEach((mimeType) => {
-        const option = document.createElement('option')
-        option.value = mimeType.value
-        option.innerText = mimeType.label
-        codecPreferences.appendChild(option)
-      })
-    }
+      function renderScene() {
+        requestAnimationFrame(renderScene)
+        camera.lookAt(scene.position)
+        renderer.render(scene, camera)
+      }
 
-    // hangup
-    // ------------------------------------------------------
-    async function hangup() {
-      dc2.send('hangup')
-      window.stream.getTracks().forEach((track) => track.stop())
-    }
-
-    const controleButton = document.querySelector('button#controleButton')
-    controleButton.onclick = async () => {
-      if (controleButton.textContent === 'Start') {
-        start()
-
-        controleButton.textContent = 'Hang Up'
-        document.querySelector('.recordding').style.display = 'block'
-      } else {
-        hangup()
-
-        controleButton.textContent = 'Start'
+      let startTime
+      let ws1
+      let pc1
+      if (protocol === 'transceiver') {
+        ws1 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
+        pc1 = new RTCPeerConnection()
+        document.querySelector('.receiver').style.display = 'none'
+      }
+      let ws2
+      let pc2
+      if (protocol === 'receiver') {
+        ws2 = new WebSocket('wss://SERVER_IP_ADDRESS/ws', protocol)
+        pc2 = new RTCPeerConnection()
+        document.querySelector('.transceiver').style.display = 'none'
+        document.querySelector('.device').style.display = 'none'
         document.querySelector('.recordding').style.display = 'none'
+        chartBar('div#barChart')
+        initScene()
+        renderScene()
       }
-    }
 
-    const codecPreferences = document.querySelector('select#codecPreferences')
+      let dc1
+      let dc2
 
-    const recordButton = document.querySelector('button#record')
-    recordButton.onclick = async () => {
-      if (recordButton.textContent === 'Start Recording') {
-        // ------------------------------------------------------
-        const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
-        recorder.start(window.stream, mimeType)
+      const localCandidateAddress = {}
+      const remoteCandidateAddress = {}
 
-        recordButton.textContent = 'Stop Recording'
-        playButton.disabled = true
-        downloadButton.disabled = true
-        codecPreferences.disabled = true
-      } else {
-        // ------------------------------------------------------
-        recorder.stop()
-
-        recordButton.textContent = 'Start Recording'
-        playButton.disabled = false
-        downloadButton.disabled = false
-        codecPreferences.disabled = false
+      if (pc1) {
+        pc1.oniceconnectionstatechange = (event) => {
+          if ('connected' === pc1.iceConnectionState) {
+            startTime = window.performance.now()
+          }
+        }
+        pc1.onicecandidate = ({ candidate }) => {
+          if (candidate) {
+            if (isIPv4(candidate.address)) {
+              ws1.send('ice', ws1.id, ws1.pair, { candidate })
+            }
+          }
+        }
+        dc1 = pc1.createDataChannel('pc1')
+        dc1.onopen = () => {
+          dc1.onmessage = ({ data }) => {
+            const message = JSON.parse(data)
+            const { type } = message
+            if (type === 'position') {
+              window.navigator.geolocation.getCurrentPosition(
+                ({ coords, timestamp }) => dc1.send('position', { coords, timestamp }),
+                (err) => console.error('Error:', err),
+              )
+            } else if (type === 'hangup') {
+              window.stream.getTracks().forEach((track) => track.stop())
+            }
+          }
+        }
       }
-    }
 
-    const playButton = document.querySelector('button#play')
-    playButton.onclick = () => recorder.play(document.querySelector('video#recordedPlay'))
+      const remoteVideo = document.querySelector('video#remote')
+      if (pc2) {
+        pc2.oniceconnectionstatechange = (event) => {
+          if ('connected' === pc2.iceConnectionState) {
+            setInterval(() => {
+              pc2.getStats(null).then((stats) => {
+                let result = reportAggregate(stats, remoteCandidateAddress, localCandidateAddress)
+                document.querySelector('pre#report').innerHTML = JSON.stringify(result, null, 2)
+              })
+              dc2.send('position')
+            }, 1000)
+          }
+        }
+        pc2.onicecandidate = ({ candidate }) => {
+          if (candidate) {
+            if (isIPv4(candidate.address)) {
+              const ice = toICE(candidate.candidate)
+              if (ice) localCandidateAddress[ice[3]] = ice[2]
+              ws2.send('ice', ws2.pair, ws2.id, { candidate })
+            }
+          }
+        }
+        pc2.ondatachannel = ({ channel }) => {
+          dc2 = channel
+          dc2.onmessage = ({ data }) => {
+            const message = JSON.parse(data)
+            const { type } = message
+            if (type === 'position') {
+              const { longitude, latitude } = message.coords
+              renderMap([longitude, latitude])
+            } else if (type === 'quaternion') {
+              if (model) model.quaternion.fromArray(message.quaternion).inverse()
+            }
+          }
+        }
+        pc2.ontrack = ({ receiver, streams, track }) => {
+          if (track.kind === 'video') {
+            setupReceiverTransform(receiver)
+          }
+          if (track.kind === 'audio') {
+            new AudioStreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
+          }
+          if (remoteVideo.srcObject !== streams[0]) {
+            window.stream = remoteVideo.srcObject = streams[0]
+          }
+        }
+      }
 
-    const downloadButton = document.querySelector('button#download')
-    downloadButton.onclick = () => recorder.download('test')
+      const localVideo = document.querySelector('video#local')
+      if (ws1) {
+        ws1.onopen = async () => {
+          ws1.onmessage = async ({ data }) => {
+            const message = JSON.parse(data)
+            const { type, ws1Id, ws2Id } = message
+            switch (type) {
+              case 'session':
+                ws1.id = message.sessionId
+                break
+              case 'init':
+                let devices = await getDevices()
+                ws1.send('info', ws1Id, ws2Id, { devices })
+                break
+              case 'start':
+                localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
+                window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
+                setSenderPriority(pc1)
+                const offer = await pc1.createOffer()
+                await pc1.setLocalDescription(offer)
+                ws1.pair = ws2Id
+                ws1.send('offer', ws1Id, ws2Id, { offer })
+                break
+              case 'answer':
+                await pc1.setRemoteDescription(new RTCSessionDescription(message.answer))
+                break
+              case 'ice':
+                await pc1.addIceCandidate(message.candidate)
+                break
+            }
+          }
+        }
+      }
 
-    const requestPermissionButton = document.querySelector('button#requestPermission')
-    if (isIOS()) requestPermissionButton.style.display = 'block'
-    requestPermissionButton.onclick = requestPermission
+      const transceivers = document.querySelector('select#transceivers')
+      const videoSelect = document.querySelector('select#videoSource')
+      const audioSelect = document.querySelector('select#audioSource')
 
-  </script>
-  <style>
-    body {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
+      if (ws2) {
+        ws2.onopen = () => {
+          ws2.onmessage = async ({ data }) => {
+            const message = JSON.parse(data)
+            const { type, ws1Id, ws2Id } = message
+            switch (type) {
+              case 'session':
+                ws2.id = message.sessionId
+              case 'change':
+                changeTransceiverEntries(transceivers, message.transceivers)
+                break
+              case 'info':
+                updateDeviceList(videoSelect, audioSelect, message.devices)
+                document.querySelector('.device').style.display = 'block'
+                break
+              case 'offer':
+                await pc2.setRemoteDescription(new RTCSessionDescription(message.offer))
+                fixedCodecH264(pc2.getTransceivers())
+                const answer = await pc2.createAnswer()
+                await pc2.setLocalDescription(answer)
+                ws2.send('answer', ws1Id, ws2Id, { answer })
+                ws2.pair = ws1Id
+                break
+              case 'ice':
+                const ice = toICE(message.candidate.candidate)
+                if (ice) remoteCandidateAddress[ice[3]] = ice[2]
+                await pc2.addIceCandidate(message.candidate)
+                break
+            }
+          }
+        }
+      }
 
-    .side {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+      const sensorReadingButton = document.querySelector('button#sensorReading')
+      sensorReadingButton.onclick = () => sendSensor(dc1, false)
 
-    .session {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      /* max-width: 300px; */
-    }
+      const initButton = document.getElementById('initButton')
+      initButton.onclick = () => ws2.send('init', transceivers.value, ws2.id)
 
-    .device {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      /* max-width: 300px; */
-    }
+      // start
+      // ------------------------------------------------------
+      async function start() {
+        const constraints = {
+          video: {
+            frameRate: { ideal: 30, max: 60 },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            deviceId: {
+              ideal: videoSelect.value,
+            },
+          },
+          audio: {
+            echoCancellation: document.querySelector('input#echoCancellation').checked,
+            noiseSuppression: document.querySelector('input#noiseSuppression').checked,
+            autoGainControl: document.querySelector('input#noiseSuppression').checked,
+            deviceId: { ideal: audioSelect.value },
+          },
+        }
+        ws2.send('start', transceivers.value, ws2.id, { constraints })
 
-    .recordding {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      /* max-width: 300px; */
-    }
+        RecorderSupportedMediaType.forEach((mimeType) => {
+          const option = document.createElement('option')
+          option.value = mimeType.value
+          option.innerText = mimeType.label
+          codecPreferences.appendChild(option)
+        })
+      }
 
-    /* --- chart -------------------------- */
+      // hangup
+      // ------------------------------------------------------
+      async function hangup() {
+        dc2.send('hangup')
+        window.stream.getTracks().forEach((track) => track.stop())
+      }
 
-    svg {
-      font: 10px sans-serif;
-    }
+      const controleButton = document.querySelector('button#controleButton')
+      controleButton.onclick = async () => {
+        if (controleButton.textContent === 'Start') {
+          start()
 
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
+          controleButton.textContent = 'Hang Up'
+          document.querySelector('.recordding').style.display = 'block'
+        } else {
+          hangup()
 
-    .x.axis line {
-      shape-rendering: auto;
-    }
+          controleButton.textContent = 'Start'
+          document.querySelector('.recordding').style.display = 'none'
+        }
+      }
 
-    .line {
-      fill: none;
-      stroke: #000;
-      stroke-width: 1.5px;
-    }
+      const codecPreferences = document.querySelector('select#codecPreferences')
 
-    .bar {
-      fill: steelblue;
-    }
+      const recordButton = document.querySelector('button#record')
+      recordButton.onclick = async () => {
+        if (recordButton.textContent === 'Start Recording') {
+          // ------------------------------------------------------
+          const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value
+          recorder.start(window.stream, mimeType)
 
-    .grid-line {
-      stroke: lightgray;
-      stroke-width: 0.5;
-    }
+          recordButton.textContent = 'Stop Recording'
+          playButton.disabled = true
+          downloadButton.disabled = true
+          codecPreferences.disabled = true
+        } else {
+          // ------------------------------------------------------
+          recorder.stop()
 
-    /* --- map -------------------------- */
+          recordButton.textContent = 'Start Recording'
+          playButton.disabled = false
+          downloadButton.disabled = false
+          codecPreferences.disabled = false
+        }
+      }
 
-    .map {
-      width: 400px;
-      height: 280px;
-      opacity: 0.7;
-    }
+      const playButton = document.querySelector('button#play')
+      playButton.onclick = () => recorder.play(document.querySelector('video#recordedPlay'))
 
-    /* .navigation-map {
+      const downloadButton = document.querySelector('button#download')
+      downloadButton.onclick = () => recorder.download('test')
+
+      const requestPermissionButton = document.querySelector('button#requestPermission')
+      if (isIOS()) requestPermissionButton.style.display = 'block'
+      requestPermissionButton.onclick = requestPermission
+    </script>
+    <style>
+      body {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .side {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .session {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        /* max-width: 300px; */
+      }
+
+      .device {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        /* max-width: 300px; */
+      }
+
+      .recordding {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        /* max-width: 300px; */
+      }
+
+      /* --- chart -------------------------- */
+
+      svg {
+        font: 10px sans-serif;
+      }
+
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .x.axis line {
+        shape-rendering: auto;
+      }
+
+      .line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 1.5px;
+      }
+
+      .bar {
+        fill: steelblue;
+      }
+
+      .grid-line {
+        stroke: lightgray;
+        stroke-width: 0.5;
+      }
+
+      /* --- map -------------------------- */
+
+      .map {
+        width: 400px;
+        height: 280px;
+        opacity: 0.7;
+      }
+
+      /* .navigation-map {
   position: absolute;
   top: 0;
   right: 0;
   color: white;
   background: rgba(0, 0, 0, 0.3);
 } */
-    button {
-      /* display: none; */
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-  </style>
-</head>
+      button {
+        /* display: none; */
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+    </style>
+  </head>
 
-<body>
-  <div id="map" class="map"></div>
-  <div id="gui"></div>
+  <body>
+    <div id="map" class="map"></div>
+    <div id="gui"></div>
 
-  <div class="container">
-    <div class="transceiver">
-      <p>LocalVideo</p>
-      <video id="local" playsinline autoplay muted></video>
-      <button id="testButton">test</button>
-      <button id="requestPermission">Request Permission</button>
-      <button id="sensorReading">Sensor Reading</button>
-    </div>
-
-    <div class="receiver">
-      <div id="phone"></div>
-      <div class="session">
-        <div class="side">
-          <label for="transceivers">Transceiver:</label>
-          <select id="transceivers"></select>
-          <button id="initButton">Init</button>
-        </div>
-        <div class="device">
-          <div class="side">
-            <label for="videoSource">Video source:</label><select id="videoSource"></select>
-          </div>
-          <div class="side">
-            <label for="audioSource">Audio source:</label><select id="audioSource"></select>
-          </div>
-          <div class="side"><label for="echoCancellation">Echo Cancellation:</label><input type="checkbox"
-              id="echoCancellation" checked /></div>
-          <div class="side"><label for="noiseSuppression">Noise Suppression:</label><input type="checkbox"
-              id="noiseSuppression" checked /></div>
-          <div class="side"><label for="autoGainControl">Auto GainControl:</label><input type="checkbox"
-              id="autoGainControl" checked /></div>
-          <button id="controleButton">Start</button>
-        </div>
+    <div class="container">
+      <div class="transceiver">
+        <p>LocalVideo</p>
+        <video id="local" playsinline autoplay muted></video>
+        <button id="testButton">test</button>
+        <button id="requestPermission">Request Permission</button>
+        <button id="sensorReading">Sensor Reading</button>
       </div>
-      <div class="recordding">
-        <label for="codecPreferences">Recording format:</label>
-        <select id="codecPreferences"></select>
-        <button id="record">Start Recording</button>
-        <button id="play">Play</button>
-        <button id="download">Download</button>
+
+      <div class="receiver">
+        <div id="phone"></div>
+        <div class="session">
+          <div class="side">
+            <label for="transceivers">Transceiver:</label>
+            <select id="transceivers"></select>
+            <button id="initButton">Init</button>
+          </div>
+          <div class="device">
+            <div class="side">
+              <label for="videoSource">Video source:</label
+              ><select id="videoSource"></select>
+            </div>
+            <div class="side">
+              <label for="audioSource">Audio source:</label
+              ><select id="audioSource"></select>
+            </div>
+            <div class="side"><label for="echoCancellation">Echo Cancellation:</label><input type="checkbox" id="echoCancellation" checked /></div>
+            <div class="side"><label for="noiseSuppression">Noise Suppression:</label><input type="checkbox" id="noiseSuppression" checked /></div>
+            <div class="side"><label for="autoGainControl">Auto GainControl:</label><input type="checkbox" id="autoGainControl" checked /></div>
+            <button id="controleButton">Start</button>
+          </div>
+        </div>
+        <div class="recordding">
+          <label for="codecPreferences">Recording format:</label>
+          <select id="codecPreferences"></select>
+          <button id="record">Start Recording</button>
+          <button id="play">Play</button>
+          <button id="download">Download</button>
+        </div>
+        <p>RemoteVideo</p>
+        <video id="remote" playsinline autoplay muted></video>
+        <video id="recordedPlay" playsinline loop></video>
+        <canvas id="audio"></canvas>
+        <div id="barChart"></div>
+        <pre id="report"></pre>
+
+        <button id="positionButton">position</button>
       </div>
-      <p>RemoteVideo</p>
-      <video id="remote" playsinline autoplay muted></video>
-      <video id="recordedPlay" playsinline loop></video>
-      <canvas id="audio"></canvas>
-      <div id="barChart"></div>
-      <pre id="report"></pre>
-
-      <button id="positionButton">position</button>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>
