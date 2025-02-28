@@ -15,7 +15,10 @@
     const protocol = params.get('protocol')
 
     import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
-    import { setSenderPriority, setupReceiverTransform, isIPv4, toICE } from './Support.js'
+    import {
+      setSenderPriority, setupReceiverTransform, isIPv4, toICE,
+      changeTransceiverEntries, updateDeviceList
+    } from './Support.js'
     import { getDevices } from './Device.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
@@ -118,7 +121,6 @@
 
     if (pc1) {
       pc1.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc1.iceConnectionState)
         if ('connected' === pc1.iceConnectionState) {
           startTime = window.performance.now()
         }
@@ -132,10 +134,8 @@
       }
       dc1 = pc1.createDataChannel('pc1')
       dc1.onopen = () => {
-        console.log('DataChannel open pc1')
         dc1.onmessage = ({ data }) => {
           const message = JSON.parse(data)
-          console.log('DataChannel1 message:', message)
           const { type } = message
           if (type === 'position') {
             window.navigator.geolocation.getCurrentPosition(
@@ -149,9 +149,9 @@
       }
     }
 
+    const remoteVideo = document.querySelector('video#remote')
     if (pc2) {
       pc2.oniceconnectionstatechange = (event) => {
-        console.log('ICE State Changed:', pc2.iceConnectionState)
         if ('connected' === pc2.iceConnectionState) {
           setInterval(() => {
             pc2.getStats(null).then((stats) => {
@@ -172,14 +172,11 @@
         }
       }
       pc2.ondatachannel = ({ channel }) => {
-        console.log('DataChannel open pc2')
         dc2 = channel
         dc2.onmessage = ({ data }) => {
           const message = JSON.parse(data)
-          console.log('DataChannel2 message:', message)
           const { type } = message
           if (type === 'position') {
-            console.log('position:', message.coords)
             const { longitude, latitude } = message.coords
             renderMap([longitude, latitude])
           } else if (type === 'quaternion') {
@@ -194,17 +191,15 @@
         if (track.kind === 'audio') {
           new StreamVisualizer(streams[0], document.querySelector('canvas#audio')).start()
         }
-        const remoteVideo = document.querySelector('video#remote')
         if (remoteVideo.srcObject !== streams[0]) {
           window.stream = remoteVideo.srcObject = streams[0]
         }
       }
     }
 
+    const localVideo = document.querySelector('video#local')
     if (ws1) {
       ws1.onopen = async () => {
-        console.log('ws1 connected')
-        ws1.onclose = () => console.log('ws1 closed')
         ws1.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
           const { type, ws1Id, ws2Id } = message
@@ -217,8 +212,7 @@
               ws1.send('info', ws1Id, ws2Id, { devices })
               break
             case 'start':
-              window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
-              document.querySelector('video#local').srcObject = window.stream
+              localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
               window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
               // const [track] = ([window.track] = stream.getVideoTracks())
               // const capabilities = track.getCapabilities()
@@ -241,58 +235,28 @@
     }
 
     const transceivers = document.querySelector('select#transceivers')
-    function changeTransceiverEntries(entries) {
-      initButton.disabled = entries.length === 0
-      while (transceivers.firstChild) transceivers.removeChild(transceivers.firstChild)
-      entries.forEach((value) => {
-        const option = document.createElement('option')
-        option.value = value
-        option.innerText = value
-        transceivers.appendChild(option)
-      })
-    }
-
     const videoSelect = document.querySelector('select#videoSource')
     const audioSelect = document.querySelector('select#audioSource')
-    function updateDeviceList(devices) {
-      while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
-      while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
-      devices.forEach(({ deviceId, kind, label }) => {
-        const option = document.createElement('option')
-        option.value = deviceId
-        if (kind === 'videoinput') {
-          option.text = label || `Camera ${videoSelect.length + 1}`
-          videoSelect.appendChild(option)
-        } else if (kind === 'audioinput') {
-          option.text = label || `Microphone ${audioSelect.length + 1}`
-          audioSelect.appendChild(option)
-        }
-      })
-    }
 
     if (ws2) {
       ws2.onopen = () => {
-        console.log('ws2 connected')
-        ws2.onclose = () => console.log('ws2 closed')
         ws2.onmessage = async ({ data }) => {
           const message = JSON.parse(data)
           const { type, ws1Id, ws2Id } = message
           switch (type) {
             case 'session':
               ws2.id = message.sessionId
-              changeTransceiverEntries(message.transceivers)
-              break
             case 'change':
-              changeTransceiverEntries(message.transceivers)
+              changeTransceiverEntries(transceivers, message.transceivers)
               break
             case 'info':
-              updateDeviceList(message.devices)
+              updateDeviceList(videoSelect, audioSelect, message.devices)
               document.querySelector('.device').style.display = 'block'
               break
             case 'offer':
               await pc2.setRemoteDescription(new RTCSessionDescription(message.offer))
               fixH264Codecs(pc2.getTransceivers())
-              preferredCodecs(pc2.getTransceivers())
+              // preferredCodecs(pc2.getTransceivers())
               const answer = await pc2.createAnswer()
               await pc2.setLocalDescription(answer)
               ws2.send('answer', ws1Id, ws2Id, { answer })

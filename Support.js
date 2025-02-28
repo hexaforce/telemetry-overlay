@@ -1,33 +1,29 @@
-// export async function requestPermission(dc1) {
-//   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-//     const response = await DeviceOrientationEvent.requestPermission()
-//     if (response === 'granted') {
-//       sensorInfo(dc1)
-//     }
-//   } else sensorInfo(dc1)
-// }
+export function changeTransceiverEntries(transceivers, entries) {
+  initButton.disabled = entries.length === 0
+  while (transceivers.firstChild) transceivers.removeChild(transceivers.firstChild)
+  entries.forEach((value) => {
+    const option = document.createElement('option')
+    option.value = value
+    option.innerText = value
+    transceivers.appendChild(option)
+  })
+}
 
-// function sensorInfo(dc1) {
-//   const sendOrientation = ({ type, webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma }) => {
-//     dc1.send(type, { webkitCompassAccuracy, webkitCompassHeading, absolute, alpha, beta, gamma })
-//   }
-//   window.ondeviceorientation = sendOrientation
-//   window.ondeviceorientationabsolute = sendOrientation
-//   window.ondevicemotion = ({ type, acceleration, accelerationIncludingGravity, rotationRate }) => {
-//     const conv1 = (v) => {
-//       const { x, y, z } = v
-//       return { x, y, z }
-//     }
-//     acceleration = conv1(acceleration)
-//     accelerationIncludingGravity = conv1(accelerationIncludingGravity)
-//     const conv2 = (v) => {
-//       const { alpha, beta, gamma } = v
-//       return { alpha, beta, gamma }
-//     }
-//     rotationRate = conv2(rotationRate)
-//     dc1.send(type, { acceleration, accelerationIncludingGravity, rotationRate })
-//   }
-// }
+export function updateDeviceList(videoSelect, audioSelect, devices) {
+  while (videoSelect.firstChild) videoSelect.removeChild(videoSelect.firstChild)
+  while (audioSelect.firstChild) audioSelect.removeChild(audioSelect.firstChild)
+  devices.forEach(({ deviceId, kind, label }) => {
+    const option = document.createElement('option')
+    option.value = deviceId
+    if (kind === 'videoinput') {
+      option.text = label || `Camera ${videoSelect.length + 1}`
+      videoSelect.appendChild(option)
+    } else if (kind === 'audioinput') {
+      option.text = label || `Microphone ${audioSelect.length + 1}`
+      audioSelect.appendChild(option)
+    }
+  })
+}
 
 export function setSenderPriority(pc) {
   pc.getSenders().forEach((sender) => {
