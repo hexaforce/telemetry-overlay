@@ -78,3 +78,18 @@ export function isIPv4(address) {
 export function toICE(candidate) {
   return candidate.match(/candidate:\d+ \d+ (udp|tcp) \d+ ([0-9.:a-fA-F]+) (\d+) typ (\w+)/)
 }
+
+export function isIOS() {
+  return ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1)
+}
+
+export async function requestPermission() {
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    let permissionState = await DeviceMotionEvent.requestPermission()
+    if (permissionState === 'granted') {
+      console.log('Motion permission granted!')
+    } else {
+      console.log('Motion permission denied.')
+    }
+  }
+}

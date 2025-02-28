@@ -16,13 +16,13 @@
 
     import { AbsoluteOrientationSensor, RelativeOrientationSensor } from './sensor-polyfills/motion-sensors.js'
     import {
-      setSenderPriority, setupReceiverTransform, isIPv4, toICE,
+      setSenderPriority, setupReceiverTransform, isIPv4, toICE, isIOS, requestPermission,
       changeTransceiverEntries, updateDeviceList
     } from './Support.js'
     import { getDevices } from './Device.js'
     import { StreamVisualizer } from './StreamVisualizer.js'
     import { reportAggregate } from './Report.js'
-    import { fixH264Codecs, preferredCodecs } from './Codec.js'
+    import { fixedCodecH264, preferredCodecs } from './Codec.js'
     import { SupportedType, MultimediaRecorder } from './MultimediaRecorder.js'
     import { renderMap } from './NavigationMap.js'
     import { chartBar } from './RealtimeChart.js'
@@ -255,8 +255,7 @@
               break
             case 'offer':
               await pc2.setRemoteDescription(new RTCSessionDescription(message.offer))
-              fixH264Codecs(pc2.getTransceivers())
-              // preferredCodecs(pc2.getTransceivers())
+              fixedCodecH264(pc2.getTransceivers())
               const answer = await pc2.createAnswer()
               await pc2.setLocalDescription(answer)
               ws2.send('answer', ws1Id, ws2Id, { answer })
@@ -397,23 +396,10 @@
     const downloadButton = document.querySelector('button#download')
     downloadButton.onclick = () => recorder.download('test')
 
-    let requestPermissionButton = document.querySelector('button#requestPermission')
-    function isIOS() {
-      return ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1)
-    }
+    const requestPermissionButton = document.querySelector('button#requestPermission')
     if (isIOS()) requestPermissionButton.style.display = 'block'
-    requestPermissionButton.onclick = async () => {
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        let permissionState = await DeviceMotionEvent.requestPermission()
-        if (permissionState === 'granted') {
-          console.log('Motion permission granted!')
-        } else {
-          console.log('Motion permission denied.')
-        }
-      }
-    }
-    // document.querySelector('button#positionButton').onclick = async () => dc2.send('position')
-    // document.querySelector('button#testButton').onclick = async () => requestPermission(dc1)
+    requestPermissionButton.onclick = requestPermission
+    
   </script>
   <style>
     body {
