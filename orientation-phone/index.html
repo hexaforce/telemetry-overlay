@@ -52,7 +52,10 @@
       renderScene()
 
       function initScene() {
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200)
+        let Width = 300
+        let Height = 600
+
+        camera = new THREE.PerspectiveCamera(50, Width / Height, 1, 200)
         camera.position.z = 10
 
         scene = new THREE.Scene()
@@ -60,6 +63,7 @@
 
         var manager = new THREE.LoadingManager()
         var mtlLoader = new THREE.MTLLoader(manager)
+        console.log(mtlLoader)
         mtlLoader.setTexturePath('resources/')
         mtlLoader.load('resources/phone.mtl', (materials) => {
           materials.preload()
@@ -73,15 +77,15 @@
 
         renderer = new THREE.WebGLRenderer({ alpha: true })
         renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.setSize(Width, Height)
         document.querySelector('div#phone').appendChild(renderer.domElement)
 
         window.addEventListener(
           'resize',
           () => {
-            camera.aspect = window.innerWidth / window.innerHeight
+            camera.aspect = Width / Height
             camera.updateProjectionMatrix()
-            renderer.setSize(window.innerWidth, window.innerHeight)
+            renderer.setSize(Width, Height)
           },
           false,
         )
