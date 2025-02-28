@@ -211,9 +211,6 @@
             case 'start':
               localVideo.srcObject = window.stream = await navigator.mediaDevices.getUserMedia(message.constraints)
               window.stream.getTracks().forEach((track) => pc1.addTrack(track, window.stream))
-              // const [track] = ([window.track] = stream.getVideoTracks())
-              // const capabilities = track.getCapabilities()
-              // const settings = track.getSettings()
               setSenderPriority(pc1)
               const offer = await pc1.createOffer()
               await pc1.setLocalDescription(offer)
@@ -271,9 +268,8 @@
     // init
     // ------------------------------------------------------
     function initSensor() {
-      let relative = null
+      let relative = false
       const options = { frequency: 60, coordinateSystem: null }
-      console.log(JSON.stringify(options))
       let sensor = relative ? new RelativeOrientationSensor(options) : new AbsoluteOrientationSensor(options)
       sensor.onreading = () => {
         dc1.send('quaternion', { quaternion: sensor.quaternion })
