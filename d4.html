@@ -13,20 +13,20 @@
 </head>
 <body>
 
-    <svg id="gauge" width="350" height="250"></svg>  <!-- サイズはそのまま -->
+    <svg id="gauge" width="250" height="250"></svg>  <!-- サイズはそのまま -->
 
     <script>
-        const width = 350;
-        const height = 250;
-        const radius = 100; // 半径を少し小さめにして調整
+        const width = 240;
+        const height = 240;
+        const radius = 115; 
         let currentValue = 0;
-        let step = 5; // 初期の増加量
+        let step = 5; 
 
         const svg = d3.select("#gauge")
             .attr("width", width)
             .attr("height", height)
             .append("g")
-            .attr("transform", `translate(${width / 2}, ${height * 0.6})`); // 位置を上へ
+            .attr("transform", `translate(${width / 2}, ${height / 2})`); // 位置を上へ
 
         // スケール（0~270° に対応）
         const scale = d3.scaleLinear()
@@ -97,8 +97,8 @@
                 .attr("stroke", "#333")
                 .attr("stroke-width", 2);
 
-            // 数値ラベル（90° ずらす）
-            const xText = Math.cos(angle) * (radius - 30);
+            // 数値ラベル
+            const xText = Math.cos(angle) * (radius - 40);
             const yText = Math.sin(angle) * (radius - 30);
 
             svg.append("text")
