@@ -215,23 +215,19 @@
 
       function tick(path, line, data, svg) {
         function each() {
-          // push a new data point onto the back
           data.push(random())
-
           showData('chart1-data', data)
-
           updateAxis(data, svg)
 
-          // redraw the line, and then slide it to the left
           path
             .attr('d', line)
             .attr('transform', null)
             .transition()
             .attr('transform', 'translate(' + svg.x(-1) + ')')
 
-          // pop the old data point off the front
           data.shift()
         }
+
         transition = transition
           .each(each)
           .transition()
@@ -247,23 +243,19 @@
 
       function tick(path, line, data, svg) {
         function each() {
-          // push a new data point onto the back
           data.push(random())
-
           showData('chart2-data', data)
-
           updateAxis(data, svg)
 
-          // redraw the line, and then slide it to the left, and repeat indefinitely
           path
             .attr('d', line)
             .attr('transform', null)
             .transition()
             .attr('transform', 'translate(' + svg.x(0) + ')')
 
-          // pop the old data point off the front
           data.shift()
         }
+
         transition = transition
           .each(each)
           .transition()
@@ -280,9 +272,7 @@
       function tick(bars, data, svg) {
         function each() {
           data.push(random())
-
           showData('chart3-data', data)
-
           updateAxis(data, svg)
 
           svg.x.domain([svg.x.domain()[0] + 1, svg.x.domain()[1] + 1])
@@ -319,9 +309,7 @@
       function tick(path, area, data, svg) {
         function each() {
           data.push(random())
-
           showData('chart4-data', data)
-
           updateAxis(data, svg)
 
           path
@@ -349,9 +337,7 @@
       function tick(path, area, data, svg) {
         function each() {
           data.push(random())
-
           showData('chart5-data', data)
-
           updateAxis(data, svg)
 
           path
@@ -392,31 +378,31 @@
     </div>
     <div id="chart-container">
       <div id="chart1">
-        Chart1 linear
+        Chart1 Line linear
         <script>
           Chart1()
         </script>
       </div>
       <div id="chart2">
-        Chart2 basis
+        Chart2 Line basis
         <script>
           Chart2()
         </script>
       </div>
       <div id="chart3">
-        Chart3 bar
+        Chart3 Bar
         <script>
           Chart3()
         </script>
       </div>
       <div id="chart4">
-        Chart4 area
+        Chart4 Area linear
         <script>
           Chart4()
         </script>
       </div>
       <div id="chart5">
-        Chart5 area
+        Chart5 Area basis
         <script>
           Chart5()
         </script>
