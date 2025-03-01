@@ -148,18 +148,17 @@
           )
       }
 
-      // 100ms ごとに5ずつ増やし、270を超えたら-20ずつ行い0になったらまた5ずつ増やす
       setInterval(() => {
-        currentValue += step
+        // currentValue += step
 
-        if (currentValue >= 270) {
-          step = -30 // 270 を超えたら減少
-        } else if (currentValue <= 0) {
-          step = 5 // 0 になったら再び増加
-        }
-
+        // if (currentValue >= 270) {
+        //   step = -30 // 270 を超えたら減少
+        // } else if (currentValue <= 0) {
+        //   step = 5 // 0 になったら再び増加
+        // }
+        currentValue = Math.floor(Math.random() * 271)
         updateGauge(currentValue)
-      }, 150)
+      }, 500)
     </script>
   </body>
 </html>
