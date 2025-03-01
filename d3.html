@@ -27,11 +27,17 @@
     .line {
       fill: none;
       stroke: #000;
-      stroke-width: 1.5px;
+      stroke-width: 0.8px;
     }
 
     .bar {
       fill: steelblue;
+      opacity: 0.8;
+    }
+
+    .area {
+      fill: steelblue;
+      opacity: 0.8;
     }
 
     .grid-line {
@@ -186,6 +192,28 @@
       tick(bars, data, svg)
     }
 
+    // --- Bar Area --------------------------
+    function areaChart(id, xDomain, tick) {
+      var data = d3.range(n).map(() => 0)
+      var svg = createSvg(data, id, xDomain)
+
+      var area = d3.svg
+        .area()
+        .x((d, i) => svg.x(i))
+        .y0(svg.y(0))
+        .y1((d) => svg.y(d))
+
+      var path = svg.baseSvg
+        .append('g')
+        .attr('clip-path', 'url(#clip)')
+        .append('path')
+        .datum(data)
+        .attr('class', 'area')
+        .attr('d', area)
+
+      tick(path, area, data, svg)
+    }
+
     // --- Chart1 --------------------------
     function Chart1() {
       var transition = d3.select({}).transition().duration(duration).ease('linear')
@@ -288,6 +316,27 @@
 
       barChart('#chart3', [0, n - 1], tick)
     }
+
+    // --- Chart4 --------------------------
+    function Chart4() {
+      var transition = d3.select({}).transition().duration(duration).ease('linear')
+
+      function tick(path, area, data, svg) {
+        function each() {
+          data.push(random())
+          document.getElementById('chart4-data').innerText = JSON.stringify(data.slice(-8), null, 2)
+          updateAxis(data, svg)
+          path.attr('d', area).attr('transform', null).transition().attr('transform', 'translate(' + svg.x(-1) + ')')
+          data.shift()
+        }
+        transition = transition
+          .each(each)
+          .transition()
+          .each('start', () => tick(path, area, data, svg))
+      }
+
+      areaChart('#chart4', [0, n - 1], tick)
+    }
   </script>
   <h1>D3 Real-time Chart</h1>
   <div id="container">
@@ -298,6 +347,8 @@
       <pre id="chart2-data"></pre>
       Chart3 Data
       <pre id="chart3-data"></pre>
+      Chart4 Data
+      <pre id="chart4-data"></pre>
     </div>
     <div id="chart-container">
       <div id="chart1">
@@ -316,6 +367,12 @@
         Chart3 bar
         <script>
           Chart3()
+        </script>
+      </div>
+      <div id="chart4">
+        Chart4 area
+        <script>
+          Chart4()
         </script>
       </div>
     </div>
