@@ -9,67 +9,87 @@
 </head>
 <div>
   <rockiot-ui 
-  background="#000"
-  bar-color="#00000060"
-  click-action="test"
-  control-bg="none"
-  control-color="#888"
   id="radial_0"
-  max="100"
-  min="0"
-  name="Humidity"
+  serial="radial_0"
+
+  type="gauge"
+  variation="radial"
+
+  svgheight="300"
+  svgwidth="300"
+  radius="lg"
+
+  name="Speed"
+  units="Km"
+  text-color="#333"
+
   needle="1"
   needle-color="#ff0000"
-  precision="2"
+
+  min="0"
+  max="270"
+  ticks="9"
+  value="100"
+
+  bar-color="#00000060"
   progress-color="#4ea5f1"
-  radius="lg"
+  size="md"
+
+
+  background="#a00"
+  click-action="test"
+  precision="2"
   scale="1"
   scale-text-color="#333"
-  serial="radial_0"
-  size="md"
   smallscale="1"
-  svgheight="300"
-  svgwidth="300"
-  text-color="#333"
-  ticks="5"
-  type="gauge"
-  units="%"
-  value="20"
   value-class="rockiot-radial-value-text"
-  variation="radial">
-</rockiot-ui>
-<rockiot-ui 
-  background="#000"
-  bar-color="#00000060"
-  class="rockiot-element"
-  click-action="test"
   control-bg="none"
   control-color="#888"
-  endangle="0"
+  >
+</rockiot-ui>
+
+<rockiot-ui 
   id="radial_1"
-  max="100"
-  min="0"
-  name="Humidity"
-  needle="1"
-  needle-color="#ff0000"
-  precision="2"
-  progress-color="#4ea5f1"
-  radius="lg"
-  scale="1"
-  scale-text-color="#bababa"
   serial="radial_1"
-  size="md"
-  smallscale="1"
-  startangle="180"
+
+  type="gauge"
+  variation="radial"
+
   svgheight="300"
   svgwidth="300"
+  radius="lg"
+
+  name="Speed"
+  units="Km"
   text-color="#bababa"
-  ticks="5"
-  type="gauge"
-  units="%"
-  value="20"
+
+  needle="1"
+  needle-color="#ff0000"
+
+  min="0"
+  max="270"
+  ticks="9"
+  value="100"
+
+  startangle="135"
+  endangle="45"
+  
+  bar-color="#00000060"
+  progress-color="#4ea5f1"
+  size="md"
+
+
+  background="#000"
+  class="rockiot-element"
+  click-action="test"
+  precision="2"
+  scale="1"
+  scale-text-color="#bababa"
+  smallscale="1"
   value-class="rockiot-radial-value-text"
-  variation="radial">
+  control-bg="none"
+  control-color="#888"
+  >
 </rockiot-ui>
 </div>
 </body>
