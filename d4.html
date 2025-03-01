@@ -1,110 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D3 Radial Gauge - Adjusted Position</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 Radial Gauge - Adjusted Tick & Label Position</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
-        svg {
-            background: #f8f8f8;
-        }
+      svg {
+        background: #f8f8f8;
+      }
     </style>
-</head>
-<body>
+  </head>
 
-    <svg id="gauge" width="350" height="250"></svg>  <!-- サイズはそのまま -->
+  <body>
+    <svg id="gauge" width="350" height="250"></svg>
 
     <script>
-        const width = 350;
-        const height = 250;
-        const radius = 100; // 半径を少し小さめにして調整
-        let currentValue = 0;
+      const width = 350
+      const height = 250
+      const radius = 100 // 半径を少し小さめにして調整
+      let currentValue = 0
+      let step = 5 // 初期の増加量
 
-        const svg = d3.select("#gauge")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${width / 2}, ${height * 0.6})`); // 位置を上へ
+      const svg = d3
+        .select('#gauge')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${height * 0.6})`) // 位置を上へ
 
-        // スケール（0~270° に対応）
-        const scale = d3.scaleLinear()
-            .domain([0, 270])
-            .range([-135, 135]);
+      // スケール（0~270° に対応）
+      const scale = d3.scaleLinear().domain([0, 270]).range([-135, 135])
 
-        // ゲージの背景
-        const arc = d3.arc()
-            .innerRadius(radius - 15)
-            .outerRadius(radius)
-            .startAngle(-Math.PI * 3 / 4)
-            .endAngle(Math.PI * 3 / 4);
+      // 目盛とラベルの両方を 90° 反時計回りにずらす
+      const tickOffset = 90 // 90° ずらす
 
-        svg.append("path")
-            .attr("d", arc)
-            .attr("fill", "#ddd");
+      // ゲージの背景
+      const arc = d3
+        .arc()
+        .innerRadius(radius - 15)
+        .outerRadius(radius)
+        .startAngle((-Math.PI * 3) / 4)
+        .endAngle((Math.PI * 3) / 4)
 
-        // 目盛 (30刻み)
-        const tickValues = d3.range(0, 271, 30);
+      svg.append('path').attr('d', arc).attr('fill', '#ddd')
 
-        tickValues.forEach(value => {
-            const angle = scale(value) * (Math.PI / 180);
-            const x1 = Math.cos(angle) * (radius - 20);
-            const y1 = Math.sin(angle) * (radius - 20);
-            const x2 = Math.cos(angle) * (radius - 5);
-            const y2 = Math.sin(angle) * (radius - 5);
+      // 目盛 (30刻み)
+      const tickValues = d3.range(0, 271, 30)
 
-            // 目盛線
-            svg.append("line")
-                .attr("x1", x1)
-                .attr("y1", y1)
-                .attr("x2", x2)
-                .attr("y2", y2)
-                .attr("stroke", "#333")
-                .attr("stroke-width", 2);
+      tickValues.forEach((value) => {
+        const angle = (scale(value) - tickOffset) * (Math.PI / 180) // 90° ずらす
 
-            // 数値ラベル
-            const xText = Math.cos(angle) * (radius - 30);
-            const yText = Math.sin(angle) * (radius - 30);
+        // 目盛の線（90° ずらす）
+        const x1 = Math.cos(angle) * (radius - 20)
+        const y1 = Math.sin(angle) * (radius - 20)
+        const x2 = Math.cos(angle) * (radius - 5)
+        const y2 = Math.sin(angle) * (radius - 5)
 
-            svg.append("text")
-                .attr("x", xText)
-                .attr("y", yText)
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "middle")
-                .attr("fill", "#000")
-                .style("font-size", "14px")
-                .text(value);
-        });
+        svg.append('line').attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2).attr('stroke', '#333').attr('stroke-width', 2)
 
-        // 針
-        const needle = svg.append("g")
-            .attr("transform", `rotate(${scale(currentValue)})`);
+        // 数値ラベル（90° ずらす）
+        const xText = Math.cos(angle) * (radius - 30)
+        const yText = Math.sin(angle) * (radius - 30)
 
-        needle.append("line")
-            .attr("x1", 0)
-            .attr("y1", 0)
-            .attr("x2", 0)
-            .attr("y2", -radius + 15)
-            .attr("stroke", "red")
-            .attr("stroke-width", 4);
+        svg.append('text').attr('x', xText).attr('y', yText).attr('text-anchor', 'middle').attr('dominant-baseline', 'middle').attr('fill', '#000').style('font-size', '14px').text(value)
+      })
 
-        // 値を更新
-        function updateGauge(value) {
-            needle.transition()
-                .duration(80)
-                .ease(d3.easeLinear)
-                .attr("transform", `rotate(${scale(value)})`);
+      // 針
+      const needle = svg.append('g').attr('transform', `rotate(${scale(currentValue)})`)
+
+      needle
+        .append('line')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('x2', 0)
+        .attr('y2', -radius + 15)
+        .attr('stroke', 'red')
+        .attr('stroke-width', 4)
+
+      // 値を更新
+      function updateGauge(value) {
+        needle
+          .transition()
+          .duration(80)
+          .ease(d3.easeLinear)
+          .attr('transform', `rotate(${scale(value)})`)
+      }
+
+      // 100ms ごとに5ずつ増やし、270を超えたら-20ずつ行い0になったらまた5ずつ増やす
+      setInterval(() => {
+        currentValue += step
+        if (currentValue >= 270) {
+          step = -20 // 270 を超えたら減少
+        } else if (currentValue <= 0) {
+          step = 5 // 0 になったら再び増加
         }
-
-        // 100ms ごとに5ずつ増やし、270を超えたら0に
-        setInterval(() => {
-            currentValue += 5;
-            if (currentValue > 270) {
-                currentValue = 0;
-            }
-            updateGauge(currentValue);
-        }, 100);
+        updateGauge(currentValue)
+      }, 100)
     </script>
-
-</body>
+  </body>
 </html>
