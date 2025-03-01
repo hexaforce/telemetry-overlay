@@ -122,15 +122,16 @@
         .attr('stroke-width', 4)
 
       // 値を更新
-      function updateGauge(value) {
+      function updateGauge(v) {
+        let value = v < 0 ? 0 : v
         needle
           .transition()
           .duration(80)
           .ease(d3.easeLinear)
-          .attr('transform', `rotate(${scale(value)})`)
+          .attr('transform', `rotate(${scale(v)})`)
 
         // 現在の値を更新
-        valueText.text(value)
+        valueText.text(v)
 
         // 背景の塗りつぶしを更新
         filledArc
@@ -138,13 +139,13 @@
           .duration(80)
           .attr(
             'd',
-            d3
-              .arc()
-              .innerRadius(radius - 15)
-              .outerRadius(radius)
-              .startAngle((-Math.PI * 3) / 4) // 135° (左端)
-              .endAngle(scale(value) * (Math.PI / 180)),
-          ) // 現在の値に応じたエンド角度
+            d3.arc()({
+              innerRadius: radius - 15,
+              outerRadius: radius,
+              startAngle: (-Math.PI * 3) / 4, // 135° (左端)
+              endAngle: scale(value) * (Math.PI / 180), // 現在の値に応じたエンド角度
+            }),
+          )
       }
 
       // 100ms ごとに5ずつ増やし、270を超えたら-20ずつ行い0になったらまた5ずつ増やす
@@ -158,7 +159,7 @@
         }
 
         updateGauge(currentValue)
-      }, 100)
+      }, 150)
     </script>
   </body>
 </html>
