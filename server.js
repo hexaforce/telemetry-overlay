@@ -177,6 +177,7 @@ server.listen(PORT, () => {
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/orientation-phone/index.html`)
 
   console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/demo/index.html`)
+  console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/demo/test.html`)
 
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/pan-tilt-zoom/index.html`)
   // console.log(`WebRTC visual page link: https://${SERVER_IP_ADDRESS}/exposure/index.html`)

@@ -1,71 +1,146 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>rockiot-ui</title>
-    <link rel="icon" href="favicon.ico" />
-    <script src="https://unpkg.com/rockiot-ui@latest/build/rockiot.ui.min.js"></script>
-    <script src="https://unpkg.com/rockiot-ui@latest/build/rockiot.gauge.linear.js"></script>
-    <script src="https://unpkg.com/rockiot-ui@latest/build/rockiot.gauge.radial.js"></script>
-    <script src="https://unpkg.com/rockiot-ui@latest/build/rockiot.chart.js"></script>
-    <style>
-      h2 {
-        margin-top: 2rem;
-        cursor: pointer;
-      }
-      .container > div {
-        margin-right: 4rem;
-        text-align: center;
-      }
-      .menu {
-        display: flex;
-        flex-direction: row;
-        background: #272626;
-        width: 100%;
-        padding: 0.5rem;
-        position: fixed;
-        z-index: 200;
-      }
-      .menu > a {
-        color: #cdcdcd;
-        text-decoration: none;
-        margin-right: 1rem;
-      }
-      .menu > a:hover {
-        color: #fafafa;
-      }
-    </style>
-  </head>
-  <body style="min-height: 100vh; width: 100vw; margin: 0; padding: 0; background: #ffffff; background-size: cover; font-family: monospace">
-    <div style="position: fixed; top: 0; right: 0; background: #222020; padding: 0.5rem"><a style="color: #fafafa; text-decoration: none" href="https://github.com/swina/rockiot-ui" target="_blank">GitHub</a></div>
-    <noscript>
-      <strong>We're sorry but rockiot-gauge doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div style="display: flex; flex-direction: column; align-items: center; max-width: 100%; flex-wrap: wrap">
-      <div style="width: 20rem; text-align: center; position: fixed; z-index: 201; top: 0; background: #272626; color: white; border-bottom-right-radius: 0.5rem; border-bottom-left-radius: 0.5rem; padding: 0.4rem; font-size: 1.4rem">rockiot-ui</div>
-      <div class="menu"><a href="dashboard.html">Dashboard Demo</a> <a href="https://github.com/swina/rockiot-ui" target="_blank">GitHub</a></div>
-      <div class="rockiot-element" style="margin-top: 3rem; text-align: center">
-        <button id="btnTest" style="font-size: 0.7rem; padding: 2px 4px 2px 4px; border: 0; outline: none; cursor: pointer; background: #000; margin: 4px; color: #fafafa; z-index: 200" onclick="stopTest()"></button>
-        <p><strong>To start/stop a test for each gauge/chart click on the gauge/chart itself then click on the wrench icon on top right corner</strong></p>
-        <p><strong>To view the HTML for each gauge click on the title</strong></p>
-      </div>
 
-      <div class="container" style="margin-top: 3rem; display: flex; flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: space-around">
-        <div>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>rockiot-ui</title>
+  <link rel="icon" href="favicon.ico" />
+  <script src="./js/rockiot.ui.min.js"></script>
+  <script src="./js/rockiot.gauge.linear.js"></script>
+  <script src="./js/rockiot.gauge.radial.js"></script>
+  <script src="./js/rockiot.chart.js"></script>
+  <style>
+    h2 {
+      margin-top: 2rem;
+      cursor: pointer;
+    }
+
+    .container>div {
+      margin-right: 4rem;
+      text-align: center;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: row;
+      background: #272626;
+      width: 100%;
+      padding: 0.5rem;
+      position: fixed;
+      z-index: 200;
+    }
+
+    .menu>a {
+      color: #cdcdcd;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+
+    .menu>a:hover {
+      color: #fafafa;
+    }
+  </style>
+</head>
+
+<body
+  style="min-height: 100vh; width: 100vw; margin: 0; padding: 0; background: #ffffff; background-size: cover; font-family: monospace">
+  <div style="position: fixed; top: 0; right: 0; background: #222020; padding: 0.5rem"><a
+      style="color: #fafafa; text-decoration: none" href="https://github.com/swina/rockiot-ui"
+      target="_blank">GitHub</a></div>
+  <noscript>
+    <strong>We're sorry but rockiot-gauge doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
+  <div style="display: flex; flex-direction: column; align-items: center; max-width: 100%; flex-wrap: wrap">
+    <div
+      style="width: 20rem; text-align: center; position: fixed; z-index: 201; top: 0; background: #272626; color: white; border-bottom-right-radius: 0.5rem; border-bottom-left-radius: 0.5rem; padding: 0.4rem; font-size: 1.4rem">
+      rockiot-ui</div>
+    <div class="menu"><a href="dashboard.html">Dashboard Demo</a> <a href="https://github.com/swina/rockiot-ui"
+        target="_blank">GitHub</a></div>
+    <div class="rockiot-element" style="margin-top: 3rem; text-align: center">
+      <button id="btnTest"
+        style="font-size: 0.7rem; padding: 2px 4px 2px 4px; border: 0; outline: none; cursor: pointer; background: #000; margin: 4px; color: #fafafa; z-index: 200"
+        onclick="stopTest()"></button>
+      <p><strong>To start/stop a test for each gauge/chart click on the gauge/chart itself then click on the wrench icon
+          on top right corner</strong></p>
+      <p><strong>To view the HTML for each gauge click on the title</strong></p>
+    </div>
+
+    <div class="container"
+      style="margin-top: 3rem; display: flex; flex-direction: row; flex-wrap: wrap; max-width: 100%; justify-content: space-around">
+      <!-- <div>
           <h2 onclick="getCode('radial_base')">Radial Base</h2>
           <rockiot-ui type="gauge" variation="radial" id="radial_base" serial="radial_base" name="Radial" min="0" max="100" value="45" units="%" precision="2" value-class="rockiot-radial-value-text" click-action="test"> </rockiot-ui>
-        </div>
-        <div>
-          <h2 onclick="getCode('radial_0')">Radial 1</h2>
-          <rockiot-ui type="gauge" variation="radial" id="radial_0" serial="radial_0" name="Humidity" min="0" max="100" value="20" units="%" precision="2" value-class="rockiot-radial-value-text" scale="1" smallscale="1" ticks="5" size="md" radius="lg" click-action="test" text-color="#333" scale-text-color="#333" bar-color="#00000060" progress-color="#4ea5f1" control-bg="none" control-color="#888" needle="1" svgwidth="300" svgheight="300" needle-color="#ff0000" background="#000"> </rockiot-ui>
-        </div>
-        <div onclick="getCode('radial_1')">
-          <h2>Radial 2</h2>
-          <rockiot-ui class="rockiot-element" startangle="180" endangle="0" type="gauge" variation="radial" id="radial_1" serial="radial_1" name="Humidity" min="0" max="100" value="20" units="%" precision="2" value-class="rockiot-radial-value-text" scale="1" smallscale="1" ticks="5" size="md" radius="lg" click-action="test" text-color="#bababa" scale-text-color="#bababa" bar-color="#00000060" progress-color="#4ea5f1" control-bg="none" control-color="#888" needle="1" svgwidth="300" svgheight="300" needle-color="#ff0000" background="#000"> </rockiot-ui>
-        </div>
-        <div>
+        </div> -->
+      <div>
+        <rockiot-ui 
+        background="#000"
+        bar-color="#00000060"
+        click-action="test"
+        control-bg="none"
+        control-color="#888"
+        id="radial_0"
+        max="100"
+        min="0"
+        name="Humidity"
+        needle="1"
+        needle-color="#ff0000"
+        precision="2"
+        progress-color="#4ea5f1"
+        radius="lg"
+        scale="1"
+        scale-text-color="#333"
+        serial="radial_0"
+        size="md"
+        smallscale="1"
+        svgheight="300"
+        svgwidth="300"
+        text-color="#333"
+        ticks="5"
+        type="gauge"
+        units="%"
+        value="20"
+        value-class="rockiot-radial-value-text"
+        variation="radial">
+      </rockiot-ui>
+      
+      <rockiot-ui 
+        background="#000"
+        bar-color="#00000060"
+        class="rockiot-element"
+        click-action="test"
+        control-bg="none"
+        control-color="#888"
+        endangle="0"
+        id="radial_1"
+        max="100"
+        min="0"
+        name="Humidity"
+        needle="1"
+        needle-color="#ff0000"
+        precision="2"
+        progress-color="#4ea5f1"
+        radius="lg"
+        scale="1"
+        scale-text-color="#bababa"
+        serial="radial_1"
+        size="md"
+        smallscale="1"
+        startangle="180"
+        svgheight="300"
+        svgwidth="300"
+        text-color="#bababa"
+        ticks="5"
+        type="gauge"
+        units="%"
+        value="20"
+        value-class="rockiot-radial-value-text"
+        variation="radial">
+      </rockiot-ui>
+      </div>
+      <!-- <div>
           <h2 onclick="getCode('radial_3')">Radial 3</h2>
           <rockiot-ui class="rockiot-element gauge_round_lg gauge_dark_gradient" type="gauge" variation="radial" id="radial_3" serial="radial_3" name="Humidity" min="0" max="100" value="20" units="%" precision="2" value-class="rockiot-radial-value-text" scale="1" smallscale="1" ticks="5" size="md" radius="lg" click-action="test" text-color="#333" scale-text-color="#333" bar-color="#00000060" progress-color="#4ea5f1" control-bg="none" control-color="#888" needle="1" svgwidth="300" svgheight="300" needle-color="#ff0000" background="#000"> </rockiot-ui>
         </div>
@@ -88,96 +163,96 @@
         <div>
           <h2 onclick="getCode('level_0')">Level 1</h2>
           <rockiot-ui type="gauge" variation="level" serial="level_0" id="level_0" min="0" max="100" value="10" progress-color="#4ea5f1" bar-border-color="#000"></rockiot-ui>
-        </div>
-        <div>
+        </div> -->
+      <!-- <div>
           <h2 onclick="getCode('box_0')">Number Box</h2>
           <rockiot-ui type="number-box" serial="box_0" name="" units="" id="box_0" min="0" max="4000" value="10" precision="0" progress-color="#4ea5f1" bar-border-color="#000"> </rockiot-ui>
-        </div>
-        <div>
+        </div> -->
+      <!-- <div>
           <h2 onclick="getCode('box_4')">Number Box 2</h2>
           <rockiot-ui id="box_4" serial="box_4" type="number-box" min="0" max="50" value="0" units="" name="Errors" value-color="#fff" value-border="border:1px solid #eaeaea;border-radius:99rem;" value-bg="red" control-color="#888" precision="0" click-action="test"> </rockiot-ui>
-        </div>
-        <div>
+        </div> -->
+      <!-- <div>
           <h2 onclick="getCode('chart_0')">Area Chart</h2>
           <rockiot-ui type="chart" variation="area" id="chart_0" serial="chart_0" name="Bandwidth" min="0" max="100" value="0" units="Mb/s" click-action="test" progress-color="#4ea5f1" control-color="#888" control-bg="none" svgwidth="650" svgheight="295"> </rockiot-ui>
-        </div>
-        <div>
+        </div> -->
+      <!-- <div>
           <h2 onclick="getCode('chart_1')">Line Chart</h2>
           <rockiot-ui type="chart" variation="line" id="chart_1" serial="chart_1" name="Bandwidth" min="0" max="100" value="0" ticks="100" units="Mb/s" click-action="test" text-color="#000" progress-color="#000" control-color="#888" control-bg="none" svgwidth="650" svgheight="295"> </rockiot-ui>
-        </div>
-      </div>
-      <div class="display-code">
-        <a href="javascript:void(0)" onclick="closeMe()" style="color: #fafafa"><strong>Close</strong></a
-        ><br /><br />
-        <div id="gauge-code"></div>
-      </div>
-      <script>
-        var autotest = 1
-        var btn = 'Stop Test'
+        </div> -->
+    </div>
+    <div class="display-code">
+      <a href="javascript:void(0)" onclick="closeMe()" style="color: #fafafa"><strong>Close</strong></a><br /><br />
+      <div id="gauge-code"></div>
+    </div>
+    <script>
+      var autotest = 1
+      var btn = 'Stop Test'
+      document.getElementById('btnTest').innerText = btn
+      var els = document.querySelectorAll('rockiot-ui')
+      els.forEach((el) => {
+        el.setAttribute('auto-test', 1)
+      })
+
+      function stopTest() {
+        autotest = !autotest
+        var flag
+        autotest ? (flag = '1') : (flag = '0')
+        autotest ? (btn = 'Stop Test') : (btn = 'Start Test')
         document.getElementById('btnTest').innerText = btn
-        var els = document.querySelectorAll('rockiot-ui')
-        els.forEach((el) => {
-          el.setAttribute('auto-test', 1)
+        let els = document.querySelectorAll('rockiot-ui')
+        els.forEach((e) => {
+          e.setAttribute('auto-test', autotest)
         })
+      }
 
-        function stopTest() {
-          autotest = !autotest
-          var flag
-          autotest ? (flag = '1') : (flag = '0')
-          autotest ? (btn = 'Stop Test') : (btn = 'Start Test')
-          document.getElementById('btnTest').innerText = btn
-          let els = document.querySelectorAll('rockiot-ui')
-          els.forEach((e) => {
-            e.setAttribute('auto-test', autotest)
+      var myCode = document.querySelector('.display-code')
+      var innerCode = document.getElementById('gauge-code')
+      var displayCode = false
+      function getCode(id) {
+        if (!displayCode) {
+          var el = document.getElementById(id)
+          var attrs = el.attributes
+          var code = '&lt;rockiot-ui<br>'
+          Object.keys(attrs).forEach((i) => {
+            code += attrs[i].name + '=' + '\"' + attrs[i].value + '\"' + '<br>'
           })
-        }
-
-        var myCode = document.querySelector('.display-code')
-        var innerCode = document.getElementById('gauge-code')
-        var displayCode = false
-        function getCode(id) {
-          if (!displayCode) {
-            var el = document.getElementById(id)
-            var attrs = el.attributes
-            var code = '&lt;rockiot-ui<br>'
-            Object.keys(attrs).forEach((i) => {
-              code += attrs[i].name + '=' + '\"' + attrs[i].value + '\"' + '<br>'
-            })
-            code += '&gt;&lt;/rockiot-ui&gt'
-            innerCode.innerHTML = code
-            myCode.style = 'transform: translateX(0%)'
-            displayCode = !displayCode
-          } else {
-            displayCode = !displayCode
-            myCode.style = 'transform: translateX(100%)'
-          }
-        }
-
-        function closeMe() {
-          innerCode.innerHTML = ''
+          code += '&gt;&lt;/rockiot-ui&gt'
+          innerCode.innerHTML = code
+          myCode.style = 'transform: translateX(0%)'
+          displayCode = !displayCode
+        } else {
           displayCode = !displayCode
           myCode.style = 'transform: translateX(100%)'
-          myCode.width = '0rem'
-          myCode.style.minWidth = '0rem'
-          myCode.style.padding = '0'
         }
-      </script>
-      <style>
-        .display-code {
-          transition: all 1s ease-in-out;
-          transform: translateX(100%);
-          position: fixed;
-          z-index: 1000;
-          top: 0;
-          height: 100vh;
-          right: 0;
-          width: 20rem;
-          background: #272626;
-          color: #dedede;
-          z-index: 201;
-          padding: 1rem;
-        }
-      </style>
-    </div>
-  </body>
+      }
+
+      function closeMe() {
+        innerCode.innerHTML = ''
+        displayCode = !displayCode
+        myCode.style = 'transform: translateX(100%)'
+        myCode.width = '0rem'
+        myCode.style.minWidth = '0rem'
+        myCode.style.padding = '0'
+      }
+    </script>
+    <style>
+      .display-code {
+        transition: all 1s ease-in-out;
+        transform: translateX(100%);
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        height: 100vh;
+        right: 0;
+        width: 20rem;
+        background: #272626;
+        color: #dedede;
+        z-index: 201;
+        padding: 1rem;
+      }
+    </style>
+  </div>
+</body>
+
 </html>

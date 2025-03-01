@@ -1,1811 +1,4432 @@
-;(window.webpackJsonp = window.webpackJsonp || []).push([
-  [1],
-  {
-    234: function (t, e) {
-      t.exports = {}
-    },
-    235: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(83),
-        s = i(22),
-        a = i(26),
-        o = i(51),
-        l = i(125),
-        c = i(126),
-        u = i(82),
-        h = Math.max,
-        d = Math.min
-      n(
-        { target: 'Array', proto: !0, forced: !u('splice') },
-        {
-          splice: function (t, e) {
-            var i,
-              n,
-              u,
-              p,
-              f,
-              m,
-              g = o(this),
-              v = a(g.length),
-              x = r(t, v),
-              y = arguments.length
-            if ((0 === y ? (i = n = 0) : 1 === y ? ((i = 0), (n = v - x)) : ((i = y - 2), (n = d(h(s(e), 0), v - x))), v + i - n > 9007199254740991)) throw TypeError('Maximum allowed length exceeded')
-            for (u = l(g, n), p = 0; p < n; p++) (f = x + p) in g && c(u, p, g[f])
-            if (((u.length = n), i < n)) {
-              for (p = x; p < v - n; p++) (m = p + i), (f = p + n) in g ? (g[m] = g[f]) : delete g[m]
-              for (p = v; p > v - n + i; p--) delete g[p - 1]
-            } else if (i > n) for (p = v - n; p > x; p--) (m = p + i - 1), (f = p + n - 1) in g ? (g[m] = g[f]) : delete g[m]
-            for (p = 0; p < i; p++) g[p + x] = arguments[p + 2]
-            return (g.length = v - n + i), u
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["build/rockiot.chart"],{
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./src/components/rockiot.charts.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/rockiot.charts.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _plugins_rockiot_chart__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../plugins/rockiot.chart */ "./src/plugins/rockiot.chart.js");
+
+/* eslint-disable */
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'RockiotCharts',
+  data: function data() {
+    return {
+      chart: null,
+      n: 1,
+      data: [],
+      labels: [],
+      chartData: {
+        data: [],
+        labels: [],
+        options: {
+          width: '600px',
+          height: '300px',
+          low: 0,
+          high: 100,
+          fullWidth: true,
+          axisY: {
+            onlyInteger: true,
+            offset: 10
           },
-        },
-      )
-    },
-    236: function (t, e, i) {
-      var n = i(5),
-        r = i(124),
-        s = i(20),
-        a = n('unscopables'),
-        o = Array.prototype
-      null == o[a] && s(o, a, r(null)),
-        (t.exports = function (t) {
-          o[a][t] = !0
-        })
-    },
-    237: function (t, e, i) {
-      'use strict'
-      var n,
-        r,
-        s,
-        a = i(238),
-        o = i(20),
-        l = i(21),
-        c = i(5),
-        u = i(123),
-        h = c('iterator'),
-        d = !1
-      ;[].keys && ('next' in (s = [].keys()) ? (r = a(a(s))) !== Object.prototype && (n = r) : (d = !0)),
-        null == n && (n = {}),
-        u ||
-          l(n, h) ||
-          o(n, h, function () {
-            return this
-          }),
-        (t.exports = { IteratorPrototype: n, BUGGY_SAFARI_ITERATORS: d })
-    },
-    238: function (t, e, i) {
-      var n = i(21),
-        r = i(51),
-        s = i(87),
-        a = i(261),
-        o = s('IE_PROTO'),
-        l = Object.prototype
-      t.exports = a
-        ? Object.getPrototypeOf
-        : function (t) {
-            return (t = r(t)), n(t, o) ? t[o] : 'function' == typeof t.constructor && t instanceof t.constructor ? t.constructor.prototype : t instanceof Object ? l : null
-          }
-    },
-    239: function (t, e, i) {
-      var n = i(15).f,
-        r = i(21),
-        s = i(5)('toStringTag')
-      t.exports = function (t, e, i) {
-        t && !r((t = i ? t : t.prototype), s) && n(t, s, { configurable: !0, value: e })
-      }
-    },
-    240: function (t, e, i) {
-      'use strict'
-      ;(function (t) {
-        i(241), i(242), i(243), i(245), i(62), i(246), i(137), i(133), i(247), i(249), i(138), i(250), i(235), i(127), i(80), i(251), i(252), i(60), i(132), i(134), i(33), i(88), i(254), i(61), i(122), i(255), i(63), i(257)
-        var e = i(102)
-        !(function (n, r) {
-          var s = (function (t, i) {
-            var n = { version: '0.1.1' }
-            return (
-              (function (t, n) {
-                var r = t.window,
-                  s = t.document
-                ;(n.namespaces = { svg: 'http://www.w3.org/2000/svg', xmlns: 'http://www.w3.org/2000/xmlns/', xhtml: 'http://www.w3.org/1999/xhtml', xlink: 'http://www.w3.org/1999/xlink', ct: 'https://github.com/swina/rockiot-ui' }),
-                  (n.noop = function (t) {
-                    return t
-                  }),
-                  (n.alphaNumerate = function (t) {
-                    return String.fromCharCode(97 + (t % 26))
-                  }),
-                  (n.extend = function (t) {
-                    var i, r, s
-                    for (t = t || {}, i = 1; i < arguments.length; i++) for (var a in (r = arguments[i])) (s = r[a]), 'object' !== Object(e.a)(s) || null === s || s instanceof Array ? (t[a] = s) : (t[a] = n.extend(t[a], s))
-                    return t
-                  }),
-                  (n.replaceAll = function (t, e, i) {
-                    return t.replace(new RegExp(e, 'g'), i)
-                  }),
-                  (n.ensureUnit = function (t, e) {
-                    return 'number' == typeof t && (t += e), t
-                  }),
-                  (n.quantity = function (t) {
-                    if ('string' == typeof t) {
-                      var e = /^(\d+)\s*(.*)$/g.exec(t)
-                      return { value: +e[1], unit: e[2] || i }
-                    }
-                    return { value: t }
-                  }),
-                  (n.querySelector = function (t) {
-                    return t instanceof Node ? t : s.querySelector(t)
-                  }),
-                  (n.times = function (t) {
-                    return Array.apply(null, new Array(t))
-                  }),
-                  (n.sum = function (t, e) {
-                    return t + (e || 0)
-                  }),
-                  (n.mapMultiply = function (t) {
-                    return function (e) {
-                      return e * t
-                    }
-                  }),
-                  (n.mapAdd = function (t) {
-                    return function (e) {
-                      return e + t
-                    }
-                  }),
-                  (n.serialMap = function (t, e) {
-                    var i = [],
-                      r = Math.max.apply(
-                        null,
-                        t.map(function (t) {
-                          return t.length
-                        }),
-                      )
-                    return (
-                      n.times(r).forEach(function (n, r) {
-                        var s = t.map(function (t) {
-                          return t[r]
-                        })
-                        i[r] = e.apply(null, s)
-                      }),
-                      i
-                    )
-                  }),
-                  (n.roundWithPrecision = function (t, e) {
-                    var i = Math.pow(10, e || n.precision)
-                    return Math.round(t * i) / i
-                  }),
-                  (n.precision = 8),
-                  (n.escapingMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }),
-                  (n.serialize = function (t) {
-                    return null === t || t === i
-                      ? t
-                      : ('number' == typeof t ? (t = '' + t) : 'object' === Object(e.a)(t) && (t = JSON.stringify({ data: t })),
-                        Object.keys(n.escapingMap).reduce(function (t, e) {
-                          return n.replaceAll(t, e, n.escapingMap[e])
-                        }, t))
-                  }),
-                  (n.deserialize = function (t) {
-                    if ('string' != typeof t) return t
-                    t = Object.keys(n.escapingMap).reduce(function (t, e) {
-                      return n.replaceAll(t, n.escapingMap[e], e)
-                    }, t)
-                    try {
-                      t = (t = JSON.parse(t)).data !== i ? t.data : t
-                    } catch (t) {}
-                    return t
-                  }),
-                  (n.createSvg = function (t, e, i, r) {
-                    var s
-                    return (
-                      (e = e || '100%'),
-                      (i = i || '100%'),
-                      Array.prototype.slice
-                        .call(t.querySelectorAll('svg'))
-                        .filter(function (t) {
-                          return t.getAttributeNS(n.namespaces.xmlns, 'ct')
-                        })
-                        .forEach(function (e) {
-                          t.removeChild(e)
-                        }),
-                      ((s = new n.Svg('svg').attr({ width: e, height: i }).addClass(r))._node.style.width = e),
-                      (s._node.style.height = i),
-                      t.appendChild(s._node),
-                      s
-                    )
-                  }),
-                  (n.normalizeData = function (t, e, i) {
-                    var r,
-                      s = { raw: t, normalized: {} }
-                    return (
-                      (s.normalized.series = n.getDataArray({ series: t.series || [] }, e, i)),
-                      (r = s.normalized.series.every(function (t) {
-                        return t instanceof Array
-                      })
-                        ? Math.max.apply(
-                            null,
-                            s.normalized.series.map(function (t) {
-                              return t.length
-                            }),
-                          )
-                        : s.normalized.series.length),
-                      (s.normalized.labels = (t.labels || []).slice()),
-                      Array.prototype.push.apply(
-                        s.normalized.labels,
-                        n.times(Math.max(0, r - s.normalized.labels.length)).map(function () {
-                          return ''
-                        }),
-                      ),
-                      e && n.reverseData(s.normalized),
-                      s
-                    )
-                  }),
-                  (n.safeHasProperty = function (t, i) {
-                    return null !== t && 'object' === Object(e.a)(t) && t.hasOwnProperty(i)
-                  }),
-                  (n.isDataHoleValue = function (t) {
-                    return null === t || t === i || ('number' == typeof t && isNaN(t))
-                  }),
-                  (n.reverseData = function (t) {
-                    t.labels.reverse(), t.series.reverse()
-                    for (var n = 0; n < t.series.length; n++) 'object' === Object(e.a)(t.series[n]) && t.series[n].data !== i ? t.series[n].data.reverse() : t.series[n] instanceof Array && t.series[n].reverse()
-                  }),
-                  (n.getDataArray = function (t, e, r) {
-                    return t.series.map(function t(e) {
-                      if (n.safeHasProperty(e, 'value')) return t(e.value)
-                      if (n.safeHasProperty(e, 'data')) return t(e.data)
-                      if (e instanceof Array) return e.map(t)
-                      if (n.isDataHoleValue(e)) return i
-                      if (r) {
-                        var s = {}
-                        return 'string' == typeof r ? (s[r] = n.getNumberOrUndefined(e)) : (s.y = n.getNumberOrUndefined(e)), (s.x = e.hasOwnProperty('x') ? n.getNumberOrUndefined(e.x) : s.x), (s.y = e.hasOwnProperty('y') ? n.getNumberOrUndefined(e.y) : s.y), s
-                      }
-                      return n.getNumberOrUndefined(e)
-                    })
-                  }),
-                  (n.normalizePadding = function (t, e) {
-                    return (e = e || 0), 'number' == typeof t ? { top: t, right: t, bottom: t, left: t } : { top: 'number' == typeof t.top ? t.top : e, right: 'number' == typeof t.right ? t.right : e, bottom: 'number' == typeof t.bottom ? t.bottom : e, left: 'number' == typeof t.left ? t.left : e }
-                  }),
-                  (n.getMetaData = function (t, e) {
-                    var n = t.data ? t.data[e] : t[e]
-                    return n ? n.meta : i
-                  }),
-                  (n.orderOfMagnitude = function (t) {
-                    return Math.floor(Math.log(Math.abs(t)) / Math.LN10)
-                  }),
-                  (n.projectLength = function (t, e, i) {
-                    return (e / i.range) * t
-                  }),
-                  (n.getAvailableHeight = function (t, e) {
-                    return Math.max((n.quantity(e.height).value || t.height()) - (e.chartPadding.top + e.chartPadding.bottom) - e.axisX.offset, 0)
-                  }),
-                  (n.getHighLow = function (t, e, r) {
-                    var s = { high: (e = n.extend({}, e, r ? e['axis' + r.toUpperCase()] : {})).high === i ? -Number.MAX_VALUE : +e.high, low: e.low === i ? Number.MAX_VALUE : +e.low },
-                      a = e.high === i,
-                      o = e.low === i
-                    return (
-                      (a || o) &&
-                        (function t(e) {
-                          if (e === i) return i
-                          if (e instanceof Array) for (var n = 0; n < e.length; n++) t(e[n])
-                          else {
-                            var l = r ? +e[r] : +e
-                            a && l > s.high && (s.high = l), o && l < s.low && (s.low = l)
-                          }
-                        })(t),
-                      (e.referenceValue || 0 === e.referenceValue) && ((s.high = Math.max(e.referenceValue, s.high)), (s.low = Math.min(e.referenceValue, s.low))),
-                      s.high <= s.low && (0 === s.low ? (s.high = 1) : s.low < 0 ? (s.high = 0) : s.high > 0 ? (s.low = 0) : ((s.high = 1), (s.low = 0))),
-                      s
-                    )
-                  }),
-                  (n.isNumeric = function (t) {
-                    return null !== t && isFinite(t)
-                  }),
-                  (n.isFalseyButZero = function (t) {
-                    return !t && 0 !== t
-                  }),
-                  (n.getNumberOrUndefined = function (t) {
-                    return n.isNumeric(t) ? +t : i
-                  }),
-                  (n.isMultiValue = function (t) {
-                    return 'object' === Object(e.a)(t) && ('x' in t || 'y' in t)
-                  }),
-                  (n.getMultiValue = function (t, e) {
-                    return n.isMultiValue(t) ? n.getNumberOrUndefined(t[e || 'y']) : n.getNumberOrUndefined(t)
-                  }),
-                  (n.rho = function (t) {
-                    if (1 === t) return t
-                    function e(t, i) {
-                      return t % i == 0 ? i : e(i, t % i)
-                    }
-                    function i(t) {
-                      return t * t + 1
-                    }
-                    var n,
-                      r = 2,
-                      s = 2
-                    if (t % 2 == 0) return 2
-                    do {
-                      ;(r = i(r) % t), (s = i(i(s)) % t), (n = e(Math.abs(r - s), t))
-                    } while (1 === n)
-                    return n
-                  }),
-                  (n.getBounds = function (t, e, i, r) {
-                    var s,
-                      a,
-                      o,
-                      l = 0,
-                      c = { high: e.high, low: e.low }
-                    ;(c.valueRange = c.high - c.low), (c.oom = n.orderOfMagnitude(c.valueRange)), (c.step = Math.pow(10, c.oom)), (c.min = Math.floor(c.low / c.step) * c.step), (c.max = Math.ceil(c.high / c.step) * c.step), (c.range = c.max - c.min), (c.numberOfSteps = Math.round(c.range / c.step))
-                    var u = n.projectLength(t, c.step, c) < i,
-                      h = r ? n.rho(c.range) : 0
-                    if (r && n.projectLength(t, 1, c) >= i) c.step = 1
-                    else if (r && h < c.step && n.projectLength(t, h, c) >= i) c.step = h
-                    else
-                      for (;;) {
-                        if (u && n.projectLength(t, c.step, c) <= i) c.step *= 2
-                        else {
-                          if (u || !(n.projectLength(t, c.step / 2, c) >= i)) break
-                          if (((c.step /= 2), r && c.step % 1 != 0)) {
-                            c.step *= 2
-                            break
-                          }
-                        }
-                        if (l++ > 1e3) throw new Error('Exceeded maximum number of iterations while optimizing scale step!')
-                      }
-                    var d = 2221e-19
-                    function p(t, e) {
-                      return t === (t += e) && (t *= 1 + (e > 0 ? d : -d)), t
-                    }
-                    for (c.step = Math.max(c.step, d), a = c.min, o = c.max; a + c.step <= c.low; ) a = p(a, c.step)
-                    for (; o - c.step >= c.high; ) o = p(o, -c.step)
-                    ;(c.min = a), (c.max = o), (c.range = c.max - c.min)
-                    var f = []
-                    for (s = c.min; s <= c.max; s = p(s, c.step)) {
-                      var m = n.roundWithPrecision(s)
-                      m !== f[f.length - 1] && f.push(m)
-                    }
-                    return (c.values = f), c
-                  }),
-                  (n.polarToCartesian = function (t, e, i, n) {
-                    var r = ((n - 90) * Math.PI) / 180
-                    return { x: t + i * Math.cos(r), y: e + i * Math.sin(r) }
-                  }),
-                  (n.createChartRect = function (t, e, i) {
-                    var r = !(!e.axisX && !e.axisY),
-                      s = r ? e.axisY.offset : 0,
-                      a = r ? e.axisX.offset : 0,
-                      o = t.width() || n.quantity(e.width).value || 0,
-                      l = t.height() || n.quantity(e.height).value || 0,
-                      c = n.normalizePadding(e.chartPadding, i)
-                    ;(o = Math.max(o, s + c.left + c.right)), (l = Math.max(l, a + c.top + c.bottom))
-                    var u = {
-                      padding: c,
-                      width: function () {
-                        return this.x2 - this.x1
-                      },
-                      height: function () {
-                        return this.y1 - this.y2
-                      },
-                    }
-                    return r ? ('start' === e.axisX.position ? ((u.y2 = c.top + a), (u.y1 = Math.max(l - c.bottom, u.y2 + 1))) : ((u.y2 = c.top), (u.y1 = Math.max(l - c.bottom - a, u.y2 + 1))), 'start' === e.axisY.position ? ((u.x1 = c.left + s), (u.x2 = Math.max(o - c.right, u.x1 + 1))) : ((u.x1 = c.left), (u.x2 = Math.max(o - c.right - s, u.x1 + 1)))) : ((u.x1 = c.left), (u.x2 = Math.max(o - c.right, u.x1 + 1)), (u.y2 = c.top), (u.y1 = Math.max(l - c.bottom, u.y2 + 1))), u
-                  }),
-                  (n.createGrid = function (t, e, i, r, s, a, o, l) {
-                    var c = {}
-                    ;(c[i.units.pos + '1'] = t), (c[i.units.pos + '2'] = t), (c[i.counterUnits.pos + '1'] = r), (c[i.counterUnits.pos + '2'] = r + s)
-                    var u = a.elem('line', c, o.join(' '))
-                    l.emit('draw', n.extend({ type: 'grid', axis: i, index: e, group: a, element: u }, c))
-                  }),
-                  (n.createGridBackground = function (t, e, i, n) {
-                    var r = t.elem('rect', { x: e.x1, y: e.y2, width: e.width(), height: e.height() }, i, !0)
-                    n.emit('draw', { type: 'gridBackground', group: t, element: r })
-                  }),
-                  (n.createLabel = function (t, e, i, r, a, o, l, c, u, h, d) {
-                    var p,
-                      f = {}
-                    if (((f[a.units.pos] = t + l[a.units.pos]), (f[a.counterUnits.pos] = l[a.counterUnits.pos]), (f[a.units.len] = e), (f[a.counterUnits.len] = Math.max(0, o - 10)), h)) {
-                      var m = s.createElement('span')
-                      ;(m.className = u.join(' ')), m.setAttribute('xmlns', n.namespaces.xhtml), (m.innerText = r[i]), (m.style[a.units.len] = Math.round(f[a.units.len]) + 'px'), (m.style[a.counterUnits.len] = Math.round(f[a.counterUnits.len]) + 'px'), (p = c.foreignObject(m, n.extend({ style: 'overflow: visible;' }, f)))
-                    } else p = c.elem('text', f, u.join(' ')).text(r[i])
-                    d.emit('draw', n.extend({ type: 'label', axis: a, index: i, group: c, element: p, text: r[i] }, f))
-                  }),
-                  (n.getSeriesOption = function (t, e, i) {
-                    if (t.name && e.series && e.series[t.name]) {
-                      var n = e.series[t.name]
-                      return n.hasOwnProperty(i) ? n[i] : e[i]
-                    }
-                    return e[i]
-                  }),
-                  (n.optionsProvider = function (t, e, i) {
-                    var s,
-                      a,
-                      o = n.extend({}, t),
-                      l = []
-                    function c(t) {
-                      var l = s
-                      if (((s = n.extend({}, o)), e))
-                        for (a = 0; a < e.length; a++) {
-                          r.matchMedia(e[a][0]).matches && (s = n.extend(s, e[a][1]))
-                        }
-                      i && t && i.emit('optionsChanged', { previousOptions: l, currentOptions: s })
-                    }
-                    if (!r.matchMedia) throw "window.matchMedia not found! Make sure you're using a polyfill."
-                    if (e)
-                      for (a = 0; a < e.length; a++) {
-                        var u = r.matchMedia(e[a][0])
-                        u.addListener(c), l.push(u)
-                      }
-                    return (
-                      c(),
-                      {
-                        removeMediaQueryListeners: function () {
-                          l.forEach(function (t) {
-                            t.removeListener(c)
-                          })
-                        },
-                        getCurrentOptions: function () {
-                          return n.extend({}, s)
-                        },
-                      }
-                    )
-                  }),
-                  (n.splitIntoSegments = function (t, e, r) {
-                    r = n.extend({}, { increasingX: !1, fillHoles: !1 }, r)
-                    for (var s = [], a = !0, o = 0; o < t.length; o += 2) n.getMultiValue(e[o / 2].value) === i ? r.fillHoles || (a = !0) : (r.increasingX && o >= 2 && t[o] <= t[o - 2] && (a = !0), a && (s.push({ pathCoordinates: [], valueData: [] }), (a = !1)), s[s.length - 1].pathCoordinates.push(t[o], t[o + 1]), s[s.length - 1].valueData.push(e[o / 2]))
-                    return s
-                  })
-              })(this || t, n),
-              (function (t, e) {
-                ;(e.Interpolation = {}),
-                  (e.Interpolation.none = function (t) {
-                    return (
-                      (t = e.extend({}, { fillHoles: !1 }, t)),
-                      function (n, r) {
-                        for (var s = new e.Svg.Path(), a = !0, o = 0; o < n.length; o += 2) {
-                          var l = n[o],
-                            c = n[o + 1],
-                            u = r[o / 2]
-                          e.getMultiValue(u.value) !== i ? (a ? s.move(l, c, !1, u) : s.line(l, c, !1, u), (a = !1)) : t.fillHoles || (a = !0)
-                        }
-                        return s
-                      }
-                    )
-                  }),
-                  (e.Interpolation.simple = function (t) {
-                    t = e.extend({}, { divisor: 2, fillHoles: !1 }, t)
-                    var n = 1 / Math.max(1, t.divisor)
-                    return function (r, s) {
-                      for (var a, o, l, c = new e.Svg.Path(), u = 0; u < r.length; u += 2) {
-                        var h = r[u],
-                          d = r[u + 1],
-                          p = (h - a) * n,
-                          f = s[u / 2]
-                        f.value !== i ? (l === i ? c.move(h, d, !1, f) : c.curve(a + p, o, h - p, d, h, d, !1, f), (a = h), (o = d), (l = f)) : t.fillHoles || (a = h = l = i)
-                      }
-                      return c
-                    }
-                  }),
-                  (e.Interpolation.cardinal = function (t) {
-                    t = e.extend({}, { tension: 1, fillHoles: !1 }, t)
-                    var i = Math.min(1, Math.max(0, t.tension)),
-                      n = 1 - i
-                    return function r(s, a) {
-                      var o = e.splitIntoSegments(s, a, { fillHoles: t.fillHoles })
-                      if (o.length) {
-                        if (o.length > 1) {
-                          var l = []
-                          return (
-                            o.forEach(function (t) {
-                              l.push(r(t.pathCoordinates, t.valueData))
-                            }),
-                            e.Svg.Path.join(l)
-                          )
-                        }
-                        if (((s = o[0].pathCoordinates), (a = o[0].valueData), s.length <= 4)) return e.Interpolation.none()(s, a)
-                        for (var c = new e.Svg.Path().move(s[0], s[1], !1, a[0]), u = 0, h = s.length; h - 2 > u; u += 2) {
-                          var d = [
-                            { x: +s[u - 2], y: +s[u - 1] },
-                            { x: +s[u], y: +s[u + 1] },
-                            { x: +s[u + 2], y: +s[u + 3] },
-                            { x: +s[u + 4], y: +s[u + 5] },
-                          ]
-                          h - 4 === u ? (d[3] = d[2]) : u || (d[0] = { x: +s[u], y: +s[u + 1] }), c.curve((i * (-d[0].x + 6 * d[1].x + d[2].x)) / 6 + n * d[2].x, (i * (-d[0].y + 6 * d[1].y + d[2].y)) / 6 + n * d[2].y, (i * (d[1].x + 6 * d[2].x - d[3].x)) / 6 + n * d[2].x, (i * (d[1].y + 6 * d[2].y - d[3].y)) / 6 + n * d[2].y, d[2].x, d[2].y, !1, a[(u + 2) / 2])
-                        }
-                        return c
-                      }
-                      return e.Interpolation.none()([])
-                    }
-                  }),
-                  (e.Interpolation.monotoneCubic = function (t) {
-                    return (
-                      (t = e.extend({}, { fillHoles: !1 }, t)),
-                      function i(n, r) {
-                        var s = e.splitIntoSegments(n, r, { fillHoles: t.fillHoles, increasingX: !0 })
-                        if (s.length) {
-                          if (s.length > 1) {
-                            var a = []
-                            return (
-                              s.forEach(function (t) {
-                                a.push(i(t.pathCoordinates, t.valueData))
-                              }),
-                              e.Svg.Path.join(a)
-                            )
-                          }
-                          if (((n = s[0].pathCoordinates), (r = s[0].valueData), n.length <= 4)) return e.Interpolation.none()(n, r)
-                          var o,
-                            l,
-                            c = [],
-                            u = [],
-                            h = n.length / 2,
-                            d = [],
-                            p = [],
-                            f = [],
-                            m = []
-                          for (o = 0; o < h; o++) (c[o] = n[2 * o]), (u[o] = n[2 * o + 1])
-                          for (o = 0; o < h - 1; o++) (f[o] = u[o + 1] - u[o]), (m[o] = c[o + 1] - c[o]), (p[o] = f[o] / m[o])
-                          for (d[0] = p[0], d[h - 1] = p[h - 2], o = 1; o < h - 1; o++) 0 === p[o] || 0 === p[o - 1] || p[o - 1] > 0 != p[o] > 0 ? (d[o] = 0) : ((d[o] = (3 * (m[o - 1] + m[o])) / ((2 * m[o] + m[o - 1]) / p[o - 1] + (m[o] + 2 * m[o - 1]) / p[o])), isFinite(d[o]) || (d[o] = 0))
-                          for (l = new e.Svg.Path().move(c[0], u[0], !1, r[0]), o = 0; o < h - 1; o++) l.curve(c[o] + m[o] / 3, u[o] + (d[o] * m[o]) / 3, c[o + 1] - m[o] / 3, u[o + 1] - (d[o + 1] * m[o]) / 3, c[o + 1], u[o + 1], !1, r[o + 1])
-                          return l
-                        }
-                        return e.Interpolation.none()([])
-                      }
-                    )
-                  }),
-                  (e.Interpolation.step = function (t) {
-                    return (
-                      (t = e.extend({}, { postpone: !0, fillHoles: !1 }, t)),
-                      function (n, r) {
-                        for (var s, a, o, l = new e.Svg.Path(), c = 0; c < n.length; c += 2) {
-                          var u = n[c],
-                            h = n[c + 1],
-                            d = r[c / 2]
-                          d.value !== i ? (o === i ? l.move(u, h, !1, d) : (t.postpone ? l.line(u, a, !1, o) : l.line(s, h, !1, d), l.line(u, h, !1, d)), (s = u), (a = h), (o = d)) : t.fillHoles || (s = a = o = i)
-                        }
-                        return l
-                      }
-                    )
-                  })
-              })(0, n),
-              (function (t, e) {
-                e.EventEmitter = function () {
-                  var t = []
-                  return {
-                    addEventHandler: function (e, i) {
-                      ;(t[e] = t[e] || []), t[e].push(i)
-                    },
-                    removeEventHandler: function (e, i) {
-                      t[e] && (i ? (t[e].splice(t[e].indexOf(i), 1), 0 === t[e].length && delete t[e]) : delete t[e])
-                    },
-                    emit: function (e, i) {
-                      t[e] &&
-                        t[e].forEach(function (t) {
-                          t(i)
-                        }),
-                        t['*'] &&
-                          t['*'].forEach(function (t) {
-                            t(e, i)
-                          })
-                    },
-                  }
-                }
-              })(0, n),
-              (function (t, e) {
-                e.Class = {
-                  extend: function (t, i) {
-                    var n = i || this.prototype || e.Class,
-                      r = Object.create(n)
-                    e.Class.cloneDefinitions(r, t)
-                    var s = function () {
-                      var t,
-                        i = r.constructor || function () {}
-                      return (t = this === e ? Object.create(r) : this), i.apply(t, Array.prototype.slice.call(arguments, 0)), t
-                    }
-                    return (s.prototype = r), (s.super = n), (s.extend = this.extend), s
-                  },
-                  cloneDefinitions: function () {
-                    var t = (function (t) {
-                        var e = []
-                        if (t.length) for (var i = 0; i < t.length; i++) e.push(t[i])
-                        return e
-                      })(arguments),
-                      e = t[0]
-                    return (
-                      t.splice(1, t.length - 1).forEach(function (t) {
-                        Object.getOwnPropertyNames(t).forEach(function (i) {
-                          delete e[i], Object.defineProperty(e, i, Object.getOwnPropertyDescriptor(t, i))
-                        })
-                      }),
-                      e
-                    )
-                  },
-                }
-              })(0, n),
-              (function (t, e) {
-                var n = t.window
-                function r() {
-                  n.addEventListener('resize', this.resizeListener),
-                    (this.optionsProvider = e.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter)),
-                    this.eventEmitter.addEventHandler(
-                      'optionsChanged',
-                      function () {
-                        this.update()
-                      }.bind(this),
-                    ),
-                    this.options.plugins &&
-                      this.options.plugins.forEach(
-                        function (t) {
-                          t instanceof Array ? t[0](this, t[1]) : t(this)
-                        }.bind(this),
-                      ),
-                    this.eventEmitter.emit('data', { type: 'initial', data: this.data }),
-                    this.createChart(this.optionsProvider.getCurrentOptions()),
-                    (this.initializeTimeoutId = i)
-                }
-                e.Base = e.Class.extend({
-                  constructor: function (t, i, n, s, a) {
-                    ;(this.container = e.querySelector(t)),
-                      (this.data = i || {}),
-                      (this.data.labels = this.data.labels || []),
-                      (this.data.series = this.data.series || []),
-                      (this.defaultOptions = n),
-                      (this.options = s),
-                      (this.responsiveOptions = a),
-                      (this.eventEmitter = e.EventEmitter()),
-                      (this.supportsForeignObject = e.Svg.isSupported('Extensibility')),
-                      (this.supportsAnimations = e.Svg.isSupported('AnimationEventsAttribute')),
-                      (this.resizeListener = function () {
-                        this.update()
-                      }.bind(this)),
-                      this.container && (this.container.__chartist__ && this.container.__chartist__.detach(), (this.container.__chartist__ = this)),
-                      (this.initializeTimeoutId = setTimeout(r.bind(this), 0))
-                  },
-                  optionsProvider: i,
-                  container: i,
-                  svg: i,
-                  eventEmitter: i,
-                  createChart: function () {
-                    throw new Error("Base chart type can't be instantiated!")
-                  },
-                  update: function (t, i, n) {
-                    return t && ((this.data = t || {}), (this.data.labels = this.data.labels || []), (this.data.series = this.data.series || []), this.eventEmitter.emit('data', { type: 'update', data: this.data })), i && ((this.options = e.extend({}, n ? this.options : this.defaultOptions, i)), this.initializeTimeoutId || (this.optionsProvider.removeMediaQueryListeners(), (this.optionsProvider = e.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter)))), this.initializeTimeoutId || this.createChart(this.optionsProvider.getCurrentOptions()), this
-                  },
-                  detach: function () {
-                    return this.initializeTimeoutId ? n.clearTimeout(this.initializeTimeoutId) : (n.removeEventListener('resize', this.resizeListener), this.optionsProvider.removeMediaQueryListeners()), this
-                  },
-                  on: function (t, e) {
-                    return this.eventEmitter.addEventHandler(t, e), this
-                  },
-                  off: function (t, e) {
-                    return this.eventEmitter.removeEventHandler(t, e), this
-                  },
-                  version: e.version,
-                  supportsForeignObject: !1,
-                })
-              })(this || t, n),
-              (function (t, e) {
-                var n = t.document
-                ;(e.Svg = e.Class.extend({
-                  constructor: function (t, i, r, s, a) {
-                    t instanceof Element ? (this._node = t) : ((this._node = n.createElementNS(e.namespaces.svg, t)), 'svg' === t && this.attr({ 'xmlns:ct': e.namespaces.ct, preserveAspectRatio: 'none' })), i && (('path' !== t && 'line' !== t) || (i['vector-effect'] = 'non-scaling-stroke'), this.attr(i)), r && this.addClass(r), s && (a && s._node.firstChild ? s._node.insertBefore(this._node, s._node.firstChild) : s._node.appendChild(this._node))
-                  },
-                  attr: function (t, n) {
-                    return 'string' == typeof t
-                      ? n
-                        ? this._node.getAttributeNS(n, t)
-                        : this._node.getAttribute(t)
-                      : (Object.keys(t).forEach(
-                          function (n) {
-                            if (t[n] !== i)
-                              if (-1 !== n.indexOf(':')) {
-                                var r = n.split(':')
-                                this._node.setAttributeNS(e.namespaces[r[0]], n, t[n])
-                              } else this._node.setAttribute(n, t[n])
-                          }.bind(this),
-                        ),
-                        this)
-                  },
-                  elem: function (t, i, n, r) {
-                    return new e.Svg(t, i, n, this, r)
-                  },
-                  parent: function () {
-                    return this._node.parentNode instanceof SVGElement ? new e.Svg(this._node.parentNode) : null
-                  },
-                  root: function () {
-                    for (var t = this._node; 'svg' !== t.nodeName; ) t = t.parentNode
-                    return new e.Svg(t)
-                  },
-                  querySelector: function (t) {
-                    var i = this._node.querySelector(t)
-                    return i ? new e.Svg(i) : null
-                  },
-                  querySelectorAll: function (t) {
-                    var i = this._node.querySelectorAll(t)
-                    return i.length ? new e.Svg.List(i) : null
-                  },
-                  getNode: function () {
-                    return this._node
-                  },
-                  foreignObject: function (t, i, r, s) {
-                    if ('string' == typeof t) {
-                      var a = n.createElement('div')
-                      ;(a.innerHTML = t), (t = a.firstChild)
-                    }
-                    t.setAttribute('xmlns', e.namespaces.xmlns)
-                    var o = this.elem('foreignObject', i, r, s)
-                    return o._node.appendChild(t), o
-                  },
-                  text: function (t) {
-                    return this._node.appendChild(n.createTextNode(t)), this
-                  },
-                  empty: function () {
-                    for (; this._node.firstChild; ) this._node.removeChild(this._node.firstChild)
-                    return this
-                  },
-                  remove: function () {
-                    return this._node.parentNode.removeChild(this._node), this.parent()
-                  },
-                  replace: function (t) {
-                    return this._node.parentNode.replaceChild(t._node, this._node), t
-                  },
-                  append: function (t, e) {
-                    return e && this._node.firstChild ? this._node.insertBefore(t._node, this._node.firstChild) : this._node.appendChild(t._node), this
-                  },
-                  classes: function () {
-                    return this._node.getAttribute('class') ? this._node.getAttribute('class').trim().split(/\s+/) : []
-                  },
-                  addClass: function (t) {
-                    return (
-                      this._node.setAttribute(
-                        'class',
-                        this.classes(this._node)
-                          .concat(t.trim().split(/\s+/))
-                          .filter(function (t, e, i) {
-                            return i.indexOf(t) === e
-                          })
-                          .join(' '),
-                      ),
-                      this
-                    )
-                  },
-                  removeClass: function (t) {
-                    var e = t.trim().split(/\s+/)
-                    return (
-                      this._node.setAttribute(
-                        'class',
-                        this.classes(this._node)
-                          .filter(function (t) {
-                            return -1 === e.indexOf(t)
-                          })
-                          .join(' '),
-                      ),
-                      this
-                    )
-                  },
-                  removeAllClasses: function () {
-                    return this._node.setAttribute('class', ''), this
-                  },
-                  height: function () {
-                    return this._node.getBoundingClientRect().height
-                  },
-                  width: function () {
-                    return this._node.getBoundingClientRect().width
-                  },
-                  animate: function (t, n, r) {
-                    return (
-                      n === i && (n = !0),
-                      Object.keys(t).forEach(
-                        function (i) {
-                          function s(t, n) {
-                            var s,
-                              a,
-                              o,
-                              l = {}
-                            t.easing && ((o = t.easing instanceof Array ? t.easing : e.Svg.Easing[t.easing]), delete t.easing),
-                              (t.begin = e.ensureUnit(t.begin, 'ms')),
-                              (t.dur = e.ensureUnit(t.dur, 'ms')),
-                              o && ((t.calcMode = 'spline'), (t.keySplines = o.join(' ')), (t.keyTimes = '0;1')),
-                              n && ((t.fill = 'freeze'), (l[i] = t.from), this.attr(l), (a = e.quantity(t.begin || 0).value), (t.begin = 'indefinite')),
-                              (s = this.elem('animate', e.extend({ attributeName: i }, t))),
-                              n &&
-                                setTimeout(
-                                  function () {
-                                    try {
-                                      s._node.beginElement()
-                                    } catch (e) {
-                                      ;(l[i] = t.to), this.attr(l), s.remove()
-                                    }
-                                  }.bind(this),
-                                  a,
-                                ),
-                              r &&
-                                s._node.addEventListener(
-                                  'beginEvent',
-                                  function () {
-                                    r.emit('animationBegin', { element: this, animate: s._node, params: t })
-                                  }.bind(this),
-                                ),
-                              s._node.addEventListener(
-                                'endEvent',
-                                function () {
-                                  r && r.emit('animationEnd', { element: this, animate: s._node, params: t }), n && ((l[i] = t.to), this.attr(l), s.remove())
-                                }.bind(this),
-                              )
-                          }
-                          t[i] instanceof Array
-                            ? t[i].forEach(
-                                function (t) {
-                                  s.bind(this)(t, !1)
-                                }.bind(this),
-                              )
-                            : s.bind(this)(t[i], n)
-                        }.bind(this),
-                      ),
-                      this
-                    )
-                  },
-                })),
-                  (e.Svg.isSupported = function (t) {
-                    return n.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#' + t, '1.1')
-                  })
-                ;(e.Svg.Easing = { easeInSine: [0.47, 0, 0.745, 0.715], easeOutSine: [0.39, 0.575, 0.565, 1], easeInOutSine: [0.445, 0.05, 0.55, 0.95], easeInQuad: [0.55, 0.085, 0.68, 0.53], easeOutQuad: [0.25, 0.46, 0.45, 0.94], easeInOutQuad: [0.455, 0.03, 0.515, 0.955], easeInCubic: [0.55, 0.055, 0.675, 0.19], easeOutCubic: [0.215, 0.61, 0.355, 1], easeInOutCubic: [0.645, 0.045, 0.355, 1], easeInQuart: [0.895, 0.03, 0.685, 0.22], easeOutQuart: [0.165, 0.84, 0.44, 1], easeInOutQuart: [0.77, 0, 0.175, 1], easeInQuint: [0.755, 0.05, 0.855, 0.06], easeOutQuint: [0.23, 1, 0.32, 1], easeInOutQuint: [0.86, 0, 0.07, 1], easeInExpo: [0.95, 0.05, 0.795, 0.035], easeOutExpo: [0.19, 1, 0.22, 1], easeInOutExpo: [1, 0, 0, 1], easeInCirc: [0.6, 0.04, 0.98, 0.335], easeOutCirc: [0.075, 0.82, 0.165, 1], easeInOutCirc: [0.785, 0.135, 0.15, 0.86], easeInBack: [0.6, -0.28, 0.735, 0.045], easeOutBack: [0.175, 0.885, 0.32, 1.275], easeInOutBack: [0.68, -0.55, 0.265, 1.55] }),
-                  (e.Svg.List = e.Class.extend({
-                    constructor: function (t) {
-                      var i = this
-                      this.svgElements = []
-                      for (var n = 0; n < t.length; n++) this.svgElements.push(new e.Svg(t[n]))
-                      Object.keys(e.Svg.prototype)
-                        .filter(function (t) {
-                          return -1 === ['constructor', 'parent', 'querySelector', 'querySelectorAll', 'replace', 'append', 'classes', 'height', 'width'].indexOf(t)
-                        })
-                        .forEach(function (t) {
-                          i[t] = function () {
-                            var n = Array.prototype.slice.call(arguments, 0)
-                            return (
-                              i.svgElements.forEach(function (i) {
-                                e.Svg.prototype[t].apply(i, n)
-                              }),
-                              i
-                            )
-                          }
-                        })
-                    },
-                  }))
-              })(this || t, n),
-              (function (t, e) {
-                var n = { m: ['x', 'y'], l: ['x', 'y'], c: ['x1', 'y1', 'x2', 'y2', 'x', 'y'], a: ['rx', 'ry', 'xAr', 'lAf', 'sf', 'x', 'y'] },
-                  r = { accuracy: 3 }
-                function s(t, i, n, r, s, a) {
-                  var o = e.extend({ command: s ? t.toLowerCase() : t.toUpperCase() }, i, a ? { data: a } : {})
-                  n.splice(r, 0, o)
-                }
-                function a(t, e) {
-                  t.forEach(function (i, r) {
-                    n[i.command.toLowerCase()].forEach(function (n, s) {
-                      e(i, n, r, s, t)
-                    })
-                  })
-                }
-                ;(e.Svg.Path = e.Class.extend({
-                  constructor: function (t, i) {
-                    ;(this.pathElements = []), (this.pos = 0), (this.close = t), (this.options = e.extend({}, r, i))
-                  },
-                  position: function (t) {
-                    return t !== i ? ((this.pos = Math.max(0, Math.min(this.pathElements.length, t))), this) : this.pos
-                  },
-                  remove: function (t) {
-                    return this.pathElements.splice(this.pos, t), this
-                  },
-                  move: function (t, e, i, n) {
-                    return s('M', { x: +t, y: +e }, this.pathElements, this.pos++, i, n), this
-                  },
-                  line: function (t, e, i, n) {
-                    return s('L', { x: +t, y: +e }, this.pathElements, this.pos++, i, n), this
-                  },
-                  curve: function (t, e, i, n, r, a, o, l) {
-                    return s('C', { x1: +t, y1: +e, x2: +i, y2: +n, x: +r, y: +a }, this.pathElements, this.pos++, o, l), this
-                  },
-                  arc: function (t, e, i, n, r, a, o, l, c) {
-                    return s('A', { rx: +t, ry: +e, xAr: +i, lAf: +n, sf: +r, x: +a, y: +o }, this.pathElements, this.pos++, l, c), this
-                  },
-                  scale: function (t, e) {
-                    return (
-                      a(this.pathElements, function (i, n) {
-                        i[n] *= 'x' === n[0] ? t : e
-                      }),
-                      this
-                    )
-                  },
-                  translate: function (t, e) {
-                    return (
-                      a(this.pathElements, function (i, n) {
-                        i[n] += 'x' === n[0] ? t : e
-                      }),
-                      this
-                    )
-                  },
-                  transform: function (t) {
-                    return (
-                      a(this.pathElements, function (e, i, n, r, s) {
-                        var a = t(e, i, n, r, s)
-                        ;(a || 0 === a) && (e[i] = a)
-                      }),
-                      this
-                    )
-                  },
-                  parse: function (t) {
-                    var i = t
-                      .replace(/([A-Za-z])([0-9])/g, '$1 $2')
-                      .replace(/([0-9])([A-Za-z])/g, '$1 $2')
-                      .split(/[\s,]+/)
-                      .reduce(function (t, e) {
-                        return e.match(/[A-Za-z]/) && t.push([]), t[t.length - 1].push(e), t
-                      }, [])
-                    'Z' === i[i.length - 1][0].toUpperCase() && i.pop()
-                    var r = i.map(function (t) {
-                        var i = t.shift(),
-                          r = n[i.toLowerCase()]
-                        return e.extend(
-                          { command: i },
-                          r.reduce(function (e, i, n) {
-                            return (e[i] = +t[n]), e
-                          }, {}),
-                        )
-                      }),
-                      s = [this.pos, 0]
-                    return Array.prototype.push.apply(s, r), Array.prototype.splice.apply(this.pathElements, s), (this.pos += r.length), this
-                  },
-                  stringify: function () {
-                    var t = Math.pow(10, this.options.accuracy)
-                    return (
-                      this.pathElements.reduce(
-                        function (e, i) {
-                          var r = n[i.command.toLowerCase()].map(
-                            function (e) {
-                              return this.options.accuracy ? Math.round(i[e] * t) / t : i[e]
-                            }.bind(this),
-                          )
-                          return e + i.command + r.join(',')
-                        }.bind(this),
-                        '',
-                      ) + (this.close ? 'Z' : '')
-                    )
-                  },
-                  clone: function (t) {
-                    var i = new e.Svg.Path(t || this.close)
-                    return (
-                      (i.pos = this.pos),
-                      (i.pathElements = this.pathElements.slice().map(function (t) {
-                        return e.extend({}, t)
-                      })),
-                      (i.options = e.extend({}, this.options)),
-                      i
-                    )
-                  },
-                  splitByCommand: function (t) {
-                    var i = [new e.Svg.Path()]
-                    return (
-                      this.pathElements.forEach(function (n) {
-                        n.command === t.toUpperCase() && 0 !== i[i.length - 1].pathElements.length && i.push(new e.Svg.Path()), i[i.length - 1].pathElements.push(n)
-                      }),
-                      i
-                    )
-                  },
-                })),
-                  (e.Svg.Path.elementDescriptions = n),
-                  (e.Svg.Path.join = function (t, i, n) {
-                    for (var r = new e.Svg.Path(i, n), s = 0; s < t.length; s++) for (var a = t[s], o = 0; o < a.pathElements.length; o++) r.pathElements.push(a.pathElements[o])
-                    return r
-                  })
-              })(0, n),
-              (function (t, e) {
-                t.window, t.document
-                var i = { x: { pos: 'x', len: 'width', dir: 'horizontal', rectStart: 'x1', rectEnd: 'x2', rectOffset: 'y2' }, y: { pos: 'y', len: 'height', dir: 'vertical', rectStart: 'y2', rectEnd: 'y1', rectOffset: 'x1' } }
-                ;(e.Axis = e.Class.extend({
-                  constructor: function (t, e, n, r) {
-                    ;(this.units = t), (this.counterUnits = t === i.x ? i.y : i.x), (this.chartRect = e), (this.axisLength = e[t.rectEnd] - e[t.rectStart]), (this.gridOffset = e[t.rectOffset]), (this.ticks = n), (this.options = r)
-                  },
-                  createGridAndLabels: function (t, i, n, r, s) {
-                    var a = r['axis' + this.units.pos.toUpperCase()],
-                      o = this.ticks.map(this.projectValue.bind(this)),
-                      l = this.ticks.map(a.labelInterpolationFnc)
-                    o.forEach(
-                      function (c, u) {
-                        var h,
-                          d = { x: 0, y: 0 }
-                        ;(h = o[u + 1] ? o[u + 1] - c : Math.max(this.axisLength - c, 30)), (e.isFalseyButZero(l[u]) && '' !== l[u]) || ('x' === this.units.pos ? ((c = this.chartRect.x1 + c), (d.x = r.axisX.labelOffset.x), 'start' === r.axisX.position ? (d.y = this.chartRect.padding.top + r.axisX.labelOffset.y + (n ? 5 : 20)) : (d.y = this.chartRect.y1 + r.axisX.labelOffset.y + (n ? 5 : 20))) : ((c = this.chartRect.y1 - c), (d.y = r.axisY.labelOffset.y - (n ? h : 0)), 'start' === r.axisY.position ? (d.x = n ? this.chartRect.padding.left + r.axisY.labelOffset.x : this.chartRect.x1 - 10) : (d.x = this.chartRect.x2 + r.axisY.labelOffset.x + 10)), a.showGrid && e.createGrid(c, u, this, this.gridOffset, this.chartRect[this.counterUnits.len](), t, [r.classNames.grid, r.classNames[this.units.dir]], s), a.showLabel && e.createLabel(c, h, u, l, this, a.offset, d, i, [r.classNames.label, r.classNames[this.units.dir], 'start' === a.position ? r.classNames[a.position] : r.classNames.end], n, s))
-                      }.bind(this),
-                    )
-                  },
-                  projectValue: function (t, e, i) {
-                    throw new Error("Base axis can't be instantiated!")
-                  },
-                })),
-                  (e.Axis.units = i)
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                e.AutoScaleAxis = e.Axis.extend({
-                  constructor: function (t, i, n, r) {
-                    var s = r.highLow || e.getHighLow(i, r, t.pos)
-                    ;(this.bounds = e.getBounds(n[t.rectEnd] - n[t.rectStart], s, r.scaleMinSpace || 20, r.onlyInteger)), (this.range = { min: this.bounds.min, max: this.bounds.max }), e.AutoScaleAxis.super.constructor.call(this, t, n, this.bounds.values, r)
-                  },
-                  projectValue: function (t) {
-                    return (this.axisLength * (+e.getMultiValue(t, this.units.pos) - this.bounds.min)) / this.bounds.range
-                  },
-                })
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                e.FixedScaleAxis = e.Axis.extend({
-                  constructor: function (t, i, n, r) {
-                    var s = r.highLow || e.getHighLow(i, r, t.pos)
-                    ;(this.divisor = r.divisor || 1),
-                      (this.ticks =
-                        r.ticks ||
-                        e.times(this.divisor).map(
-                          function (t, e) {
-                            return s.low + ((s.high - s.low) / this.divisor) * e
-                          }.bind(this),
-                        )),
-                      this.ticks.sort(function (t, e) {
-                        return t - e
-                      }),
-                      (this.range = { min: s.low, max: s.high }),
-                      e.FixedScaleAxis.super.constructor.call(this, t, n, this.ticks, r),
-                      (this.stepLength = this.axisLength / this.divisor)
-                  },
-                  projectValue: function (t) {
-                    return (this.axisLength * (+e.getMultiValue(t, this.units.pos) - this.range.min)) / (this.range.max - this.range.min)
-                  },
-                })
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                e.StepAxis = e.Axis.extend({
-                  constructor: function (t, i, n, r) {
-                    e.StepAxis.super.constructor.call(this, t, n, r.ticks, r)
-                    var s = Math.max(1, r.ticks.length - (r.stretch ? 1 : 0))
-                    this.stepLength = this.axisLength / s
-                  },
-                  projectValue: function (t, e) {
-                    return this.stepLength * e
-                  },
-                })
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                var n = { axisX: { offset: 30, position: 'end', labelOffset: { x: 0, y: 0 }, showLabel: !0, showGrid: !0, labelInterpolationFnc: e.noop, type: i }, axisY: { offset: 40, position: 'start', labelOffset: { x: 0, y: 0 }, showLabel: !0, showGrid: !0, labelInterpolationFnc: e.noop, type: i, scaleMinSpace: 20, onlyInteger: !1 }, width: i, height: i, showLine: !0, showPoint: !0, showArea: !1, areaBase: 0, lineSmooth: !0, showGridBackground: !1, low: i, high: i, chartPadding: { top: 15, right: 15, bottom: 5, left: 10 }, fullWidth: !1, reverseData: !1, classNames: { chart: 'ct-chart-line', label: 'ct-label', labelGroup: 'ct-labels', series: 'ct-series', line: 'ct-line', point: 'ct-point', area: 'ct-area', grid: 'ct-grid', gridGroup: 'ct-grids', gridBackground: 'ct-grid-background', vertical: 'ct-vertical', horizontal: 'ct-horizontal', start: 'ct-start', end: 'ct-end' } }
-                e.Line = e.Base.extend({
-                  constructor: function (t, i, r, s) {
-                    e.Line.super.constructor.call(this, t, i, n, e.extend({}, n, r), s)
-                  },
-                  createChart: function (t) {
-                    var r = e.normalizeData(this.data, t.reverseData, !0)
-                    this.svg = e.createSvg(this.container, t.width, t.height, t.classNames.chart)
-                    var s,
-                      a,
-                      o = this.svg.elem('g').addClass(t.classNames.gridGroup),
-                      l = this.svg.elem('g'),
-                      c = this.svg.elem('g').addClass(t.classNames.labelGroup),
-                      u = e.createChartRect(this.svg, t, n.padding)
-                    ;(s = t.axisX.type === i ? new e.StepAxis(e.Axis.units.x, r.normalized.series, u, e.extend({}, t.axisX, { ticks: r.normalized.labels, stretch: t.fullWidth })) : t.axisX.type.call(e, e.Axis.units.x, r.normalized.series, u, t.axisX)),
-                      (a = t.axisY.type === i ? new e.AutoScaleAxis(e.Axis.units.y, r.normalized.series, u, e.extend({}, t.axisY, { high: e.isNumeric(t.high) ? t.high : t.axisY.high, low: e.isNumeric(t.low) ? t.low : t.axisY.low })) : t.axisY.type.call(e, e.Axis.units.y, r.normalized.series, u, t.axisY)),
-                      s.createGridAndLabels(o, c, this.supportsForeignObject, t, this.eventEmitter),
-                      a.createGridAndLabels(o, c, this.supportsForeignObject, t, this.eventEmitter),
-                      t.showGridBackground && e.createGridBackground(o, u, t.classNames.gridBackground, this.eventEmitter),
-                      r.raw.series.forEach(
-                        function (i, n) {
-                          var o = l.elem('g')
-                          o.attr({ 'ct:series-name': i.name, 'ct:meta': e.serialize(i.meta) }), o.addClass([t.classNames.series, i.className || t.classNames.series + '-' + e.alphaNumerate(n)].join(' '))
-                          var c = [],
-                            h = []
-                          r.normalized.series[n].forEach(
-                            function (t, o) {
-                              var l = { x: u.x1 + s.projectValue(t, o, r.normalized.series[n]), y: u.y1 - a.projectValue(t, o, r.normalized.series[n]) }
-                              c.push(l.x, l.y), h.push({ value: t, valueIndex: o, meta: e.getMetaData(i, o) })
-                            }.bind(this),
-                          )
-                          var d = { lineSmooth: e.getSeriesOption(i, t, 'lineSmooth'), showPoint: e.getSeriesOption(i, t, 'showPoint'), showLine: e.getSeriesOption(i, t, 'showLine'), showArea: e.getSeriesOption(i, t, 'showArea'), areaBase: e.getSeriesOption(i, t, 'areaBase') },
-                            p = ('function' == typeof d.lineSmooth ? d.lineSmooth : d.lineSmooth ? e.Interpolation.monotoneCubic() : e.Interpolation.none())(c, h)
-                          if (
-                            (d.showPoint &&
-                              p.pathElements.forEach(
-                                function (r) {
-                                  var l = o.elem('line', { x1: r.x, y1: r.y, x2: r.x + 0.01, y2: r.y }, t.classNames.point).attr({ 'ct:value': [r.data.value.x, r.data.value.y].filter(e.isNumeric).join(','), 'ct:meta': e.serialize(r.data.meta) })
-                                  this.eventEmitter.emit('draw', { type: 'point', value: r.data.value, index: r.data.valueIndex, meta: r.data.meta, series: i, seriesIndex: n, axisX: s, axisY: a, group: o, element: l, x: r.x, y: r.y })
-                                }.bind(this),
-                              ),
-                            d.showLine)
-                          ) {
-                            var f = o.elem('path', { d: p.stringify() }, t.classNames.line, !0)
-                            this.eventEmitter.emit('draw', { type: 'line', values: r.normalized.series[n], path: p.clone(), chartRect: u, index: n, series: i, seriesIndex: n, seriesMeta: i.meta, axisX: s, axisY: a, group: o, element: f })
-                          }
-                          if (d.showArea && a.range) {
-                            var m = Math.max(Math.min(d.areaBase, a.range.max), a.range.min),
-                              g = u.y1 - a.projectValue(m)
-                            p.splitByCommand('M')
-                              .filter(function (t) {
-                                return t.pathElements.length > 1
-                              })
-                              .map(function (t) {
-                                var e = t.pathElements[0],
-                                  i = t.pathElements[t.pathElements.length - 1]
-                                return t
-                                  .clone(!0)
-                                  .position(0)
-                                  .remove(1)
-                                  .move(e.x, g)
-                                  .line(e.x, e.y)
-                                  .position(t.pathElements.length + 1)
-                                  .line(i.x, g)
-                              })
-                              .forEach(
-                                function (e) {
-                                  var l = o.elem('path', { d: e.stringify() }, t.classNames.area, !0)
-                                  this.eventEmitter.emit('draw', { type: 'area', values: r.normalized.series[n], path: e.clone(), series: i, seriesIndex: n, axisX: s, axisY: a, chartRect: u, index: n, group: o, element: l })
-                                }.bind(this),
-                              )
-                          }
-                        }.bind(this),
-                      ),
-                      this.eventEmitter.emit('created', { bounds: a.bounds, chartRect: u, axisX: s, axisY: a, svg: this.svg, options: t })
-                  },
-                })
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                var n = { axisX: { offset: 30, position: 'end', labelOffset: { x: 0, y: 0 }, showLabel: !0, showGrid: !0, labelInterpolationFnc: e.noop, scaleMinSpace: 30, onlyInteger: !1 }, axisY: { offset: 40, position: 'start', labelOffset: { x: 0, y: 0 }, showLabel: !0, showGrid: !0, labelInterpolationFnc: e.noop, scaleMinSpace: 20, onlyInteger: !1 }, width: i, height: i, high: i, low: i, referenceValue: 0, chartPadding: { top: 15, right: 15, bottom: 5, left: 10 }, seriesBarDistance: 15, stackBars: !1, stackMode: 'accumulate', horizontalBars: !1, distributeSeries: !1, reverseData: !1, showGridBackground: !1, classNames: { chart: 'ct-chart-bar', horizontalBars: 'ct-horizontal-bars', label: 'ct-label', labelGroup: 'ct-labels', series: 'ct-series', bar: 'ct-bar', grid: 'ct-grid', gridGroup: 'ct-grids', gridBackground: 'ct-grid-background', vertical: 'ct-vertical', horizontal: 'ct-horizontal', start: 'ct-start', end: 'ct-end' } }
-                e.Bar = e.Base.extend({
-                  constructor: function (t, i, r, s) {
-                    e.Bar.super.constructor.call(this, t, i, n, e.extend({}, n, r), s)
-                  },
-                  createChart: function (t) {
-                    var r, s
-                    t.distributeSeries
-                      ? ((r = e.normalizeData(this.data, t.reverseData, t.horizontalBars ? 'x' : 'y')).normalized.series = r.normalized.series.map(function (t) {
-                          return [t]
-                        }))
-                      : (r = e.normalizeData(this.data, t.reverseData, t.horizontalBars ? 'x' : 'y')),
-                      (this.svg = e.createSvg(this.container, t.width, t.height, t.classNames.chart + (t.horizontalBars ? ' ' + t.classNames.horizontalBars : '')))
-                    var a = this.svg.elem('g').addClass(t.classNames.gridGroup),
-                      o = this.svg.elem('g'),
-                      l = this.svg.elem('g').addClass(t.classNames.labelGroup)
-                    if (t.stackBars && 0 !== r.normalized.series.length) {
-                      var c = e.serialMap(r.normalized.series, function () {
-                        return Array.prototype.slice
-                          .call(arguments)
-                          .map(function (t) {
-                            return t
-                          })
-                          .reduce(
-                            function (t, e) {
-                              return { x: t.x + (e && e.x) || 0, y: t.y + (e && e.y) || 0 }
-                            },
-                            { x: 0, y: 0 },
-                          )
-                      })
-                      s = e.getHighLow([c], t, t.horizontalBars ? 'x' : 'y')
-                    } else s = e.getHighLow(r.normalized.series, t, t.horizontalBars ? 'x' : 'y')
-                    ;(s.high = +t.high || (0 === t.high ? 0 : s.high)), (s.low = +t.low || (0 === t.low ? 0 : s.low))
-                    var u,
-                      h,
-                      d,
-                      p,
-                      f,
-                      m = e.createChartRect(this.svg, t, n.padding)
-                    ;(h = t.distributeSeries && t.stackBars ? r.normalized.labels.slice(0, 1) : r.normalized.labels), t.horizontalBars ? ((u = p = t.axisX.type === i ? new e.AutoScaleAxis(e.Axis.units.x, r.normalized.series, m, e.extend({}, t.axisX, { highLow: s, referenceValue: 0 })) : t.axisX.type.call(e, e.Axis.units.x, r.normalized.series, m, e.extend({}, t.axisX, { highLow: s, referenceValue: 0 }))), (d = f = t.axisY.type === i ? new e.StepAxis(e.Axis.units.y, r.normalized.series, m, { ticks: h }) : t.axisY.type.call(e, e.Axis.units.y, r.normalized.series, m, t.axisY))) : ((d = p = t.axisX.type === i ? new e.StepAxis(e.Axis.units.x, r.normalized.series, m, { ticks: h }) : t.axisX.type.call(e, e.Axis.units.x, r.normalized.series, m, t.axisX)), (u = f = t.axisY.type === i ? new e.AutoScaleAxis(e.Axis.units.y, r.normalized.series, m, e.extend({}, t.axisY, { highLow: s, referenceValue: 0 })) : t.axisY.type.call(e, e.Axis.units.y, r.normalized.series, m, e.extend({}, t.axisY, { highLow: s, referenceValue: 0 }))))
-                    var g = t.horizontalBars ? m.x1 + u.projectValue(0) : m.y1 - u.projectValue(0),
-                      v = []
-                    d.createGridAndLabels(a, l, this.supportsForeignObject, t, this.eventEmitter),
-                      u.createGridAndLabels(a, l, this.supportsForeignObject, t, this.eventEmitter),
-                      t.showGridBackground && e.createGridBackground(a, m, t.classNames.gridBackground, this.eventEmitter),
-                      r.raw.series.forEach(
-                        function (n, s) {
-                          var a,
-                            l,
-                            c = s - (r.raw.series.length - 1) / 2
-                          ;(a = t.distributeSeries && !t.stackBars ? d.axisLength / r.normalized.series.length / 2 : t.distributeSeries && t.stackBars ? d.axisLength / 2 : d.axisLength / r.normalized.series[s].length / 2),
-                            (l = o.elem('g')).attr({ 'ct:series-name': n.name, 'ct:meta': e.serialize(n.meta) }),
-                            l.addClass([t.classNames.series, n.className || t.classNames.series + '-' + e.alphaNumerate(s)].join(' ')),
-                            r.normalized.series[s].forEach(
-                              function (o, h) {
-                                var x, y, b, w
-                                if (((w = t.distributeSeries && !t.stackBars ? s : t.distributeSeries && t.stackBars ? 0 : h), (x = t.horizontalBars ? { x: m.x1 + u.projectValue(o && o.x ? o.x : 0, h, r.normalized.series[s]), y: m.y1 - d.projectValue(o && o.y ? o.y : 0, w, r.normalized.series[s]) } : { x: m.x1 + d.projectValue(o && o.x ? o.x : 0, w, r.normalized.series[s]), y: m.y1 - u.projectValue(o && o.y ? o.y : 0, h, r.normalized.series[s]) }), d instanceof e.StepAxis && (d.options.stretch || (x[d.units.pos] += a * (t.horizontalBars ? -1 : 1)), (x[d.units.pos] += t.stackBars || t.distributeSeries ? 0 : c * t.seriesBarDistance * (t.horizontalBars ? -1 : 1))), (b = v[h] || g), (v[h] = b - (g - x[d.counterUnits.pos])), o !== i)) {
-                                  var A = {}
-                                  ;(A[d.units.pos + '1'] = x[d.units.pos]), (A[d.units.pos + '2'] = x[d.units.pos]), !t.stackBars || ('accumulate' !== t.stackMode && t.stackMode) ? ((A[d.counterUnits.pos + '1'] = g), (A[d.counterUnits.pos + '2'] = x[d.counterUnits.pos])) : ((A[d.counterUnits.pos + '1'] = b), (A[d.counterUnits.pos + '2'] = v[h])), (A.x1 = Math.min(Math.max(A.x1, m.x1), m.x2)), (A.x2 = Math.min(Math.max(A.x2, m.x1), m.x2)), (A.y1 = Math.min(Math.max(A.y1, m.y2), m.y1)), (A.y2 = Math.min(Math.max(A.y2, m.y2), m.y1))
-                                  var S = e.getMetaData(n, h)
-                                  ;(y = l.elem('line', A, t.classNames.bar).attr({ 'ct:value': [o.x, o.y].filter(e.isNumeric).join(','), 'ct:meta': e.serialize(S) })), this.eventEmitter.emit('draw', e.extend({ type: 'bar', value: o, index: h, meta: S, series: n, seriesIndex: s, axisX: p, axisY: f, chartRect: m, group: l, element: y }, A))
-                                }
-                              }.bind(this),
-                            )
-                        }.bind(this),
-                      ),
-                      this.eventEmitter.emit('created', { bounds: u.bounds, chartRect: m, axisX: p, axisY: f, svg: this.svg, options: t })
-                  },
-                })
-              })(this || t, n),
-              (function (t, e) {
-                t.window, t.document
-                var n = { width: i, height: i, chartPadding: 5, classNames: { chartPie: 'ct-chart-pie', chartDonut: 'ct-chart-donut', series: 'ct-series', slicePie: 'ct-slice-pie', sliceDonut: 'ct-slice-donut', sliceDonutSolid: 'ct-slice-donut-solid', label: 'ct-label' }, startAngle: 0, total: i, donut: !1, donutSolid: !1, donutWidth: 60, showLabel: !0, labelOffset: 0, labelPosition: 'inside', labelInterpolationFnc: e.noop, labelDirection: 'neutral', reverseData: !1, ignoreEmptyValues: !1 }
-                function r(t, e, i) {
-                  var n = e.x > t.x
-                  return (n && 'explode' === i) || (!n && 'implode' === i) ? 'start' : (n && 'implode' === i) || (!n && 'explode' === i) ? 'end' : 'middle'
-                }
-                e.Pie = e.Base.extend({
-                  constructor: function (t, i, r, s) {
-                    e.Pie.super.constructor.call(this, t, i, n, e.extend({}, n, r), s)
-                  },
-                  createChart: function (t) {
-                    var i,
-                      s,
-                      a,
-                      o,
-                      l,
-                      c = e.normalizeData(this.data),
-                      u = [],
-                      h = t.startAngle
-                    ;(this.svg = e.createSvg(this.container, t.width, t.height, t.donut ? t.classNames.chartDonut : t.classNames.chartPie)),
-                      (s = e.createChartRect(this.svg, t, n.padding)),
-                      (a = Math.min(s.width() / 2, s.height() / 2)),
-                      (l =
-                        t.total ||
-                        c.normalized.series.reduce(function (t, e) {
-                          return t + e
-                        }, 0))
-                    var d = e.quantity(t.donutWidth)
-                    '%' === d.unit && (d.value *= a / 100), (a -= t.donut && !t.donutSolid ? d.value / 2 : 0), (o = 'outside' === t.labelPosition || (t.donut && !t.donutSolid) ? a : 'center' === t.labelPosition ? 0 : t.donutSolid ? a - d.value / 2 : a / 2), (o += t.labelOffset)
-                    var p = { x: s.x1 + s.width() / 2, y: s.y2 + s.height() / 2 },
-                      f =
-                        1 ===
-                        c.raw.series.filter(function (t) {
-                          return t.hasOwnProperty('value') ? 0 !== t.value : 0 !== t
-                        }).length
-                    c.raw.series.forEach(
-                      function (t, e) {
-                        u[e] = this.svg.elem('g', null, null)
-                      }.bind(this),
-                    ),
-                      t.showLabel && (i = this.svg.elem('g', null, null)),
-                      c.raw.series.forEach(
-                        function (n, s) {
-                          if (0 !== c.normalized.series[s] || !t.ignoreEmptyValues) {
-                            u[s].attr({ 'ct:series-name': n.name }), u[s].addClass([t.classNames.series, n.className || t.classNames.series + '-' + e.alphaNumerate(s)].join(' '))
-                            var m = l > 0 ? h + (c.normalized.series[s] / l) * 360 : 0,
-                              g = Math.max(0, h - (0 === s || f ? 0 : 0.2))
-                            m - g >= 359.99 && (m = g + 359.99)
-                            var v,
-                              x,
-                              y,
-                              b = e.polarToCartesian(p.x, p.y, a, g),
-                              w = e.polarToCartesian(p.x, p.y, a, m),
-                              A = new e.Svg.Path(!t.donut || t.donutSolid).move(w.x, w.y).arc(a, a, 0, m - h > 180, 0, b.x, b.y)
-                            t.donut ? t.donutSolid && ((y = a - d.value), (v = e.polarToCartesian(p.x, p.y, y, h - (0 === s || f ? 0 : 0.2))), (x = e.polarToCartesian(p.x, p.y, y, m)), A.line(v.x, v.y), A.arc(y, y, 0, m - h > 180, 1, x.x, x.y)) : A.line(p.x, p.y)
-                            var S = t.classNames.slicePie
-                            t.donut && ((S = t.classNames.sliceDonut), t.donutSolid && (S = t.classNames.sliceDonutSolid))
-                            var E = u[s].elem('path', { d: A.stringify() }, S)
-                            if ((E.attr({ 'ct:value': c.normalized.series[s], 'ct:meta': e.serialize(n.meta) }), t.donut && !t.donutSolid && (E._node.style.strokeWidth = d.value + 'px'), this.eventEmitter.emit('draw', { type: 'slice', value: c.normalized.series[s], totalDataSum: l, index: s, meta: n.meta, series: n, group: u[s], element: E, path: A.clone(), center: p, radius: a, startAngle: h, endAngle: m }), t.showLabel)) {
-                              var O, C
-                              ;(O = 1 === c.raw.series.length ? { x: p.x, y: p.y } : e.polarToCartesian(p.x, p.y, o, h + (m - h) / 2)), (C = c.normalized.labels && !e.isFalseyButZero(c.normalized.labels[s]) ? c.normalized.labels[s] : c.normalized.series[s])
-                              var M = t.labelInterpolationFnc(C, s)
-                              if (M || 0 === M) {
-                                var z = i.elem('text', { dx: O.x, dy: O.y, 'text-anchor': r(p, O, t.labelDirection) }, t.classNames.label).text('' + M)
-                                this.eventEmitter.emit('draw', { type: 'label', index: s, group: i, element: z, text: '' + M, x: O.x, y: O.y })
-                              }
-                            }
-                            h = m
-                          }
-                        }.bind(this),
-                      ),
-                      this.eventEmitter.emit('created', { chartRect: s, svg: this.svg, options: t })
-                  },
-                  determineAnchorPosition: r,
-                })
-              })(this || t, n),
-              n
-            )
-          })(n)
-          'function' == typeof define && i(139)
-            ? define(function () {
-                return s
-              })
-            : 'object' === Object(e.a)(t) && t.exports
-              ? (t.exports = s)
-              : (n.Rockiotchart = s)
-        })('undefined' == typeof window ? void 0 : window)
-      }).call(this, i(136)(t))
-    },
-    241: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(2),
-        s = i(86),
-        a = i(10),
-        o = i(51),
-        l = i(26),
-        c = i(126),
-        u = i(125),
-        h = i(82),
-        d = i(5)('isConcatSpreadable'),
-        p = !r(function () {
-          var t = []
-          return (t[d] = !1), t.concat()[0] !== t
-        }),
-        f = h('concat'),
-        m = function (t) {
-          if (!a(t)) return !1
-          var e = t[d]
-          return void 0 !== e ? !!e : s(t)
-        }
-      n(
-        { target: 'Array', proto: !0, forced: !p || !f },
-        {
-          concat: function (t) {
-            var e,
-              i,
-              n,
-              r,
-              s,
-              a = o(this),
-              h = u(a, 0),
-              d = 0
-            for (e = -1, n = arguments.length; e < n; e++)
-              if (((s = -1 === e ? a : arguments[e]), m(s))) {
-                if (d + (r = l(s.length)) > 9007199254740991) throw TypeError('Maximum allowed index exceeded')
-                for (i = 0; i < r; i++, d++) i in s && c(h, d, s[i])
-              } else {
-                if (d >= 9007199254740991) throw TypeError('Maximum allowed index exceeded')
-                c(h, d++, s)
-              }
-            return (h.length = d), h
+          divisor: 4,
+          chartPadding: {
+            right: 20,
+            left: 40
           },
-        },
-      )
-    },
-    242: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(84).every
-      n(
-        { target: 'Array', proto: !0, forced: i(81)('every') },
-        {
-          every: function (t) {
-            return r(this, t, arguments.length > 1 ? arguments[1] : void 0)
-          },
-        },
-      )
-    },
-    243: function (t, e, i) {
-      var n = i(8),
-        r = i(244),
-        s = i(236)
-      n({ target: 'Array', proto: !0 }, { fill: r }), s('fill')
-    },
-    244: function (t, e, i) {
-      'use strict'
-      var n = i(51),
-        r = i(83),
-        s = i(26)
-      t.exports = function (t) {
-        for (var e = n(this), i = s(e.length), a = arguments.length, o = r(a > 1 ? arguments[1] : void 0, i), l = a > 2 ? arguments[2] : void 0, c = void 0 === l ? i : r(l, i); c > o; ) e[o++] = t
-        return e
-      }
-    },
-    245: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(84).filter
-      n(
-        { target: 'Array', proto: !0, forced: !i(82)('filter') },
-        {
-          filter: function (t) {
-            return r(this, t, arguments.length > 1 ? arguments[1] : void 0)
-          },
-        },
-      )
-    },
-    246: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(131).indexOf,
-        s = i(81),
-        a = [].indexOf,
-        o = !!a && 1 / [1].indexOf(1, -0) < 0,
-        l = s('indexOf')
-      n(
-        { target: 'Array', proto: !0, forced: o || l },
-        {
-          indexOf: function (t) {
-            return o ? a.apply(this, arguments) || 0 : r(this, t, arguments.length > 1 ? arguments[1] : void 0)
-          },
-        },
-      )
-    },
-    247: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(248).left
-      n(
-        { target: 'Array', proto: !0, forced: i(81)('reduce') },
-        {
-          reduce: function (t) {
-            return r(this, t, arguments.length, arguments.length > 1 ? arguments[1] : void 0)
-          },
-        },
-      )
-    },
-    248: function (t, e, i) {
-      var n = i(85),
-        r = i(51),
-        s = i(55),
-        a = i(26),
-        o = function (t) {
-          return function (e, i, o, l) {
-            n(i)
-            var c = r(e),
-              u = s(c),
-              h = a(c.length),
-              d = t ? h - 1 : 0,
-              p = t ? -1 : 1
-            if (o < 2)
-              for (;;) {
-                if (d in u) {
-                  ;(l = u[d]), (d += p)
-                  break
-                }
-                if (((d += p), t ? d < 0 : h <= d)) throw TypeError('Reduce of empty array with no initial value')
-              }
-            for (; t ? d >= 0 : h > d; d += p) d in u && (l = i(l, u[d], d, c))
-            return l
-          }
-        }
-      t.exports = { left: o(!1), right: o(!0) }
-    },
-    249: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(86),
-        s = [].reverse,
-        a = [1, 2]
-      n(
-        { target: 'Array', proto: !0, forced: String(a) === String(a.reverse()) },
-        {
-          reverse: function () {
-            return r(this) && (this.length = this.length), s.call(this)
-          },
-        },
-      )
-    },
-    250: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(85),
-        s = i(51),
-        a = i(2),
-        o = i(81),
-        l = [].sort,
-        c = [1, 2, 3],
-        u = a(function () {
-          c.sort(void 0)
-        }),
-        h = a(function () {
-          c.sort(null)
-        }),
-        d = o('sort')
-      n(
-        { target: 'Array', proto: !0, forced: u || !h || d },
-        {
-          sort: function (t) {
-            return void 0 === t ? l.call(s(this)) : l.call(s(this), r(t))
-          },
-        },
-      )
-    },
-    251: function (t, e, i) {
-      var n = i(8),
-        r = i(2),
-        s = i(27),
-        a = i(57).f,
-        o = i(9),
-        l = r(function () {
-          a(1)
-        })
-      n(
-        { target: 'Object', stat: !0, forced: !o || l, sham: !o },
-        {
-          getOwnPropertyDescriptor: function (t, e) {
-            return a(s(t), e)
-          },
-        },
-      )
-    },
-    252: function (t, e, i) {
-      var n = i(8),
-        r = i(2),
-        s = i(253).f
-      n(
-        {
-          target: 'Object',
-          stat: !0,
-          forced: r(function () {
-            return !Object.getOwnPropertyNames(1)
-          }),
-        },
-        { getOwnPropertyNames: s },
-      )
-    },
-    253: function (t, e, i) {
-      var n = i(27),
-        r = i(56).f,
-        s = {}.toString,
-        a = 'object' == typeof window && window && Object.getOwnPropertyNames ? Object.getOwnPropertyNames(window) : []
-      t.exports.f = function (t) {
-        return a && '[object Window]' == s.call(t)
-          ? (function (t) {
-              try {
-                return r(t)
-              } catch (t) {
-                return a.slice()
-              }
-            })(t)
-          : r(n(t))
-      }
-    },
-    254: function (t, e, i) {
-      'use strict'
-      var n = i(89),
-        r = i(6),
-        s = i(26),
-        a = i(18),
-        o = i(90),
-        l = i(91)
-      n('match', 1, function (t, e, i) {
-        return [
-          function (e) {
-            var i = a(this),
-              n = null == e ? void 0 : e[t]
-            return void 0 !== n ? n.call(e, i) : new RegExp(e)[t](String(i))
-          },
-          function (t) {
-            var n = i(e, t, this)
-            if (n.done) return n.value
-            var a = r(t),
-              c = String(this)
-            if (!a.global) return l(a, c)
-            var u = a.unicode
-            a.lastIndex = 0
-            for (var h, d = [], p = 0; null !== (h = l(a, c)); ) {
-              var f = String(h[0])
-              ;(d[p] = f), '' === f && (a.lastIndex = o(c, s(a.lastIndex), u)), p++
-            }
-            return 0 === p ? null : d
-          },
-        ]
-      })
-    },
-    255: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(58).trim
-      n(
-        { target: 'String', proto: !0, forced: i(256)('trim') },
-        {
-          trim: function () {
-            return r(this)
-          },
-        },
-      )
-    },
-    256: function (t, e, i) {
-      var n = i(2),
-        r = i(59)
-      t.exports = function (t) {
-        return n(function () {
-          return !!r[t]() || '​᠎' != '​᠎'[t]() || r[t].name !== t
-        })
-      }
-    },
-    257: function (t, e, i) {
-      var n = i(1),
-        r = i(135),
-        s = i(258),
-        a = i(20),
-        o = i(5),
-        l = o('iterator'),
-        c = o('toStringTag'),
-        u = s.values
-      for (var h in r) {
-        var d = n[h],
-          p = d && d.prototype
-        if (p) {
-          if (p[l] !== u)
-            try {
-              a(p, l, u)
-            } catch (t) {
-              p[l] = u
-            }
-          if ((p[c] || a(p, c, h), r[h]))
-            for (var f in s)
-              if (p[f] !== s[f])
-                try {
-                  a(p, f, s[f])
-                } catch (t) {
-                  p[f] = s[f]
-                }
+          showArea: false,
+          showLine: true,
+          showPoint: true
         }
       }
-    },
-    258: function (t, e, i) {
-      'use strict'
-      var n = i(27),
-        r = i(236),
-        s = i(234),
-        a = i(129),
-        o = i(259),
-        l = a.set,
-        c = a.getterFor('Array Iterator')
-      ;(t.exports = o(
-        Array,
-        'Array',
-        function (t, e) {
-          l(this, { type: 'Array Iterator', target: n(t), index: 0, kind: e })
-        },
-        function () {
-          var t = c(this),
-            e = t.target,
-            i = t.kind,
-            n = t.index++
-          return !e || n >= e.length ? ((t.target = void 0), { value: void 0, done: !0 }) : 'keys' == i ? { value: n, done: !1 } : 'values' == i ? { value: e[n], done: !1 } : { value: [n, e[n]], done: !1 }
-        },
-        'values',
-      )),
-        (s.Arguments = s.Array),
-        r('keys'),
-        r('values'),
-        r('entries')
-    },
-    259: function (t, e, i) {
-      'use strict'
-      var n = i(8),
-        r = i(260),
-        s = i(238),
-        a = i(130),
-        o = i(239),
-        l = i(20),
-        c = i(17),
-        u = i(5),
-        h = i(123),
-        d = i(234),
-        p = i(237),
-        f = p.IteratorPrototype,
-        m = p.BUGGY_SAFARI_ITERATORS,
-        g = u('iterator'),
-        v = function () {
-          return this
-        }
-      t.exports = function (t, e, i, u, p, x, y) {
-        r(i, e, u)
-        var b,
-          w,
-          A,
-          S = function (t) {
-            if (t === p && z) return z
-            if (!m && t in C) return C[t]
-            switch (t) {
-              case 'keys':
-              case 'values':
-              case 'entries':
-                return function () {
-                  return new i(this, t)
-                }
-            }
-            return function () {
-              return new i(this)
-            }
-          },
-          E = e + ' Iterator',
-          O = !1,
-          C = t.prototype,
-          M = C[g] || C['@@iterator'] || (p && C[p]),
-          z = (!m && M) || S(p),
-          k = ('Array' == e && C.entries) || M
-        if (
-          (k && ((b = s(k.call(new t()))), f !== Object.prototype && b.next && (h || s(b) === f || (a ? a(b, f) : 'function' != typeof b[g] && l(b, g, v)), o(b, E, !0, !0), h && (d[E] = v))),
-          'values' == p &&
-            M &&
-            'values' !== M.name &&
-            ((O = !0),
-            (z = function () {
-              return M.call(this)
-            })),
-          (h && !y) || C[g] === z || l(C, g, z),
-          (d[e] = z),
-          p)
-        )
-          if (((w = { values: S('values'), keys: x ? z : S('keys'), entries: S('entries') }), y)) for (A in w) (!m && !O && A in C) || c(C, A, w[A])
-          else n({ target: e, proto: !0, forced: m || O }, w)
-        return w
-      }
-    },
-    260: function (t, e, i) {
-      'use strict'
-      var n = i(237).IteratorPrototype,
-        r = i(124),
-        s = i(54),
-        a = i(239),
-        o = i(234),
-        l = function () {
-          return this
-        }
-      t.exports = function (t, e, i) {
-        var c = e + ' Iterator'
-        return (t.prototype = r(n, { next: s(1, i) })), a(t, c, !1, !0), (o[c] = l), t
-      }
-    },
-    261: function (t, e, i) {
-      var n = i(2)
-      t.exports = !n(function () {
-        function t() {}
-        return (t.prototype.constructor = null), Object.getPrototypeOf(new t()) !== t.prototype
-      })
-    },
-    266: function (t, e, i) {
-      'use strict'
-      i.r(e)
-      i(235), i(128), i(80), i(240)
-      var n = {
-          name: 'RockiotCharts',
-          data: function () {
-            return { chart: null, n: 1, data: [], labels: [], chartData: { data: [], labels: [], options: { width: '600px', height: '300px', low: 0, high: 100, fullWidth: !0, axisY: { onlyInteger: !0, offset: 10 }, divisor: 4, chartPadding: { right: 20, left: 40 }, showArea: !1, showLine: !0, showPoint: !0 } } }
-          },
-          methods: {
-            xLabel: function () {
-              var t,
-                e = new Date()
-              return 'count' === this.$attrs.chartXData && (t = this.n++), 'now' === this.$attrs.chartXData ? (t = this.timeNow()) : 'time' === this.$attrs.chartXData ? (t = e.getHours() + ':' + e.getMinutes() + ':' + e.getSeconds()) : 'date' === this.$attrs.chartXData && (t = e.getUTCMonth() + '/' + e.getUTCDay()), t
-            },
-            timeNow: function () {
-              var t = new Date()
-              return t.getMinutes() + ':' + t.getSeconds()
-            },
-            createChart: function () {
-              var t = this
-              'bar' != this.$attrs.variation &&
-                (this.chart = new Rockiotchart.Line('.rockiot-chartist-' + this.$attrs.serial, { labels: t.chartData.labels, series: [t.chartData.data] }, t.chartData.options).on('draw', function (e) {
-                  'grid' === e.type && e.element._node.setAttribute('style', 'stroke:' + t.$attrs.scaleColor), 'label' === e.type && e.element._node.children[0].setAttribute('style', 'color:' + t.$attrs.scaleTextColor + ';fill:' + t.$attrs.scaleTextColor + ';'), 'line' === e.type && e.element._node.setAttribute('style', 'stroke-width:' + t.$attrs.chartLine + ';stroke:' + t.$attrs.progressColor), 'point' === e.type && e.element._node.setAttribute('style', 'stroke-width:' + t.$attrs.chartPoint + ';stroke:' + t.$attrs.progressColor), 'area' === e.type && e.element._node.setAttribute('style', 'fill-opacity:' + t.$attrs.chartArea + ';fill:' + t.$attrs.progressColor)
-                })),
-                'bar' === this.$attrs.variation &&
-                  (this.chart = new Rockiotchart.Bar('.rockiot-chartist-' + this.$attrs.serial, { labels: t.chartData.labels, series: [t.chartData.data] }, t.chartData.options).on('draw', function (e) {
-                    'grid' === e.type && e.element._node.setAttribute('style', 'stroke:' + t.$attrs.scaleColor), 'label' === e.type && e.element._node.children[0].setAttribute('style', 'color:' + t.$attrs.scaleTextColor + ';fill:' + t.$attrs.scaleTextColor + ';'), 'bar' === e.type && e.element._node.setAttribute('style', 'stroke-width:' + t.$attrs.chartLine + ';stroke:' + t.$attrs.progressColor), 'point' === e.type && e.element._node.setAttribute('style', 'stroke-width:' + t.$attrs.chartPoint + ';stroke:' + t.$attrs.progressColor), 'area' === e.type && e.element._node.setAttribute('style', 'fill-opacity:' + t.$attrs.chartArea + ';fill:' + t.$attrs.progressColor)
-                  }))
-            },
-          },
-          computed: {
-            isArea: function () {
-              return 'area' === this.$attrs.variation
-            },
-          },
-          watch: {
-            '$attrs.value': function (t) {
-              var e
-              this.n++, this.n > Number(this.$attrs.ticks) && (this.chartData.data.splice(0, 1), this.chartData.labels.splice(0, 1)), this.chartData.data.push(Number(t)), this.$attrs.chartXLabels ? ((e = this.$attrs.chartXLabels > 1 ? (this.n % this.$attrs.chartXLabels == 0 ? this.xLabel() : '') : this.xLabel()), this.chartData.labels.push(e)) : this.chartData.labels.push(' '), this.chart.update({ labels: this.chartData.labels, series: [this.chartData.data] })
-            },
-          },
-          mounted: function () {
-            'area' === this.$attrs.variation && (this.chartData.options.showArea = !0), this.chartData.data.push(Number(this.$attrs.value)), this.chartData.labels.push(this.n), (this.chartData.options.low = Number(this.$attrs.min)), (this.chartData.options.high = Number(this.$attrs.max)), '0' != this.$attrs.precision && (this.chartData.options.axisY.onlyInteger = !1), this.createChart()
-          },
-        },
-        r = i(7),
-        s = Object(r.a)(
-          n,
-          function () {
-            var t = this.$createElement
-            return (this._self._c || t)('div', { class: 'rockiot-chartist rockiot-chartist-' + this.$attrs.serial, style: 'background:' + this.$attrs.chartBackground })
-          },
-          [],
-          !1,
-          null,
-          null,
-          null,
-        )
-      e.default = s.exports
-    },
+    };
   },
-])
+  methods: {
+    xLabel: function xLabel() {
+      var d = new Date();
+      var label;
+      if (this.$attrs.chartXData === 'count') {
+        label = this.n++;
+      }
+      this.$attrs.chartXData === 'now' ? label = this.timeNow() : this.$attrs.chartXData === 'time' ? label = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() : this.$attrs.chartXData === 'date' ? label = d.getUTCMonth() + '/' + d.getUTCDay() : null;
+      return label;
+    },
+    timeNow: function timeNow() {
+      var d = new Date();
+      return d.getMinutes() + ':' + d.getSeconds();
+    },
+    createChart: function createChart() {
+      var self = this;
+      var options = {};
+      if (this.$attrs.variation != 'bar') {
+        this.chart = new Rockiotchart.Line('.rockiot-chartist-' + this.$attrs.serial, {
+          labels: self.chartData.labels,
+          series: [self.chartData.data]
+        }, self.chartData.options).on('draw', function (data) {
+          data.type === 'grid' ? data.element._node.setAttribute('style', 'stroke:' + self.$attrs.scaleColor) : null;
+          data.type === 'label' ? data.element._node.children[0].setAttribute('style', 'color:' + self.$attrs.scaleTextColor + ';fill:' + self.$attrs.scaleTextColor + ';') : null;
+          data.type === 'line' ? data.element._node.setAttribute('style', 'stroke-width:' + self.$attrs.chartLine + ';stroke:' + self.$attrs.progressColor) : null;
+          data.type === 'point' ? data.element._node.setAttribute('style', 'stroke-width:' + self.$attrs.chartPoint + ';stroke:' + self.$attrs.progressColor) : null;
+          data.type === 'area' ? data.element._node.setAttribute('style', 'fill-opacity:' + self.$attrs.chartArea + ';fill:' + self.$attrs.progressColor) : null;
+        });
+      }
+      if (this.$attrs.variation === 'bar') {
+        this.chart = new Rockiotchart.Bar('.rockiot-chartist-' + this.$attrs.serial, {
+          labels: self.chartData.labels,
+          series: [self.chartData.data]
+        }, self.chartData.options).on('draw', function (data) {
+          data.type === 'grid' ? data.element._node.setAttribute('style', 'stroke:' + self.$attrs.scaleColor) : null;
+          data.type === 'label' ? data.element._node.children[0].setAttribute('style', 'color:' + self.$attrs.scaleTextColor + ';fill:' + self.$attrs.scaleTextColor + ';') : null;
+          data.type === 'bar' ? data.element._node.setAttribute('style', 'stroke-width:' + self.$attrs.chartLine + ';stroke:' + self.$attrs.progressColor) : null;
+          data.type === 'point' ? data.element._node.setAttribute('style', 'stroke-width:' + self.$attrs.chartPoint + ';stroke:' + self.$attrs.progressColor) : null;
+          data.type === 'area' ? data.element._node.setAttribute('style', 'fill-opacity:' + self.$attrs.chartArea + ';fill:' + self.$attrs.progressColor) : null;
+        });
+      }
+    }
+  },
+  computed: {
+    isArea: function isArea() {
+      return this.$attrs.variation === 'area' ? true : false;
+    }
+  },
+  watch: {
+    '$attrs.value': function $attrsValue(v) {
+      this.n++;
+      var label;
+      if (this.n > Number(this.$attrs.ticks)) {
+        this.chartData.data.splice(0, 1);
+        this.chartData.labels.splice(0, 1);
+      }
+      this.chartData.data.push(Number(v));
+      if (this.$attrs.chartXLabels) {
+        this.$attrs.chartXLabels > 1 ? this.n % this.$attrs.chartXLabels === 0 ? label = this.xLabel() : label = '' : label = this.xLabel();
+        this.chartData.labels.push(label);
+      } else {
+        this.chartData.labels.push(' ');
+      }
+      this.chart.update({
+        labels: this.chartData.labels,
+        series: [this.chartData.data]
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.$attrs.variation === 'area' ? this.chartData.options.showArea = true : null;
+    //this.$attrs.chartLine === '1' ? this.chartData.options.showLine = true : this.chartData.options.showLine = false
+    this.chartData.data.push(Number(this.$attrs.value));
+    this.chartData.labels.push(this.n);
+    this.chartData.options.low = Number(this.$attrs.min);
+    this.chartData.options.high = Number(this.$attrs.max);
+    this.$attrs.precision != '0' ? this.chartData.options.axisY.onlyInteger = false : null;
+    this.createChart();
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!./node_modules/vue-loader/lib??vue-loader-options!./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a ***!
+  \*************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c('div', {
+    "class": 'rockiot-chartist rockiot-chartist-' + _vm.$attrs.serial,
+    style: 'background:' + _vm.$attrs.chartBackground
+  });
+};
+var staticRenderFns = [];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./src/components/rockiot.charts.vue":
+/*!*******************************************!*\
+  !*** ./src/components/rockiot.charts.vue ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rockiot.charts.vue?vue&type=template&id=01cf806a */ "./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a");
+/* harmony import */ var _rockiot_charts_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./rockiot.charts.vue?vue&type=script&lang=js */ "./src/components/rockiot.charts.vue?vue&type=script&lang=js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _rockiot_charts_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__["render"],
+  _rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "src/components/rockiot.charts.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./src/components/rockiot.charts.vue?vue&type=script&lang=js":
+/*!*******************************************************************!*\
+  !*** ./src/components/rockiot.charts.vue?vue&type=script&lang=js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_rockiot_charts_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib??ref--4-0!../../node_modules/vue-loader/lib??vue-loader-options!./rockiot.charts.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./src/components/rockiot.charts.vue?vue&type=script&lang=js");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_rockiot_charts_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a":
+/*!*************************************************************************!*\
+  !*** ./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a ***!
+  \*************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib??ref--4-0!../../node_modules/vue-loader/lib/loaders/templateLoader.js??ref--6!../../node_modules/vue-loader/lib??vue-loader-options!./rockiot.charts.vue?vue&type=template&id=01cf806a */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./src/components/rockiot.charts.vue?vue&type=template&id=01cf806a");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ref_6_node_modules_vue_loader_lib_index_js_vue_loader_options_rockiot_charts_vue_vue_type_template_id_01cf806a__WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./src/plugins/rockiot.chart.js":
+/*!**************************************!*\
+  !*** ./src/plugins/rockiot.chart.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(module) {function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+/* eslint-disable */
+/* harmony default export */ __webpack_exports__["default"] = ((function (global, factory) {
+  var Rockiotchart = factory(global);
+  if (typeof define === 'function' && __webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js")) {
+    // AMD support
+    define(function () {
+      return Rockiotchart;
+    });
+  } else if (( false ? undefined : _typeof(module)) === 'object' && module.exports) {
+    // CommonJS support
+    module.exports = Rockiotchart;
+  } else {
+    // We are probably running in the browser
+    global.Rockiotchart = Rockiotchart;
+  }
+})(typeof window === 'undefined' ? undefined : window, function (global, undefined) {
+  /* Rockiotchart.js 0.1.1
+   * MIT license.
+   * Adapted from Chartist.js
+   * Bundled with rockiot-ui https://github.com/swina/rockiot-ui
+   *
+   * Added attributes :
+   * svg => preserveAspectRatio = none
+   * path,line => vector-effect = non-scaling-stroke
+   */
+  /**
+   * The core module of Rockiotchart that is mainly providing static functions and higher level functions for chart modules.
+   *
+   * @module Rockiotchart.Core
+   */
+  var Rockiotchart = {
+    version: '0.1.1'
+  };
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+
+    /**
+     * This object contains all namespaces used within Rockiotchart.
+     *
+     * @memberof Rockiotchart.Core
+     * @type {{svg: string, xmlns: string, xhtml: string, xlink: string, ct: string}}
+     */
+    Rockiotchart.namespaces = {
+      svg: 'http://www.w3.org/2000/svg',
+      xmlns: 'http://www.w3.org/2000/xmlns/',
+      xhtml: 'http://www.w3.org/1999/xhtml',
+      xlink: 'http://www.w3.org/1999/xlink',
+      ct: 'https://github.com/swina/rockiot-ui'
+    };
+
+    /**
+     * Helps to simplify functional style code
+     *
+     * @memberof Rockiotchart.Core
+     * @param {*} n This exact value will be returned by the noop function
+     * @return {*} The same value that was provided to the n parameter
+     */
+    Rockiotchart.noop = function (n) {
+      return n;
+    };
+
+    /**
+     * Generates a-z from a number 0 to 26
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} n A number from 0 to 26 that will result in a letter a-z
+     * @return {String} A character from a-z based on the input number n
+     */
+    Rockiotchart.alphaNumerate = function (n) {
+      // Limit to a-z
+      return String.fromCharCode(97 + n % 26);
+    };
+
+    /**
+     * Simple recursive object extend
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} target Target object where the source will be merged into
+     * @param {Object...} sources This object (objects) will be merged into target and then target is returned
+     * @return {Object} An object that has the same reference as target but is extended and merged with the properties of source
+     */
+    Rockiotchart.extend = function (target) {
+      var i, source, sourceProp;
+      target = target || {};
+      for (i = 1; i < arguments.length; i++) {
+        source = arguments[i];
+        for (var prop in source) {
+          sourceProp = source[prop];
+          if (_typeof(sourceProp) === 'object' && sourceProp !== null && !(sourceProp instanceof Array)) {
+            target[prop] = Rockiotchart.extend(target[prop], sourceProp);
+          } else {
+            target[prop] = sourceProp;
+          }
+        }
+      }
+      return target;
+    };
+
+    /**
+     * Replaces all occurrences of subStr in str with newSubStr and returns a new string.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {String} str
+     * @param {String} subStr
+     * @param {String} newSubStr
+     * @return {String}
+     */
+    Rockiotchart.replaceAll = function (str, subStr, newSubStr) {
+      return str.replace(new RegExp(subStr, 'g'), newSubStr);
+    };
+
+    /**
+     * Converts a number to a string with a unit. If a string is passed then this will be returned unmodified.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} value
+     * @param {String} unit
+     * @return {String} Returns the passed number value with unit.
+     */
+    Rockiotchart.ensureUnit = function (value, unit) {
+      if (typeof value === 'number') {
+        value = value + unit;
+      }
+      return value;
+    };
+
+    /**
+     * Converts a number or string to a quantity object.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {String|Number} input
+     * @return {Object} Returns an object containing the value as number and the unit as string.
+     */
+    Rockiotchart.quantity = function (input) {
+      if (typeof input === 'string') {
+        var match = /^(\d+)\s*(.*)$/g.exec(input);
+        return {
+          value: +match[1],
+          unit: match[2] || undefined
+        };
+      }
+      return {
+        value: input
+      };
+    };
+
+    /**
+     * This is a wrapper around document.querySelector that will return the query if it's already of type Node
+     *
+     * @memberof Rockiotchart.Core
+     * @param {String|Node} query The query to use for selecting a Node or a DOM node that will be returned directly
+     * @return {Node}
+     */
+    Rockiotchart.querySelector = function (query) {
+      return query instanceof Node ? query : document.querySelector(query);
+    };
+
+    /**
+     * Functional style helper to produce array with given length initialized with undefined values
+     *
+     * @memberof Rockiotchart.Core
+     * @param length
+     * @return {Array}
+     */
+    Rockiotchart.times = function (length) {
+      return Array.apply(null, new Array(length));
+    };
+
+    /**
+     * Sum helper to be used in reduce functions
+     *
+     * @memberof Rockiotchart.Core
+     * @param previous
+     * @param current
+     * @return {*}
+     */
+    Rockiotchart.sum = function (previous, current) {
+      return previous + (current ? current : 0);
+    };
+
+    /**
+     * Multiply helper to be used in `Array.map` for multiplying each value of an array with a factor.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} factor
+     * @returns {Function} Function that can be used in `Array.map` to multiply each value in an array
+     */
+    Rockiotchart.mapMultiply = function (factor) {
+      return function (num) {
+        return num * factor;
+      };
+    };
+
+    /**
+     * Add helper to be used in `Array.map` for adding a addend to each value of an array.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} addend
+     * @returns {Function} Function that can be used in `Array.map` to add a addend to each value in an array
+     */
+    Rockiotchart.mapAdd = function (addend) {
+      return function (num) {
+        return num + addend;
+      };
+    };
+
+    /**
+     * Map for multi dimensional arrays where their nested arrays will be mapped in serial. The output array will have the length of the largest nested array. The callback function is called with variable arguments where each argument is the nested array value (or undefined if there are no more values).
+     *
+     * @memberof Rockiotchart.Core
+     * @param arr
+     * @param cb
+     * @return {Array}
+     */
+    Rockiotchart.serialMap = function (arr, cb) {
+      var result = [],
+        length = Math.max.apply(null, arr.map(function (e) {
+          return e.length;
+        }));
+      Rockiotchart.times(length).forEach(function (e, index) {
+        var args = arr.map(function (e) {
+          return e[index];
+        });
+        result[index] = cb.apply(null, args);
+      });
+      return result;
+    };
+
+    /**
+     * This helper function can be used to round values with certain precision level after decimal. This is used to prevent rounding errors near float point precision limit.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} value The value that should be rounded with precision
+     * @param {Number} [digits] The number of digits after decimal used to do the rounding
+     * @returns {number} Rounded value
+     */
+    Rockiotchart.roundWithPrecision = function (value, digits) {
+      var precision = Math.pow(10, digits || Rockiotchart.precision);
+      return Math.round(value * precision) / precision;
+    };
+
+    /**
+     * Precision level used internally in Rockiotchart for rounding. If you require more decimal places you can increase this number.
+     *
+     * @memberof Rockiotchart.Core
+     * @type {number}
+     */
+    Rockiotchart.precision = 8;
+
+    /**
+     * A map with characters to escape for strings to be safely used as attribute values.
+     *
+     * @memberof Rockiotchart.Core
+     * @type {Object}
+     */
+    Rockiotchart.escapingMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+
+    /**
+     * This function serializes arbitrary data to a string. In case of data that can't be easily converted to a string, this function will create a wrapper object and serialize the data using JSON.stringify. The outcoming string will always be escaped using Rockiotchart.escapingMap.
+     * If called with null or undefined the function will return immediately with null or undefined.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number|String|Object} data
+     * @return {String}
+     */
+    Rockiotchart.serialize = function (data) {
+      if (data === null || data === undefined) {
+        return data;
+      } else if (typeof data === 'number') {
+        data = '' + data;
+      } else if (_typeof(data) === 'object') {
+        data = JSON.stringify({
+          data: data
+        });
+      }
+      return Object.keys(Rockiotchart.escapingMap).reduce(function (result, key) {
+        return Rockiotchart.replaceAll(result, key, Rockiotchart.escapingMap[key]);
+      }, data);
+    };
+
+    /**
+     * This function de-serializes a string previously serialized with Rockiotchart.serialize. The string will always be unescaped using Rockiotchart.escapingMap before it's returned. Based on the input value the return type can be Number, String or Object. JSON.parse is used with try / catch to see if the unescaped string can be parsed into an Object and this Object will be returned on success.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {String} data
+     * @return {String|Number|Object}
+     */
+    Rockiotchart.deserialize = function (data) {
+      if (typeof data !== 'string') {
+        return data;
+      }
+      data = Object.keys(Rockiotchart.escapingMap).reduce(function (result, key) {
+        return Rockiotchart.replaceAll(result, Rockiotchart.escapingMap[key], key);
+      }, data);
+      try {
+        data = JSON.parse(data);
+        data = data.data !== undefined ? data.data : data;
+      } catch (e) {}
+      return data;
+    };
+
+    /**
+     * Create or reinitialize the SVG element for the chart
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Node} container The containing DOM Node object that will be used to plant the SVG element
+     * @param {String} width Set the width of the SVG element. Default is 100%
+     * @param {String} height Set the height of the SVG element. Default is 100%
+     * @param {String} className Specify a class to be added to the SVG element
+     * @return {Object} The created/reinitialized SVG element
+     */
+    Rockiotchart.createSvg = function (container, width, height, className) {
+      var svg;
+      width = width || '100%';
+      height = height || '100%';
+
+      // Check if there is a previous SVG element in the container that contains the Rockiotchart XML namespace and remove it
+      // Since the DOM API does not support namespaces we need to manually search the returned list http://www.w3.org/TR/selectors-api/
+      Array.prototype.slice.call(container.querySelectorAll('svg')).filter(function filterRockiotchartSvgObjects(svg) {
+        return svg.getAttributeNS(Rockiotchart.namespaces.xmlns, 'ct');
+      }).forEach(function removePreviousElement(svg) {
+        container.removeChild(svg);
+      });
+
+      // Create svg object with width and height or use 100% as default
+      svg = new Rockiotchart.Svg('svg').attr({
+        width: width,
+        height: height
+      }).addClass(className);
+      svg._node.style.width = width;
+      svg._node.style.height = height;
+
+      // Add the DOM node to our container
+      container.appendChild(svg._node);
+      return svg;
+    };
+
+    /**
+     * Ensures that the data object passed as second argument to the charts is present and correctly initialized.
+     *
+     * @param  {Object} data The data object that is passed as second argument to the charts
+     * @return {Object} The normalized data object
+     */
+    Rockiotchart.normalizeData = function (data, reverse, multi) {
+      var labelCount;
+      var output = {
+        raw: data,
+        normalized: {}
+      };
+
+      // Check if we should generate some labels based on existing series data
+      output.normalized.series = Rockiotchart.getDataArray({
+        series: data.series || []
+      }, reverse, multi);
+
+      // If all elements of the normalized data array are arrays we're dealing with
+      // multi series data and we need to find the largest series if they are un-even
+      if (output.normalized.series.every(function (value) {
+        return value instanceof Array;
+      })) {
+        // Getting the series with the the most elements
+        labelCount = Math.max.apply(null, output.normalized.series.map(function (series) {
+          return series.length;
+        }));
+      } else {
+        // We're dealing with Pie data so we just take the normalized array length
+        labelCount = output.normalized.series.length;
+      }
+      output.normalized.labels = (data.labels || []).slice();
+      // Padding the labels to labelCount with empty strings
+      Array.prototype.push.apply(output.normalized.labels, Rockiotchart.times(Math.max(0, labelCount - output.normalized.labels.length)).map(function () {
+        return '';
+      }));
+      if (reverse) {
+        Rockiotchart.reverseData(output.normalized);
+      }
+      return output;
+    };
+
+    /**
+     * This function safely checks if an objects has an owned property.
+     *
+     * @param {Object} object The object where to check for a property
+     * @param {string} property The property name
+     * @returns {boolean} Returns true if the object owns the specified property
+     */
+    Rockiotchart.safeHasProperty = function (object, property) {
+      return object !== null && _typeof(object) === 'object' && object.hasOwnProperty(property);
+    };
+
+    /**
+     * Checks if a value is considered a hole in the data series.
+     *
+     * @param {*} value
+     * @returns {boolean} True if the value is considered a data hole
+     */
+    Rockiotchart.isDataHoleValue = function (value) {
+      return value === null || value === undefined || typeof value === 'number' && isNaN(value);
+    };
+
+    /**
+     * Reverses the series, labels and series data arrays.
+     *
+     * @memberof Rockiotchart.Core
+     * @param data
+     */
+    Rockiotchart.reverseData = function (data) {
+      data.labels.reverse();
+      data.series.reverse();
+      for (var i = 0; i < data.series.length; i++) {
+        if (_typeof(data.series[i]) === 'object' && data.series[i].data !== undefined) {
+          data.series[i].data.reverse();
+        } else if (data.series[i] instanceof Array) {
+          data.series[i].reverse();
+        }
+      }
+    };
+
+    /**
+     * Convert data series into plain array
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} data The series object that contains the data to be visualized in the chart
+     * @param {Boolean} [reverse] If true the whole data is reversed by the getDataArray call. This will modify the data object passed as first parameter. The labels as well as the series order is reversed. The whole series data arrays are reversed too.
+     * @param {Boolean} [multi] Create a multi dimensional array from a series data array where a value object with `x` and `y` values will be created.
+     * @return {Array} A plain array that contains the data to be visualized in the chart
+     */
+    Rockiotchart.getDataArray = function (data, reverse, multi) {
+      // Recursively walks through nested arrays and convert string values to numbers and objects with value properties
+      // to values. Check the tests in data core -> data normalization for a detailed specification of expected values
+      function recursiveConvert(value) {
+        if (Rockiotchart.safeHasProperty(value, 'value')) {
+          // We are dealing with value object notation so we need to recurse on value property
+          return recursiveConvert(value.value);
+        } else if (Rockiotchart.safeHasProperty(value, 'data')) {
+          // We are dealing with series object notation so we need to recurse on data property
+          return recursiveConvert(value.data);
+        } else if (value instanceof Array) {
+          // Data is of type array so we need to recurse on the series
+          return value.map(recursiveConvert);
+        } else if (Rockiotchart.isDataHoleValue(value)) {
+          // We're dealing with a hole in the data and therefore need to return undefined
+          // We're also returning undefined for multi value output
+          return undefined;
+        } else {
+          // We need to prepare multi value output (x and y data)
+          if (multi) {
+            var multiValue = {};
+
+            // Single series value arrays are assumed to specify the Y-Axis value
+            // For example: [1, 2] => [{x: undefined, y: 1}, {x: undefined, y: 2}]
+            // If multi is a string then it's assumed that it specified which dimension should be filled as default
+            if (typeof multi === 'string') {
+              multiValue[multi] = Rockiotchart.getNumberOrUndefined(value);
+            } else {
+              multiValue.y = Rockiotchart.getNumberOrUndefined(value);
+            }
+            multiValue.x = value.hasOwnProperty('x') ? Rockiotchart.getNumberOrUndefined(value.x) : multiValue.x;
+            multiValue.y = value.hasOwnProperty('y') ? Rockiotchart.getNumberOrUndefined(value.y) : multiValue.y;
+            return multiValue;
+          } else {
+            // We can return simple data
+            return Rockiotchart.getNumberOrUndefined(value);
+          }
+        }
+      }
+      return data.series.map(recursiveConvert);
+    };
+
+    /**
+     * Converts a number into a padding object.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object|Number} padding
+     * @param {Number} [fallback] This value is used to fill missing values if a incomplete padding object was passed
+     * @returns {Object} Returns a padding object containing top, right, bottom, left properties filled with the padding number passed in as argument. If the argument is something else than a number (presumably already a correct padding object) then this argument is directly returned.
+     */
+    Rockiotchart.normalizePadding = function (padding, fallback) {
+      fallback = fallback || 0;
+      return typeof padding === 'number' ? {
+        top: padding,
+        right: padding,
+        bottom: padding,
+        left: padding
+      } : {
+        top: typeof padding.top === 'number' ? padding.top : fallback,
+        right: typeof padding.right === 'number' ? padding.right : fallback,
+        bottom: typeof padding.bottom === 'number' ? padding.bottom : fallback,
+        left: typeof padding.left === 'number' ? padding.left : fallback
+      };
+    };
+    Rockiotchart.getMetaData = function (series, index) {
+      var value = series.data ? series.data[index] : series[index];
+      return value ? value.meta : undefined;
+    };
+
+    /**
+     * Calculate the order of magnitude for the chart scale
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} value The value Range of the chart
+     * @return {Number} The order of magnitude
+     */
+    Rockiotchart.orderOfMagnitude = function (value) {
+      return Math.floor(Math.log(Math.abs(value)) / Math.LN10);
+    };
+
+    /**
+     * Project a data length into screen coordinates (pixels)
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} axisLength The svg element for the chart
+     * @param {Number} length Single data value from a series array
+     * @param {Object} bounds All the values to set the bounds of the chart
+     * @return {Number} The projected data length in pixels
+     */
+    Rockiotchart.projectLength = function (axisLength, length, bounds) {
+      return length / bounds.range * axisLength;
+    };
+
+    /**
+     * Get the height of the area in the chart for the data series
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} svg The svg element for the chart
+     * @param {Object} options The Object that contains all the optional values for the chart
+     * @return {Number} The height of the area in the chart for the data series
+     */
+    Rockiotchart.getAvailableHeight = function (svg, options) {
+      return Math.max((Rockiotchart.quantity(options.height).value || svg.height()) - (options.chartPadding.top + options.chartPadding.bottom) - options.axisX.offset, 0);
+    };
+
+    /**
+     * Get highest and lowest value of data array. This Array contains the data that will be visualized in the chart.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Array} data The array that contains the data to be visualized in the chart
+     * @param {Object} options The Object that contains the chart options
+     * @param {String} dimension Axis dimension 'x' or 'y' used to access the correct value and high / low configuration
+     * @return {Object} An object that contains the highest and lowest value that will be visualized on the chart.
+     */
+    Rockiotchart.getHighLow = function (data, options, dimension) {
+      // TODO: Remove workaround for deprecated global high / low config. Axis high / low configuration is preferred
+      options = Rockiotchart.extend({}, options, dimension ? options['axis' + dimension.toUpperCase()] : {});
+      var highLow = {
+        high: options.high === undefined ? -Number.MAX_VALUE : +options.high,
+        low: options.low === undefined ? Number.MAX_VALUE : +options.low
+      };
+      var findHigh = options.high === undefined;
+      var findLow = options.low === undefined;
+
+      // Function to recursively walk through arrays and find highest and lowest number
+      function recursiveHighLow(data) {
+        if (data === undefined) {
+          return undefined;
+        } else if (data instanceof Array) {
+          for (var i = 0; i < data.length; i++) {
+            recursiveHighLow(data[i]);
+          }
+        } else {
+          var value = dimension ? +data[dimension] : +data;
+          if (findHigh && value > highLow.high) {
+            highLow.high = value;
+          }
+          if (findLow && value < highLow.low) {
+            highLow.low = value;
+          }
+        }
+      }
+
+      // Start to find highest and lowest number recursively
+      if (findHigh || findLow) {
+        recursiveHighLow(data);
+      }
+
+      // Overrides of high / low based on reference value, it will make sure that the invisible reference value is
+      // used to generate the chart. This is useful when the chart always needs to contain the position of the
+      // invisible reference value in the view i.e. for bipolar scales.
+      if (options.referenceValue || options.referenceValue === 0) {
+        highLow.high = Math.max(options.referenceValue, highLow.high);
+        highLow.low = Math.min(options.referenceValue, highLow.low);
+      }
+
+      // If high and low are the same because of misconfiguration or flat data (only the same value) we need
+      // to set the high or low to 0 depending on the polarity
+      if (highLow.high <= highLow.low) {
+        // If both values are 0 we set high to 1
+        if (highLow.low === 0) {
+          highLow.high = 1;
+        } else if (highLow.low < 0) {
+          // If we have the same negative value for the bounds we set bounds.high to 0
+          highLow.high = 0;
+        } else if (highLow.high > 0) {
+          // If we have the same positive value for the bounds we set bounds.low to 0
+          highLow.low = 0;
+        } else {
+          // If data array was empty, values are Number.MAX_VALUE and -Number.MAX_VALUE. Set bounds to prevent errors
+          highLow.high = 1;
+          highLow.low = 0;
+        }
+      }
+      return highLow;
+    };
+
+    /**
+     * Checks if a value can be safely coerced to a number. This includes all values except null which result in finite numbers when coerced. This excludes NaN, since it's not finite.
+     *
+     * @memberof Rockiotchart.Core
+     * @param value
+     * @returns {Boolean}
+     */
+    Rockiotchart.isNumeric = function (value) {
+      return value === null ? false : isFinite(value);
+    };
+
+    /**
+     * Returns true on all falsey values except the numeric value 0.
+     *
+     * @memberof Rockiotchart.Core
+     * @param value
+     * @returns {boolean}
+     */
+    Rockiotchart.isFalseyButZero = function (value) {
+      return !value && value !== 0;
+    };
+
+    /**
+     * Returns a number if the passed parameter is a valid number or the function will return undefined. On all other values than a valid number, this function will return undefined.
+     *
+     * @memberof Rockiotchart.Core
+     * @param value
+     * @returns {*}
+     */
+    Rockiotchart.getNumberOrUndefined = function (value) {
+      return Rockiotchart.isNumeric(value) ? +value : undefined;
+    };
+
+    /**
+     * Checks if provided value object is multi value (contains x or y properties)
+     *
+     * @memberof Rockiotchart.Core
+     * @param value
+     */
+    Rockiotchart.isMultiValue = function (value) {
+      return _typeof(value) === 'object' && ('x' in value || 'y' in value);
+    };
+
+    /**
+     * Gets a value from a dimension `value.x` or `value.y` while returning value directly if it's a valid numeric value. If the value is not numeric and it's falsey this function will return `defaultValue`.
+     *
+     * @memberof Rockiotchart.Core
+     * @param value
+     * @param dimension
+     * @param defaultValue
+     * @returns {*}
+     */
+    Rockiotchart.getMultiValue = function (value, dimension) {
+      if (Rockiotchart.isMultiValue(value)) {
+        return Rockiotchart.getNumberOrUndefined(value[dimension || 'y']);
+      } else {
+        return Rockiotchart.getNumberOrUndefined(value);
+      }
+    };
+
+    /**
+     * Pollard Rho Algorithm to find smallest factor of an integer value. There are more efficient algorithms for factorization, but this one is quite efficient and not so complex.
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} num An integer number where the smallest factor should be searched for
+     * @returns {Number} The smallest integer factor of the parameter num.
+     */
+    Rockiotchart.rho = function (num) {
+      if (num === 1) {
+        return num;
+      }
+      function gcd(p, q) {
+        if (p % q === 0) {
+          return q;
+        } else {
+          return gcd(q, p % q);
+        }
+      }
+      function f(x) {
+        return x * x + 1;
+      }
+      var x1 = 2,
+        x2 = 2,
+        divisor;
+      if (num % 2 === 0) {
+        return 2;
+      }
+      do {
+        x1 = f(x1) % num;
+        x2 = f(f(x2)) % num;
+        divisor = gcd(Math.abs(x1 - x2), num);
+      } while (divisor === 1);
+      return divisor;
+    };
+
+    /**
+     * Calculate and retrieve all the bounds for the chart and return them in one array
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} axisLength The length of the Axis used for
+     * @param {Object} highLow An object containing a high and low property indicating the value range of the chart.
+     * @param {Number} scaleMinSpace The minimum projected length a step should result in
+     * @param {Boolean} onlyInteger
+     * @return {Object} All the values to set the bounds of the chart
+     */
+    Rockiotchart.getBounds = function (axisLength, highLow, scaleMinSpace, onlyInteger) {
+      var i,
+        optimizationCounter = 0,
+        newMin,
+        newMax,
+        bounds = {
+          high: highLow.high,
+          low: highLow.low
+        };
+      bounds.valueRange = bounds.high - bounds.low;
+      bounds.oom = Rockiotchart.orderOfMagnitude(bounds.valueRange);
+      bounds.step = Math.pow(10, bounds.oom);
+      bounds.min = Math.floor(bounds.low / bounds.step) * bounds.step;
+      bounds.max = Math.ceil(bounds.high / bounds.step) * bounds.step;
+      bounds.range = bounds.max - bounds.min;
+      bounds.numberOfSteps = Math.round(bounds.range / bounds.step);
+
+      // Optimize scale step by checking if subdivision is possible based on horizontalGridMinSpace
+      // If we are already below the scaleMinSpace value we will scale up
+      var length = Rockiotchart.projectLength(axisLength, bounds.step, bounds);
+      var scaleUp = length < scaleMinSpace;
+      var smallestFactor = onlyInteger ? Rockiotchart.rho(bounds.range) : 0;
+
+      // First check if we should only use integer steps and if step 1 is still larger than scaleMinSpace so we can use 1
+      if (onlyInteger && Rockiotchart.projectLength(axisLength, 1, bounds) >= scaleMinSpace) {
+        bounds.step = 1;
+      } else if (onlyInteger && smallestFactor < bounds.step && Rockiotchart.projectLength(axisLength, smallestFactor, bounds) >= scaleMinSpace) {
+        // If step 1 was too small, we can try the smallest factor of range
+        // If the smallest factor is smaller than the current bounds.step and the projected length of smallest factor
+        // is larger than the scaleMinSpace we should go for it.
+        bounds.step = smallestFactor;
+      } else {
+        // Trying to divide or multiply by 2 and find the best step value
+        while (true) {
+          if (scaleUp && Rockiotchart.projectLength(axisLength, bounds.step, bounds) <= scaleMinSpace) {
+            bounds.step *= 2;
+          } else if (!scaleUp && Rockiotchart.projectLength(axisLength, bounds.step / 2, bounds) >= scaleMinSpace) {
+            bounds.step /= 2;
+            if (onlyInteger && bounds.step % 1 !== 0) {
+              bounds.step *= 2;
+              break;
+            }
+          } else {
+            break;
+          }
+          if (optimizationCounter++ > 1000) {
+            throw new Error('Exceeded maximum number of iterations while optimizing scale step!');
+          }
+        }
+      }
+      var EPSILON = 2.221e-16;
+      bounds.step = Math.max(bounds.step, EPSILON);
+      function safeIncrement(value, increment) {
+        // If increment is too small use *= (1+EPSILON) as a simple nextafter
+        if (value === (value += increment)) {
+          value *= 1 + (increment > 0 ? EPSILON : -EPSILON);
+        }
+        return value;
+      }
+
+      // Narrow min and max based on new step
+      newMin = bounds.min;
+      newMax = bounds.max;
+      while (newMin + bounds.step <= bounds.low) {
+        newMin = safeIncrement(newMin, bounds.step);
+      }
+      while (newMax - bounds.step >= bounds.high) {
+        newMax = safeIncrement(newMax, -bounds.step);
+      }
+      bounds.min = newMin;
+      bounds.max = newMax;
+      bounds.range = bounds.max - bounds.min;
+      var values = [];
+      for (i = bounds.min; i <= bounds.max; i = safeIncrement(i, bounds.step)) {
+        var value = Rockiotchart.roundWithPrecision(i);
+        if (value !== values[values.length - 1]) {
+          values.push(value);
+        }
+      }
+      bounds.values = values;
+      return bounds;
+    };
+
+    /**
+     * Calculate cartesian coordinates of polar coordinates
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Number} centerX X-axis coordinates of center point of circle segment
+     * @param {Number} centerY X-axis coordinates of center point of circle segment
+     * @param {Number} radius Radius of circle segment
+     * @param {Number} angleInDegrees Angle of circle segment in degrees
+     * @return {{x:Number, y:Number}} Coordinates of point on circumference
+     */
+    Rockiotchart.polarToCartesian = function (centerX, centerY, radius, angleInDegrees) {
+      var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return {
+        x: centerX + radius * Math.cos(angleInRadians),
+        y: centerY + radius * Math.sin(angleInRadians)
+      };
+    };
+
+    /**
+     * Initialize chart drawing rectangle (area where chart is drawn) x1,y1 = bottom left / x2,y2 = top right
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} svg The svg element for the chart
+     * @param {Object} options The Object that contains all the optional values for the chart
+     * @param {Number} [fallbackPadding] The fallback padding if partial padding objects are used
+     * @return {Object} The chart rectangles coordinates inside the svg element plus the rectangles measurements
+     */
+    Rockiotchart.createChartRect = function (svg, options, fallbackPadding) {
+      var hasAxis = !!(options.axisX || options.axisY);
+      var yAxisOffset = hasAxis ? options.axisY.offset : 0;
+      var xAxisOffset = hasAxis ? options.axisX.offset : 0;
+      // If width or height results in invalid value (including 0) we fallback to the unitless settings or even 0
+      var width = svg.width() || Rockiotchart.quantity(options.width).value || 0;
+      var height = svg.height() || Rockiotchart.quantity(options.height).value || 0;
+      var normalizedPadding = Rockiotchart.normalizePadding(options.chartPadding, fallbackPadding);
+
+      // If settings were to small to cope with offset (legacy) and padding, we'll adjust
+      width = Math.max(width, yAxisOffset + normalizedPadding.left + normalizedPadding.right);
+      height = Math.max(height, xAxisOffset + normalizedPadding.top + normalizedPadding.bottom);
+      var chartRect = {
+        padding: normalizedPadding,
+        width: function width() {
+          return this.x2 - this.x1;
+        },
+        height: function height() {
+          return this.y1 - this.y2;
+        }
+      };
+      if (hasAxis) {
+        if (options.axisX.position === 'start') {
+          chartRect.y2 = normalizedPadding.top + xAxisOffset;
+          chartRect.y1 = Math.max(height - normalizedPadding.bottom, chartRect.y2 + 1);
+        } else {
+          chartRect.y2 = normalizedPadding.top;
+          chartRect.y1 = Math.max(height - normalizedPadding.bottom - xAxisOffset, chartRect.y2 + 1);
+        }
+        if (options.axisY.position === 'start') {
+          chartRect.x1 = normalizedPadding.left + yAxisOffset;
+          chartRect.x2 = Math.max(width - normalizedPadding.right, chartRect.x1 + 1);
+        } else {
+          chartRect.x1 = normalizedPadding.left;
+          chartRect.x2 = Math.max(width - normalizedPadding.right - yAxisOffset, chartRect.x1 + 1);
+        }
+      } else {
+        chartRect.x1 = normalizedPadding.left;
+        chartRect.x2 = Math.max(width - normalizedPadding.right, chartRect.x1 + 1);
+        chartRect.y2 = normalizedPadding.top;
+        chartRect.y1 = Math.max(height - normalizedPadding.bottom, chartRect.y2 + 1);
+      }
+      return chartRect;
+    };
+
+    /**
+     * Creates a grid line based on a projected value.
+     *
+     * @memberof Rockiotchart.Core
+     * @param position
+     * @param index
+     * @param axis
+     * @param offset
+     * @param length
+     * @param group
+     * @param classes
+     * @param eventEmitter
+     */
+    Rockiotchart.createGrid = function (position, index, axis, offset, length, group, classes, eventEmitter) {
+      var positionalData = {};
+      positionalData[axis.units.pos + '1'] = position;
+      positionalData[axis.units.pos + '2'] = position;
+      positionalData[axis.counterUnits.pos + '1'] = offset;
+      positionalData[axis.counterUnits.pos + '2'] = offset + length;
+      var gridElement = group.elem('line', positionalData, classes.join(' '));
+
+      // Event for grid draw
+      eventEmitter.emit('draw', Rockiotchart.extend({
+        type: 'grid',
+        axis: axis,
+        index: index,
+        group: group,
+        element: gridElement
+      }, positionalData));
+    };
+
+    /**
+     * Creates a grid background rect and emits the draw event.
+     *
+     * @memberof Rockiotchart.Core
+     * @param gridGroup
+     * @param chartRect
+     * @param className
+     * @param eventEmitter
+     */
+    Rockiotchart.createGridBackground = function (gridGroup, chartRect, className, eventEmitter) {
+      var gridBackground = gridGroup.elem('rect', {
+        x: chartRect.x1,
+        y: chartRect.y2,
+        width: chartRect.width(),
+        height: chartRect.height()
+      }, className, true);
+
+      // Event for grid background draw
+      eventEmitter.emit('draw', {
+        type: 'gridBackground',
+        group: gridGroup,
+        element: gridBackground
+      });
+    };
+
+    /**
+     * Creates a label based on a projected value and an axis.
+     *
+     * @memberof Rockiotchart.Core
+     * @param position
+     * @param length
+     * @param index
+     * @param labels
+     * @param axis
+     * @param axisOffset
+     * @param labelOffset
+     * @param group
+     * @param classes
+     * @param useForeignObject
+     * @param eventEmitter
+     */
+    Rockiotchart.createLabel = function (position, length, index, labels, axis, axisOffset, labelOffset, group, classes, useForeignObject, eventEmitter) {
+      var labelElement;
+      var positionalData = {};
+      positionalData[axis.units.pos] = position + labelOffset[axis.units.pos];
+      positionalData[axis.counterUnits.pos] = labelOffset[axis.counterUnits.pos];
+      positionalData[axis.units.len] = length;
+      positionalData[axis.counterUnits.len] = Math.max(0, axisOffset - 10);
+      if (useForeignObject) {
+        // We need to set width and height explicitly to px as span will not expand with width and height being
+        // 100% in all browsers
+        var content = document.createElement('span');
+        content.className = classes.join(' ');
+        content.setAttribute('xmlns', Rockiotchart.namespaces.xhtml);
+        content.innerText = labels[index];
+        content.style[axis.units.len] = Math.round(positionalData[axis.units.len]) + 'px';
+        content.style[axis.counterUnits.len] = Math.round(positionalData[axis.counterUnits.len]) + 'px';
+        labelElement = group.foreignObject(content, Rockiotchart.extend({
+          style: 'overflow: visible;'
+        }, positionalData));
+      } else {
+        labelElement = group.elem('text', positionalData, classes.join(' ')).text(labels[index]);
+      }
+      eventEmitter.emit('draw', Rockiotchart.extend({
+        type: 'label',
+        axis: axis,
+        index: index,
+        group: group,
+        element: labelElement,
+        text: labels[index]
+      }, positionalData));
+    };
+
+    /**
+     * Helper to read series specific options from options object. It automatically falls back to the global option if
+     * there is no option in the series options.
+     *
+     * @param {Object} series Series object
+     * @param {Object} options Rockiotchart options object
+     * @param {string} key The options key that should be used to obtain the options
+     * @returns {*}
+     */
+    Rockiotchart.getSeriesOption = function (series, options, key) {
+      if (series.name && options.series && options.series[series.name]) {
+        var seriesOptions = options.series[series.name];
+        return seriesOptions.hasOwnProperty(key) ? seriesOptions[key] : options[key];
+      } else {
+        return options[key];
+      }
+    };
+
+    /**
+     * Provides options handling functionality with callback for options changes triggered by responsive options and media query matches
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Object} options Options set by user
+     * @param {Array} responsiveOptions Optional functions to add responsive behavior to chart
+     * @param {Object} eventEmitter The event emitter that will be used to emit the options changed events
+     * @return {Object} The consolidated options object from the defaults, base and matching responsive options
+     */
+    Rockiotchart.optionsProvider = function (options, responsiveOptions, eventEmitter) {
+      var baseOptions = Rockiotchart.extend({}, options),
+        currentOptions,
+        mediaQueryListeners = [],
+        i;
+      function updateCurrentOptions(mediaEvent) {
+        var previousOptions = currentOptions;
+        currentOptions = Rockiotchart.extend({}, baseOptions);
+        if (responsiveOptions) {
+          for (i = 0; i < responsiveOptions.length; i++) {
+            var mql = window.matchMedia(responsiveOptions[i][0]);
+            if (mql.matches) {
+              currentOptions = Rockiotchart.extend(currentOptions, responsiveOptions[i][1]);
+            }
+          }
+        }
+        if (eventEmitter && mediaEvent) {
+          eventEmitter.emit('optionsChanged', {
+            previousOptions: previousOptions,
+            currentOptions: currentOptions
+          });
+        }
+      }
+      function removeMediaQueryListeners() {
+        mediaQueryListeners.forEach(function (mql) {
+          mql.removeListener(updateCurrentOptions);
+        });
+      }
+      if (!window.matchMedia) {
+        throw "window.matchMedia not found! Make sure you're using a polyfill.";
+      } else if (responsiveOptions) {
+        for (i = 0; i < responsiveOptions.length; i++) {
+          var mql = window.matchMedia(responsiveOptions[i][0]);
+          mql.addListener(updateCurrentOptions);
+          mediaQueryListeners.push(mql);
+        }
+      }
+      // Execute initially without an event argument so we get the correct options
+      updateCurrentOptions();
+      return {
+        removeMediaQueryListeners: removeMediaQueryListeners,
+        getCurrentOptions: function getCurrentOptions() {
+          return Rockiotchart.extend({}, currentOptions);
+        }
+      };
+    };
+
+    /**
+     * Splits a list of coordinates and associated values into segments. Each returned segment contains a pathCoordinates
+     * valueData property describing the segment.
+     *
+     * With the default options, segments consist of contiguous sets of points that do not have an undefined value. Any
+     * points with undefined values are discarded.
+     *
+     * **Options**
+     * The following options are used to determine how segments are formed
+     * ```javascript
+     * var options = {
+     *   // If fillHoles is true, undefined values are simply discarded without creating a new segment. Assuming other options are default, this returns single segment.
+     *   fillHoles: false,
+     *   // If increasingX is true, the coordinates in all segments have strictly increasing x-values.
+     *   increasingX: false
+     * };
+     * ```
+     *
+     * @memberof Rockiotchart.Core
+     * @param {Array} pathCoordinates List of point coordinates to be split in the form [x1, y1, x2, y2 ... xn, yn]
+     * @param {Array} values List of associated point values in the form [v1, v2 .. vn]
+     * @param {Object} options Options set by user
+     * @return {Array} List of segments, each containing a pathCoordinates and valueData property.
+     */
+    Rockiotchart.splitIntoSegments = function (pathCoordinates, valueData, options) {
+      var defaultOptions = {
+        increasingX: false,
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      var segments = [];
+      var hole = true;
+      for (var i = 0; i < pathCoordinates.length; i += 2) {
+        // If this value is a "hole" we set the hole flag
+        if (Rockiotchart.getMultiValue(valueData[i / 2].value) === undefined) {
+          // if(valueData[i / 2].value === undefined) {
+          if (!options.fillHoles) {
+            hole = true;
+          }
+        } else {
+          if (options.increasingX && i >= 2 && pathCoordinates[i] <= pathCoordinates[i - 2]) {
+            // X is not increasing, so we need to make sure we start a new segment
+            hole = true;
+          }
+
+          // If it's a valid value we need to check if we're coming out of a hole and create a new empty segment
+          if (hole) {
+            segments.push({
+              pathCoordinates: [],
+              valueData: []
+            });
+            // As we have a valid value now, we are not in a "hole" anymore
+            hole = false;
+          }
+
+          // Add to the segment pathCoordinates and valueData
+          segments[segments.length - 1].pathCoordinates.push(pathCoordinates[i], pathCoordinates[i + 1]);
+          segments[segments.length - 1].valueData.push(valueData[i / 2]);
+        }
+      }
+      return segments;
+    };
+  })(this || global, Rockiotchart) /**
+                                   * Rockiotchart path interpolation functions.
+                                   *
+                                   * @module Rockiotchart.Interpolation
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    Rockiotchart.Interpolation = {};
+
+    /**
+     * This interpolation function does not smooth the path and the result is only containing lines and no curves.
+     *
+     * @example
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [[1, 2, 8, 1, 7]]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.none({
+     *     fillHoles: false
+     *   })
+     * });
+     *
+     *
+     * @memberof Rockiotchart.Interpolation
+     * @return {Function}
+     */
+    Rockiotchart.Interpolation.none = function (options) {
+      var defaultOptions = {
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      return function none(pathCoordinates, valueData) {
+        var path = new Rockiotchart.Svg.Path();
+        var hole = true;
+        for (var i = 0; i < pathCoordinates.length; i += 2) {
+          var currX = pathCoordinates[i];
+          var currY = pathCoordinates[i + 1];
+          var currData = valueData[i / 2];
+          if (Rockiotchart.getMultiValue(currData.value) !== undefined) {
+            if (hole) {
+              path.move(currX, currY, false, currData);
+            } else {
+              path.line(currX, currY, false, currData);
+            }
+            hole = false;
+          } else if (!options.fillHoles) {
+            hole = true;
+          }
+        }
+        return path;
+      };
+    };
+
+    /**
+     * Simple smoothing creates horizontal handles that are positioned with a fraction of the length between two data points. You can use the divisor option to specify the amount of smoothing.
+     *
+     * Simple smoothing can be used instead of `Rockiotchart.Smoothing.cardinal` if you'd like to get rid of the artifacts it produces sometimes. Simple smoothing produces less flowing lines but is accurate by hitting the points and it also doesn't swing below or above the given data point.
+     *
+     * All smoothing functions within Rockiotchart are factory functions that accept an options parameter. The simple interpolation function accepts one configuration parameter `divisor`, between 1 and ∞, which controls the smoothing characteristics.
+     *
+     * @example
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [[1, 2, 8, 1, 7]]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.simple({
+     *     divisor: 2,
+     *     fillHoles: false
+     *   })
+     * });
+     *
+     *
+     * @memberof Rockiotchart.Interpolation
+     * @param {Object} options The options of the simple interpolation factory function.
+     * @return {Function}
+     */
+    Rockiotchart.Interpolation.simple = function (options) {
+      var defaultOptions = {
+        divisor: 2,
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      var d = 1 / Math.max(1, options.divisor);
+      return function simple(pathCoordinates, valueData) {
+        var path = new Rockiotchart.Svg.Path();
+        var prevX, prevY, prevData;
+        for (var i = 0; i < pathCoordinates.length; i += 2) {
+          var currX = pathCoordinates[i];
+          var currY = pathCoordinates[i + 1];
+          var length = (currX - prevX) * d;
+          var currData = valueData[i / 2];
+          if (currData.value !== undefined) {
+            if (prevData === undefined) {
+              path.move(currX, currY, false, currData);
+            } else {
+              path.curve(prevX + length, prevY, currX - length, currY, currX, currY, false, currData);
+            }
+            prevX = currX;
+            prevY = currY;
+            prevData = currData;
+          } else if (!options.fillHoles) {
+            prevX = currX = prevData = undefined;
+          }
+        }
+        return path;
+      };
+    };
+
+    /**
+     * Cardinal / Catmull-Rome spline interpolation is the default smoothing function in Rockiotchart. It produces nice results where the splines will always meet the points. It produces some artifacts though when data values are increased or decreased rapidly. The line may not follow a very accurate path and if the line should be accurate this smoothing function does not produce the best results.
+     *
+     * Cardinal splines can only be created if there are more than two data points. If this is not the case this smoothing will fallback to `Rockiotchart.Smoothing.none`.
+     *
+     * All smoothing functions within Rockiotchart are factory functions that accept an options parameter. The cardinal interpolation function accepts one configuration parameter `tension`, between 0 and 1, which controls the smoothing intensity.
+     *
+     * @example
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [[1, 2, 8, 1, 7]]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.cardinal({
+     *     tension: 1,
+     *     fillHoles: false
+     *   })
+     * });
+     *
+     * @memberof Rockiotchart.Interpolation
+     * @param {Object} options The options of the cardinal factory function.
+     * @return {Function}
+     */
+    Rockiotchart.Interpolation.cardinal = function (options) {
+      var defaultOptions = {
+        tension: 1,
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      var t = Math.min(1, Math.max(0, options.tension)),
+        c = 1 - t;
+      return function cardinal(pathCoordinates, valueData) {
+        // First we try to split the coordinates into segments
+        // This is necessary to treat "holes" in line charts
+        var segments = Rockiotchart.splitIntoSegments(pathCoordinates, valueData, {
+          fillHoles: options.fillHoles
+        });
+        if (!segments.length) {
+          // If there were no segments return 'Rockiotchart.Interpolation.none'
+          return Rockiotchart.Interpolation.none()([]);
+        } else if (segments.length > 1) {
+          // If the split resulted in more that one segment we need to interpolate each segment individually and join them
+          // afterwards together into a single path.
+          var paths = [];
+          // For each segment we will recurse the cardinal function
+          segments.forEach(function (segment) {
+            paths.push(cardinal(segment.pathCoordinates, segment.valueData));
+          });
+          // Join the segment path data into a single path and return
+          return Rockiotchart.Svg.Path.join(paths);
+        } else {
+          // If there was only one segment we can proceed regularly by using pathCoordinates and valueData from the first
+          // segment
+          pathCoordinates = segments[0].pathCoordinates;
+          valueData = segments[0].valueData;
+
+          // If less than two points we need to fallback to no smoothing
+          if (pathCoordinates.length <= 4) {
+            return Rockiotchart.Interpolation.none()(pathCoordinates, valueData);
+          }
+          var path = new Rockiotchart.Svg.Path().move(pathCoordinates[0], pathCoordinates[1], false, valueData[0]),
+            z;
+          for (var i = 0, iLen = pathCoordinates.length; iLen - 2 * !z > i; i += 2) {
+            var p = [{
+              x: +pathCoordinates[i - 2],
+              y: +pathCoordinates[i - 1]
+            }, {
+              x: +pathCoordinates[i],
+              y: +pathCoordinates[i + 1]
+            }, {
+              x: +pathCoordinates[i + 2],
+              y: +pathCoordinates[i + 3]
+            }, {
+              x: +pathCoordinates[i + 4],
+              y: +pathCoordinates[i + 5]
+            }];
+            if (z) {
+              if (!i) {
+                p[0] = {
+                  x: +pathCoordinates[iLen - 2],
+                  y: +pathCoordinates[iLen - 1]
+                };
+              } else if (iLen - 4 === i) {
+                p[3] = {
+                  x: +pathCoordinates[0],
+                  y: +pathCoordinates[1]
+                };
+              } else if (iLen - 2 === i) {
+                p[2] = {
+                  x: +pathCoordinates[0],
+                  y: +pathCoordinates[1]
+                };
+                p[3] = {
+                  x: +pathCoordinates[2],
+                  y: +pathCoordinates[3]
+                };
+              }
+            } else {
+              if (iLen - 4 === i) {
+                p[3] = p[2];
+              } else if (!i) {
+                p[0] = {
+                  x: +pathCoordinates[i],
+                  y: +pathCoordinates[i + 1]
+                };
+              }
+            }
+            path.curve(t * (-p[0].x + 6 * p[1].x + p[2].x) / 6 + c * p[2].x, t * (-p[0].y + 6 * p[1].y + p[2].y) / 6 + c * p[2].y, t * (p[1].x + 6 * p[2].x - p[3].x) / 6 + c * p[2].x, t * (p[1].y + 6 * p[2].y - p[3].y) / 6 + c * p[2].y, p[2].x, p[2].y, false, valueData[(i + 2) / 2]);
+          }
+          return path;
+        }
+      };
+    };
+
+    /**
+     * Monotone Cubic spline interpolation produces a smooth curve which preserves monotonicity. Unlike cardinal splines, the curve will not extend beyond the range of y-values of the original data points.
+     *
+     * Monotone Cubic splines can only be created if there are more than two data points. If this is not the case this smoothing will fallback to `Rockiotchart.Smoothing.none`.
+     *
+     * The x-values of subsequent points must be increasing to fit a Monotone Cubic spline. If this condition is not met for a pair of adjacent points, then there will be a break in the curve between those data points.
+     *
+     * All smoothing functions within Rockiotchart are factory functions that accept an options parameter.
+     *
+     * @example
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [[1, 2, 8, 1, 7]]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.monotoneCubic({
+     *     fillHoles: false
+     *   })
+     * });
+     *
+     * @memberof Rockiotchart.Interpolation
+     * @param {Object} options The options of the monotoneCubic factory function.
+     * @return {Function}
+     */
+    Rockiotchart.Interpolation.monotoneCubic = function (options) {
+      var defaultOptions = {
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      return function monotoneCubic(pathCoordinates, valueData) {
+        // First we try to split the coordinates into segments
+        // This is necessary to treat "holes" in line charts
+        var segments = Rockiotchart.splitIntoSegments(pathCoordinates, valueData, {
+          fillHoles: options.fillHoles,
+          increasingX: true
+        });
+        if (!segments.length) {
+          // If there were no segments return 'Rockiotchart.Interpolation.none'
+          return Rockiotchart.Interpolation.none()([]);
+        } else if (segments.length > 1) {
+          // If the split resulted in more that one segment we need to interpolate each segment individually and join them
+          // afterwards together into a single path.
+          var paths = [];
+          // For each segment we will recurse the monotoneCubic fn function
+          segments.forEach(function (segment) {
+            paths.push(monotoneCubic(segment.pathCoordinates, segment.valueData));
+          });
+          // Join the segment path data into a single path and return
+          return Rockiotchart.Svg.Path.join(paths);
+        } else {
+          // If there was only one segment we can proceed regularly by using pathCoordinates and valueData from the first
+          // segment
+          pathCoordinates = segments[0].pathCoordinates;
+          valueData = segments[0].valueData;
+
+          // If less than three points we need to fallback to no smoothing
+          if (pathCoordinates.length <= 4) {
+            return Rockiotchart.Interpolation.none()(pathCoordinates, valueData);
+          }
+          var xs = [],
+            ys = [],
+            i,
+            n = pathCoordinates.length / 2,
+            ms = [],
+            ds = [],
+            dys = [],
+            dxs = [],
+            path;
+
+          // Populate x and y coordinates into separate arrays, for readability
+
+          for (i = 0; i < n; i++) {
+            xs[i] = pathCoordinates[i * 2];
+            ys[i] = pathCoordinates[i * 2 + 1];
+          }
+
+          // Calculate deltas and derivative
+
+          for (i = 0; i < n - 1; i++) {
+            dys[i] = ys[i + 1] - ys[i];
+            dxs[i] = xs[i + 1] - xs[i];
+            ds[i] = dys[i] / dxs[i];
+          }
+
+          // Determine desired slope (m) at each point using Fritsch-Carlson method
+          // See: http://math.stackexchange.com/questions/45218/implementation-of-monotone-cubic-interpolation
+
+          ms[0] = ds[0];
+          ms[n - 1] = ds[n - 2];
+          for (i = 1; i < n - 1; i++) {
+            if (ds[i] === 0 || ds[i - 1] === 0 || ds[i - 1] > 0 !== ds[i] > 0) {
+              ms[i] = 0;
+            } else {
+              ms[i] = 3 * (dxs[i - 1] + dxs[i]) / ((2 * dxs[i] + dxs[i - 1]) / ds[i - 1] + (dxs[i] + 2 * dxs[i - 1]) / ds[i]);
+              if (!isFinite(ms[i])) {
+                ms[i] = 0;
+              }
+            }
+          }
+
+          // Now build a path from the slopes
+
+          path = new Rockiotchart.Svg.Path().move(xs[0], ys[0], false, valueData[0]);
+          for (i = 0; i < n - 1; i++) {
+            path.curve(
+            // First control point
+            xs[i] + dxs[i] / 3, ys[i] + ms[i] * dxs[i] / 3,
+            // Second control point
+            xs[i + 1] - dxs[i] / 3, ys[i + 1] - ms[i + 1] * dxs[i] / 3,
+            // End point
+            xs[i + 1], ys[i + 1], false, valueData[i + 1]);
+          }
+          return path;
+        }
+      };
+    };
+
+    /**
+     * Step interpolation will cause the line chart to move in steps rather than diagonal or smoothed lines. This interpolation will create additional points that will also be drawn when the `showPoint` option is enabled.
+     *
+     * All smoothing functions within Rockiotchart are factory functions that accept an options parameter. The step interpolation function accepts one configuration parameter `postpone`, that can be `true` or `false`. The default value is `true` and will cause the step to occur where the value actually changes. If a different behaviour is needed where the step is shifted to the left and happens before the actual value, this option can be set to `false`.
+     *
+     * @example
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [[1, 2, 8, 1, 7]]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.step({
+     *     postpone: true,
+     *     fillHoles: false
+     *   })
+     * });
+     *
+     * @memberof Rockiotchart.Interpolation
+     * @param options
+     * @returns {Function}
+     */
+    Rockiotchart.Interpolation.step = function (options) {
+      var defaultOptions = {
+        postpone: true,
+        fillHoles: false
+      };
+      options = Rockiotchart.extend({}, defaultOptions, options);
+      return function step(pathCoordinates, valueData) {
+        var path = new Rockiotchart.Svg.Path();
+        var prevX, prevY, prevData;
+        for (var i = 0; i < pathCoordinates.length; i += 2) {
+          var currX = pathCoordinates[i];
+          var currY = pathCoordinates[i + 1];
+          var currData = valueData[i / 2];
+
+          // If the current point is also not a hole we can draw the step lines
+          if (currData.value !== undefined) {
+            if (prevData === undefined) {
+              path.move(currX, currY, false, currData);
+            } else {
+              if (options.postpone) {
+                // If postponed we should draw the step line with the value of the previous value
+                path.line(currX, prevY, false, prevData);
+              } else {
+                // If not postponed we should draw the step line with the value of the current value
+                path.line(prevX, currY, false, currData);
+              }
+              // Line to the actual point (this should only be a Y-Axis movement
+              path.line(currX, currY, false, currData);
+            }
+            prevX = currX;
+            prevY = currY;
+            prevData = currData;
+          } else if (!options.fillHoles) {
+            prevX = prevY = prevData = undefined;
+          }
+        }
+        return path;
+      };
+    };
+  })(this || global, Rockiotchart) /**
+                                   * A very basic event module that helps to generate and catch events.
+                                   *
+                                   * @module Rockiotchart.Event
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    Rockiotchart.EventEmitter = function () {
+      var handlers = [];
+
+      /**
+       * Add an event handler for a specific event
+       *
+       * @memberof Rockiotchart.Event
+       * @param {String} event The event name
+       * @param {Function} handler A event handler function
+       */
+      function addEventHandler(event, handler) {
+        handlers[event] = handlers[event] || [];
+        handlers[event].push(handler);
+      }
+
+      /**
+       * Remove an event handler of a specific event name or remove all event handlers for a specific event.
+       *
+       * @memberof Rockiotchart.Event
+       * @param {String} event The event name where a specific or all handlers should be removed
+       * @param {Function} [handler] An optional event handler function. If specified only this specific handler will be removed and otherwise all handlers are removed.
+       */
+      function removeEventHandler(event, handler) {
+        // Only do something if there are event handlers with this name existing
+        if (handlers[event]) {
+          // If handler is set we will look for a specific handler and only remove this
+          if (handler) {
+            handlers[event].splice(handlers[event].indexOf(handler), 1);
+            if (handlers[event].length === 0) {
+              delete handlers[event];
+            }
+          } else {
+            // If no handler is specified we remove all handlers for this event
+            delete handlers[event];
+          }
+        }
+      }
+
+      /**
+       * Use this function to emit an event. All handlers that are listening for this event will be triggered with the data parameter.
+       *
+       * @memberof Rockiotchart.Event
+       * @param {String} event The event name that should be triggered
+       * @param {*} data Arbitrary data that will be passed to the event handler callback functions
+       */
+      function emit(event, data) {
+        // Only do something if there are event handlers with this name existing
+        if (handlers[event]) {
+          handlers[event].forEach(function (handler) {
+            handler(data);
+          });
+        }
+
+        // Emit event to star event handlers
+        if (handlers['*']) {
+          handlers['*'].forEach(function (starHandler) {
+            starHandler(event, data);
+          });
+        }
+      }
+      return {
+        addEventHandler: addEventHandler,
+        removeEventHandler: removeEventHandler,
+        emit: emit
+      };
+    };
+  })(this || global, Rockiotchart) /**
+                                   * This module provides some basic prototype inheritance utilities.
+                                   *
+                                   * @module Rockiotchart.Class
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    function listToArray(list) {
+      var arr = [];
+      if (list.length) {
+        for (var i = 0; i < list.length; i++) {
+          arr.push(list[i]);
+        }
+      }
+      return arr;
+    }
+
+    /**
+     * Method to extend from current prototype.
+     *
+     * @memberof Rockiotchart.Class
+     * @param {Object} properties The object that serves as definition for the prototype that gets created for the new class. This object should always contain a constructor property that is the desired constructor for the newly created class.
+     * @param {Object} [superProtoOverride] By default extens will use the current class prototype or Rockiotchart.class. With this parameter you can specify any super prototype that will be used.
+     * @return {Function} Constructor function of the new class
+     *
+     * @example
+     * var Fruit = Class.extend({
+     * color: undefined,
+     *   sugar: undefined,
+     *
+     *   constructor: function(color, sugar) {
+     *     this.color = color;
+     *     this.sugar = sugar;
+     *   },
+     *
+     *   eat: function() {
+     *     this.sugar = 0;
+     *     return this;
+     *   }
+     * });
+     *
+     * var Banana = Fruit.extend({
+     *   length: undefined,
+     *
+     *   constructor: function(length, sugar) {
+     *     Banana.super.constructor.call(this, 'Yellow', sugar);
+     *     this.length = length;
+     *   }
+     * });
+     *
+     * var banana = new Banana(20, 40);
+     * console.log('banana instanceof Fruit', banana instanceof Fruit);
+     * console.log('Fruit is prototype of banana', Fruit.prototype.isPrototypeOf(banana));
+     * console.log('bananas prototype is Fruit', Object.getPrototypeOf(banana) === Fruit.prototype);
+     * console.log(banana.sugar);
+     * console.log(banana.eat().sugar);
+     * console.log(banana.color);
+     */
+    function extend(properties, superProtoOverride) {
+      var superProto = superProtoOverride || this.prototype || Rockiotchart.Class;
+      var proto = Object.create(superProto);
+      Rockiotchart.Class.cloneDefinitions(proto, properties);
+      var constr = function constr() {
+        var fn = proto.constructor || function () {},
+          instance;
+
+        // If this is linked to the Rockiotchart namespace the constructor was not called with new
+        // To provide a fallback we will instantiate here and return the instance
+        instance = this === Rockiotchart ? Object.create(proto) : this;
+        fn.apply(instance, Array.prototype.slice.call(arguments, 0));
+
+        // If this constructor was not called with new we need to return the instance
+        // This will not harm when the constructor has been called with new as the returned value is ignored
+        return instance;
+      };
+      constr.prototype = proto;
+      constr["super"] = superProto;
+      constr.extend = this.extend;
+      return constr;
+    }
+
+    // Variable argument list clones args > 0 into args[0] and retruns modified args[0]
+    function cloneDefinitions() {
+      var args = listToArray(arguments);
+      var target = args[0];
+      args.splice(1, args.length - 1).forEach(function (source) {
+        Object.getOwnPropertyNames(source).forEach(function (propName) {
+          // If this property already exist in target we delete it first
+          delete target[propName];
+          // Define the property with the descriptor from source
+          Object.defineProperty(target, propName, Object.getOwnPropertyDescriptor(source, propName));
+        });
+      });
+      return target;
+    }
+    Rockiotchart.Class = {
+      extend: extend,
+      cloneDefinitions: cloneDefinitions
+    };
+  })(this || global, Rockiotchart) /**
+                                   * Base for all chart types. The methods in Rockiotchart.Base are inherited to all chart types.
+                                   *
+                                   * @module Rockiotchart.Base
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+
+    // TODO: Currently we need to re-draw the chart on window resize. This is usually very bad and will affect performance.
+    // This is done because we can't work with relative coordinates when drawing the chart because SVG Path does not
+    // work with relative positions yet. We need to check if we can do a viewBox hack to switch to percentage.
+    // See http://mozilla.6506.n7.nabble.com/Specyfing-paths-with-percentages-unit-td247474.html
+    // Update: can be done using the above method tested here: http://codepen.io/gionkunz/pen/KDvLj
+    // The problem is with the label offsets that can't be converted into percentage and affecting the chart container
+    /**
+     * Updates the chart which currently does a full reconstruction of the SVG DOM
+     *
+     * @param {Object} [data] Optional data you'd like to set for the chart before it will update. If not specified the update method will use the data that is already configured with the chart.
+     * @param {Object} [options] Optional options you'd like to add to the previous options for the chart before it will update. If not specified the update method will use the options that have been already configured with the chart.
+     * @param {Boolean} [override] If set to true, the passed options will be used to extend the options that have been configured already. Otherwise the chart default options will be used as the base
+     * @memberof Rockiotchart.Base
+     */
+    function update(data, options, override) {
+      if (data) {
+        this.data = data || {};
+        this.data.labels = this.data.labels || [];
+        this.data.series = this.data.series || [];
+        // Event for data transformation that allows to manipulate the data before it gets rendered in the charts
+        this.eventEmitter.emit('data', {
+          type: 'update',
+          data: this.data
+        });
+      }
+      if (options) {
+        this.options = Rockiotchart.extend({}, override ? this.options : this.defaultOptions, options);
+
+        // If chartist was not initialized yet, we just set the options and leave the rest to the initialization
+        // Otherwise we re-create the optionsProvider at this point
+        if (!this.initializeTimeoutId) {
+          this.optionsProvider.removeMediaQueryListeners();
+          this.optionsProvider = Rockiotchart.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter);
+        }
+      }
+
+      // Only re-created the chart if it has been initialized yet
+      if (!this.initializeTimeoutId) {
+        this.createChart(this.optionsProvider.getCurrentOptions());
+      }
+
+      // Return a reference to the chart object to chain up calls
+      return this;
+    }
+
+    /**
+     * This method can be called on the API object of each chart and will un-register all event listeners that were added to other components. This currently includes a window.resize listener as well as media query listeners if any responsive options have been provided. Use this function if you need to destroy and recreate Rockiotchart charts dynamically.
+     *
+     * @memberof Rockiotchart.Base
+     */
+    function detach() {
+      // Only detach if initialization already occurred on this chart. If this chart still hasn't initialized (therefore
+      // the initializationTimeoutId is still a valid timeout reference, we will clear the timeout
+      if (!this.initializeTimeoutId) {
+        window.removeEventListener('resize', this.resizeListener);
+        this.optionsProvider.removeMediaQueryListeners();
+      } else {
+        window.clearTimeout(this.initializeTimeoutId);
+      }
+      return this;
+    }
+
+    /**
+     * Use this function to register event handlers. The handler callbacks are synchronous and will run in the main thread rather than the event loop.
+     *
+     * @memberof Rockiotchart.Base
+     * @param {String} event Name of the event. Check the examples for supported events.
+     * @param {Function} handler The handler function that will be called when an event with the given name was emitted. This function will receive a data argument which contains event data. See the example for more details.
+     */
+    function on(event, handler) {
+      this.eventEmitter.addEventHandler(event, handler);
+      return this;
+    }
+
+    /**
+     * Use this function to un-register event handlers. If the handler function parameter is omitted all handlers for the given event will be un-registered.
+     *
+     * @memberof Rockiotchart.Base
+     * @param {String} event Name of the event for which a handler should be removed
+     * @param {Function} [handler] The handler function that that was previously used to register a new event handler. This handler will be removed from the event handler list. If this parameter is omitted then all event handlers for the given event are removed from the list.
+     */
+    function off(event, handler) {
+      this.eventEmitter.removeEventHandler(event, handler);
+      return this;
+    }
+    function initialize() {
+      // Add window resize listener that re-creates the chart
+      window.addEventListener('resize', this.resizeListener);
+
+      // Obtain current options based on matching media queries (if responsive options are given)
+      // This will also register a listener that is re-creating the chart based on media changes
+      this.optionsProvider = Rockiotchart.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter);
+      // Register options change listener that will trigger a chart update
+      this.eventEmitter.addEventHandler('optionsChanged', function () {
+        this.update();
+      }.bind(this));
+
+      // Before the first chart creation we need to register us with all plugins that are configured
+      // Initialize all relevant plugins with our chart object and the plugin options specified in the config
+      if (this.options.plugins) {
+        this.options.plugins.forEach(function (plugin) {
+          if (plugin instanceof Array) {
+            plugin[0](this, plugin[1]);
+          } else {
+            plugin(this);
+          }
+        }.bind(this));
+      }
+
+      // Event for data transformation that allows to manipulate the data before it gets rendered in the charts
+      this.eventEmitter.emit('data', {
+        type: 'initial',
+        data: this.data
+      });
+
+      // Create the first chart
+      this.createChart(this.optionsProvider.getCurrentOptions());
+
+      // As chart is initialized from the event loop now we can reset our timeout reference
+      // This is important if the chart gets initialized on the same element twice
+      this.initializeTimeoutId = undefined;
+    }
+
+    /**
+     * Constructor of chart base class.
+     *
+     * @param query
+     * @param data
+     * @param defaultOptions
+     * @param options
+     * @param responsiveOptions
+     * @constructor
+     */
+    function Base(query, data, defaultOptions, options, responsiveOptions) {
+      this.container = Rockiotchart.querySelector(query);
+      this.data = data || {};
+      this.data.labels = this.data.labels || [];
+      this.data.series = this.data.series || [];
+      this.defaultOptions = defaultOptions;
+      this.options = options;
+      this.responsiveOptions = responsiveOptions;
+      this.eventEmitter = Rockiotchart.EventEmitter();
+      this.supportsForeignObject = Rockiotchart.Svg.isSupported('Extensibility');
+      this.supportsAnimations = Rockiotchart.Svg.isSupported('AnimationEventsAttribute');
+      this.resizeListener = function resizeListener() {
+        this.update();
+      }.bind(this);
+      if (this.container) {
+        // If chartist was already initialized in this container we are detaching all event listeners first
+        if (this.container.__chartist__) {
+          this.container.__chartist__.detach();
+        }
+        this.container.__chartist__ = this;
+      }
+
+      // Using event loop for first draw to make it possible to register event listeners in the same call stack where
+      // the chart was created.
+      this.initializeTimeoutId = setTimeout(initialize.bind(this), 0);
+    }
+
+    // Creating the chart base class
+    Rockiotchart.Base = Rockiotchart.Class.extend({
+      constructor: Base,
+      optionsProvider: undefined,
+      container: undefined,
+      svg: undefined,
+      eventEmitter: undefined,
+      createChart: function createChart() {
+        throw new Error("Base chart type can't be instantiated!");
+      },
+      update: update,
+      detach: detach,
+      on: on,
+      off: off,
+      version: Rockiotchart.version,
+      supportsForeignObject: false
+    });
+  })(this || global, Rockiotchart) /**
+                                   * Rockiotchart SVG module for simple SVG DOM abstraction
+                                   *
+                                   * @module Rockiotchart.Svg
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var document = globalRoot.document;
+
+    /**
+     * Rockiotchart.Svg creates a new SVG object wrapper with a starting element. You can use the wrapper to fluently create sub-elements and modify them.
+     *
+     * @memberof Rockiotchart.Svg
+     * @constructor
+     * @param {String|Element} name The name of the SVG element to create or an SVG dom element which should be wrapped into Rockiotchart.Svg
+     * @param {Object} attributes An object with properties that will be added as attributes to the SVG element that is created. Attributes with undefined values will not be added.
+     * @param {String} className This class or class list will be added to the SVG element
+     * @param {Object} parent The parent SVG wrapper object where this newly created wrapper and it's element will be attached to as child
+     * @param {Boolean} insertFirst If this param is set to true in conjunction with a parent element the newly created element will be added as first child element in the parent element
+     */
+    function Svg(name, attributes, className, parent, insertFirst) {
+      // If Svg is getting called with an SVG element we just return the wrapper
+      if (name instanceof Element) {
+        this._node = name;
+      } else {
+        this._node = document.createElementNS(Rockiotchart.namespaces.svg, name);
+
+        // If this is an SVG element created then custom namespace
+        if (name === 'svg') {
+          this.attr({
+            'xmlns:ct': Rockiotchart.namespaces.ct,
+            preserveAspectRatio: 'none'
+          });
+        }
+      }
+      if (attributes) {
+        if (name === 'path' || name === 'line') {
+          attributes['vector-effect'] = 'non-scaling-stroke';
+        }
+        this.attr(attributes);
+      }
+      if (className) {
+        this.addClass(className);
+      }
+      if (parent) {
+        if (insertFirst && parent._node.firstChild) {
+          parent._node.insertBefore(this._node, parent._node.firstChild);
+        } else {
+          parent._node.appendChild(this._node);
+        }
+      }
+    }
+
+    /**
+     * Set attributes on the current SVG element of the wrapper you're currently working on.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Object|String} attributes An object with properties that will be added as attributes to the SVG element that is created. Attributes with undefined values will not be added. If this parameter is a String then the function is used as a getter and will return the attribute value.
+     * @param {String} [ns] If specified, the attribute will be obtained using getAttributeNs. In order to write namepsaced attributes you can use the namespace:attribute notation within the attributes object.
+     * @return {Object|String} The current wrapper object will be returned so it can be used for chaining or the attribute value if used as getter function.
+     */
+    function attr(attributes, ns) {
+      if (typeof attributes === 'string') {
+        if (ns) {
+          return this._node.getAttributeNS(ns, attributes);
+        } else {
+          return this._node.getAttribute(attributes);
+        }
+      }
+      Object.keys(attributes).forEach(function (key) {
+        // If the attribute value is undefined we can skip this one
+        if (attributes[key] === undefined) {
+          return;
+        }
+        if (key.indexOf(':') !== -1) {
+          var namespacedAttribute = key.split(':');
+          this._node.setAttributeNS(Rockiotchart.namespaces[namespacedAttribute[0]], key, attributes[key]);
+        } else {
+          this._node.setAttribute(key, attributes[key]);
+        }
+      }.bind(this));
+      return this;
+    }
+
+    /**
+     * Create a new SVG element whose wrapper object will be selected for further operations. This way you can also create nested groups easily.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} name The name of the SVG element that should be created as child element of the currently selected element wrapper
+     * @param {Object} [attributes] An object with properties that will be added as attributes to the SVG element that is created. Attributes with undefined values will not be added.
+     * @param {String} [className] This class or class list will be added to the SVG element
+     * @param {Boolean} [insertFirst] If this param is set to true in conjunction with a parent element the newly created element will be added as first child element in the parent element
+     * @return {Rockiotchart.Svg} Returns a Rockiotchart.Svg wrapper object that can be used to modify the containing SVG data
+     */
+    function elem(name, attributes, className, insertFirst) {
+      return new Rockiotchart.Svg(name, attributes, className, this, insertFirst);
+    }
+
+    /**
+     * Returns the parent Rockiotchart.SVG wrapper object
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Rockiotchart.Svg} Returns a Rockiotchart.Svg wrapper around the parent node of the current node. If the parent node is not existing or it's not an SVG node then this function will return null.
+     */
+    function parent() {
+      return this._node.parentNode instanceof SVGElement ? new Rockiotchart.Svg(this._node.parentNode) : null;
+    }
+
+    /**
+     * This method returns a Rockiotchart.Svg wrapper around the root SVG element of the current tree.
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Rockiotchart.Svg} The root SVG element wrapped in a Rockiotchart.Svg element
+     */
+    function root() {
+      var node = this._node;
+      while (node.nodeName !== 'svg') {
+        node = node.parentNode;
+      }
+      return new Rockiotchart.Svg(node);
+    }
+
+    /**
+     * Find the first child SVG element of the current element that matches a CSS selector. The returned object is a Rockiotchart.Svg wrapper.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} selector A CSS selector that is used to query for child SVG elements
+     * @return {Rockiotchart.Svg} The SVG wrapper for the element found or null if no element was found
+     */
+    function querySelector(selector) {
+      var foundNode = this._node.querySelector(selector);
+      return foundNode ? new Rockiotchart.Svg(foundNode) : null;
+    }
+
+    /**
+     * Find the all child SVG elements of the current element that match a CSS selector. The returned object is a Rockiotchart.Svg.List wrapper.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} selector A CSS selector that is used to query for child SVG elements
+     * @return {Rockiotchart.Svg.List} The SVG wrapper list for the element found or null if no element was found
+     */
+    function querySelectorAll(selector) {
+      var foundNodes = this._node.querySelectorAll(selector);
+      return foundNodes.length ? new Rockiotchart.Svg.List(foundNodes) : null;
+    }
+
+    /**
+     * Returns the underlying SVG node for the current element.
+     *
+     * @memberof Rockiotchart.Svg
+     * @returns {Node}
+     */
+    function getNode() {
+      return this._node;
+    }
+
+    /**
+     * This method creates a foreignObject (see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject) that allows to embed HTML content into a SVG graphic. With the help of foreignObjects you can enable the usage of regular HTML elements inside of SVG where they are subject for SVG positioning and transformation but the Browser will use the HTML rendering capabilities for the containing DOM.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Node|String} content The DOM Node, or HTML string that will be converted to a DOM Node, that is then placed into and wrapped by the foreignObject
+     * @param {String} [attributes] An object with properties that will be added as attributes to the foreignObject element that is created. Attributes with undefined values will not be added.
+     * @param {String} [className] This class or class list will be added to the SVG element
+     * @param {Boolean} [insertFirst] Specifies if the foreignObject should be inserted as first child
+     * @return {Rockiotchart.Svg} New wrapper object that wraps the foreignObject element
+     */
+    function foreignObject(content, attributes, className, insertFirst) {
+      // If content is string then we convert it to DOM
+      // TODO: Handle case where content is not a string nor a DOM Node
+      if (typeof content === 'string') {
+        var container = document.createElement('div');
+        container.innerHTML = content;
+        content = container.firstChild;
+      }
+
+      // Adding namespace to content element
+      content.setAttribute('xmlns', Rockiotchart.namespaces.xmlns);
+
+      // Creating the foreignObject without required extension attribute (as described here
+      // http://www.w3.org/TR/SVG/extend.html#ForeignObjectElement)
+      var fnObj = this.elem('foreignObject', attributes, className, insertFirst);
+
+      // Add content to foreignObjectElement
+      fnObj._node.appendChild(content);
+      return fnObj;
+    }
+
+    /**
+     * This method adds a new text element to the current Rockiotchart.Svg wrapper.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} t The text that should be added to the text element that is created
+     * @return {Rockiotchart.Svg} The same wrapper object that was used to add the newly created element
+     */
+    function text(t) {
+      this._node.appendChild(document.createTextNode(t));
+      return this;
+    }
+
+    /**
+     * This method will clear all child nodes of the current wrapper object.
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Rockiotchart.Svg} The same wrapper object that got emptied
+     */
+    function empty() {
+      while (this._node.firstChild) {
+        this._node.removeChild(this._node.firstChild);
+      }
+      return this;
+    }
+
+    /**
+     * This method will cause the current wrapper to remove itself from its parent wrapper. Use this method if you'd like to get rid of an element in a given DOM structure.
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Rockiotchart.Svg} The parent wrapper object of the element that got removed
+     */
+    function remove() {
+      this._node.parentNode.removeChild(this._node);
+      return this.parent();
+    }
+
+    /**
+     * This method will replace the element with a new element that can be created outside of the current DOM.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Rockiotchart.Svg} newElement The new Rockiotchart.Svg object that will be used to replace the current wrapper object
+     * @return {Rockiotchart.Svg} The wrapper of the new element
+     */
+    function replace(newElement) {
+      this._node.parentNode.replaceChild(newElement._node, this._node);
+      return newElement;
+    }
+
+    /**
+     * This method will append an element to the current element as a child.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Rockiotchart.Svg} element The Rockiotchart.Svg element that should be added as a child
+     * @param {Boolean} [insertFirst] Specifies if the element should be inserted as first child
+     * @return {Rockiotchart.Svg} The wrapper of the appended object
+     */
+    function append(element, insertFirst) {
+      if (insertFirst && this._node.firstChild) {
+        this._node.insertBefore(element._node, this._node.firstChild);
+      } else {
+        this._node.appendChild(element._node);
+      }
+      return this;
+    }
+
+    /**
+     * Returns an array of class names that are attached to the current wrapper element. This method can not be chained further.
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Array} A list of classes or an empty array if there are no classes on the current element
+     */
+    function classes() {
+      return this._node.getAttribute('class') ? this._node.getAttribute('class').trim().split(/\s+/) : [];
+    }
+
+    /**
+     * Adds one or a space separated list of classes to the current element and ensures the classes are only existing once.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} names A white space separated list of class names
+     * @return {Rockiotchart.Svg} The wrapper of the current element
+     */
+    function addClass(names) {
+      this._node.setAttribute('class', this.classes(this._node).concat(names.trim().split(/\s+/)).filter(function (elem, pos, self) {
+        return self.indexOf(elem) === pos;
+      }).join(' '));
+      return this;
+    }
+
+    /**
+     * Removes one or a space separated list of classes from the current element.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} names A white space separated list of class names
+     * @return {Rockiotchart.Svg} The wrapper of the current element
+     */
+    function removeClass(names) {
+      var removedClasses = names.trim().split(/\s+/);
+      this._node.setAttribute('class', this.classes(this._node).filter(function (name) {
+        return removedClasses.indexOf(name) === -1;
+      }).join(' '));
+      return this;
+    }
+
+    /**
+     * Removes all classes from the current element.
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Rockiotchart.Svg} The wrapper of the current element
+     */
+    function removeAllClasses() {
+      this._node.setAttribute('class', '');
+      return this;
+    }
+
+    /**
+     * Get element height using `getBoundingClientRect`
+     *
+     * @memberof Rockiotchart.Svg
+     * @return {Number} The elements height in pixels
+     */
+    function height() {
+      return this._node.getBoundingClientRect().height;
+    }
+
+    /**
+     * Get element width using `getBoundingClientRect`
+     *
+     * @memberof Rockiotchart.Core
+     * @return {Number} The elements width in pixels
+     */
+    function width() {
+      return this._node.getBoundingClientRect().width;
+    }
+
+    /**
+     * The animate function lets you animate the current element with SMIL animations. You can add animations for multiple attributes at the same time by using an animation definition object. This object should contain SMIL animation attributes. Please refer to http://www.w3.org/TR/SVG/animate.html for a detailed specification about the available animation attributes. Additionally an easing property can be passed in the animation definition object. This can be a string with a name of an easing function in `Rockiotchart.Svg.Easing` or an array with four numbers specifying a cubic Bézier curve.
+     * **An animations object could look like this:**
+     * ```javascript
+     * element.animate({
+     *   opacity: {
+     *     dur: 1000,
+     *     from: 0,
+     *     to: 1
+     *   },
+     *   x1: {
+     *     dur: '1000ms',
+     *     from: 100,
+     *     to: 200,
+     *     easing: 'easeOutQuart'
+     *   },
+     *   y1: {
+     *     dur: '2s',
+     *     from: 0,
+     *     to: 100
+     *   }
+     * });
+     * ```
+     * **Automatic unit conversion**
+     * For the `dur` and the `begin` animate attribute you can also omit a unit by passing a number. The number will automatically be converted to milli seconds.
+     * **Guided mode**
+     * The default behavior of SMIL animations with offset using the `begin` attribute is that the attribute will keep it's original value until the animation starts. Mostly this behavior is not desired as you'd like to have your element attributes already initialized with the animation `from` value even before the animation starts. Also if you don't specify `fill="freeze"` on an animate element or if you delete the animation after it's done (which is done in guided mode) the attribute will switch back to the initial value. This behavior is also not desired when performing simple one-time animations. For one-time animations you'd want to trigger animations immediately instead of relative to the document begin time. That's why in guided mode Rockiotchart.Svg will also use the `begin` property to schedule a timeout and manually start the animation after the timeout. If you're using multiple SMIL definition objects for an attribute (in an array), guided mode will be disabled for this attribute, even if you explicitly enabled it.
+     * If guided mode is enabled the following behavior is added:
+     * - Before the animation starts (even when delayed with `begin`) the animated attribute will be set already to the `from` value of the animation
+     * - `begin` is explicitly set to `indefinite` so it can be started manually without relying on document begin time (creation)
+     * - The animate element will be forced to use `fill="freeze"`
+     * - The animation will be triggered with `beginElement()` in a timeout where `begin` of the definition object is interpreted in milli seconds. If no `begin` was specified the timeout is triggered immediately.
+     * - After the animation the element attribute value will be set to the `to` value of the animation
+     * - The animate element is deleted from the DOM
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Object} animations An animations object where the property keys are the attributes you'd like to animate. The properties should be objects again that contain the SMIL animation attributes (usually begin, dur, from, and to). The property begin and dur is auto converted (see Automatic unit conversion). You can also schedule multiple animations for the same attribute by passing an Array of SMIL definition objects. Attributes that contain an array of SMIL definition objects will not be executed in guided mode.
+     * @param {Boolean} guided Specify if guided mode should be activated for this animation (see Guided mode). If not otherwise specified, guided mode will be activated.
+     * @param {Object} eventEmitter If specified, this event emitter will be notified when an animation starts or ends.
+     * @return {Rockiotchart.Svg} The current element where the animation was added
+     */
+    function animate(animations, guided, eventEmitter) {
+      if (guided === undefined) {
+        guided = true;
+      }
+      Object.keys(animations).forEach(function createAnimateForAttributes(attribute) {
+        function createAnimate(animationDefinition, guided) {
+          var attributeProperties = {},
+            animate,
+            timeout,
+            easing;
+
+          // Check if an easing is specified in the definition object and delete it from the object as it will not
+          // be part of the animate element attributes.
+          if (animationDefinition.easing) {
+            // If already an easing Bézier curve array we take it or we lookup a easing array in the Easing object
+            easing = animationDefinition.easing instanceof Array ? animationDefinition.easing : Rockiotchart.Svg.Easing[animationDefinition.easing];
+            delete animationDefinition.easing;
+          }
+
+          // If numeric dur or begin was provided we assume milli seconds
+          animationDefinition.begin = Rockiotchart.ensureUnit(animationDefinition.begin, 'ms');
+          animationDefinition.dur = Rockiotchart.ensureUnit(animationDefinition.dur, 'ms');
+          if (easing) {
+            animationDefinition.calcMode = 'spline';
+            animationDefinition.keySplines = easing.join(' ');
+            animationDefinition.keyTimes = '0;1';
+          }
+
+          // Adding "fill: freeze" if we are in guided mode and set initial attribute values
+          if (guided) {
+            animationDefinition.fill = 'freeze';
+            // Animated property on our element should already be set to the animation from value in guided mode
+            attributeProperties[attribute] = animationDefinition.from;
+            this.attr(attributeProperties);
+
+            // In guided mode we also set begin to indefinite so we can trigger the start manually and put the begin
+            // which needs to be in ms aside
+            timeout = Rockiotchart.quantity(animationDefinition.begin || 0).value;
+            animationDefinition.begin = 'indefinite';
+          }
+          animate = this.elem('animate', Rockiotchart.extend({
+            attributeName: attribute
+          }, animationDefinition));
+          if (guided) {
+            // If guided we take the value that was put aside in timeout and trigger the animation manually with a timeout
+            setTimeout(function () {
+              // If beginElement fails we set the animated attribute to the end position and remove the animate element
+              // This happens if the SMIL ElementTimeControl interface is not supported or any other problems occured in
+              // the browser. (Currently FF 34 does not support animate elements in foreignObjects)
+              try {
+                animate._node.beginElement();
+              } catch (err) {
+                // Set animated attribute to current animated value
+                attributeProperties[attribute] = animationDefinition.to;
+                this.attr(attributeProperties);
+                // Remove the animate element as it's no longer required
+                animate.remove();
+              }
+            }.bind(this), timeout);
+          }
+          if (eventEmitter) {
+            animate._node.addEventListener('beginEvent', function handleBeginEvent() {
+              eventEmitter.emit('animationBegin', {
+                element: this,
+                animate: animate._node,
+                params: animationDefinition
+              });
+            }.bind(this));
+          }
+          animate._node.addEventListener('endEvent', function handleEndEvent() {
+            if (eventEmitter) {
+              eventEmitter.emit('animationEnd', {
+                element: this,
+                animate: animate._node,
+                params: animationDefinition
+              });
+            }
+            if (guided) {
+              // Set animated attribute to current animated value
+              attributeProperties[attribute] = animationDefinition.to;
+              this.attr(attributeProperties);
+              // Remove the animate element as it's no longer required
+              animate.remove();
+            }
+          }.bind(this));
+        }
+
+        // If current attribute is an array of definition objects we create an animate for each and disable guided mode
+        if (animations[attribute] instanceof Array) {
+          animations[attribute].forEach(function (animationDefinition) {
+            createAnimate.bind(this)(animationDefinition, false);
+          }.bind(this));
+        } else {
+          createAnimate.bind(this)(animations[attribute], guided);
+        }
+      }.bind(this));
+      return this;
+    }
+    Rockiotchart.Svg = Rockiotchart.Class.extend({
+      constructor: Svg,
+      attr: attr,
+      elem: elem,
+      parent: parent,
+      root: root,
+      querySelector: querySelector,
+      querySelectorAll: querySelectorAll,
+      getNode: getNode,
+      foreignObject: foreignObject,
+      text: text,
+      empty: empty,
+      remove: remove,
+      replace: replace,
+      append: append,
+      classes: classes,
+      addClass: addClass,
+      removeClass: removeClass,
+      removeAllClasses: removeAllClasses,
+      height: height,
+      width: width,
+      animate: animate
+    });
+
+    /**
+     * This method checks for support of a given SVG feature like Extensibility, SVG-animation or the like. Check http://www.w3.org/TR/SVG11/feature for a detailed list.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {String} feature The SVG 1.1 feature that should be checked for support.
+     * @return {Boolean} True of false if the feature is supported or not
+     */
+    Rockiotchart.Svg.isSupported = function (feature) {
+      return document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#' + feature, '1.1');
+    };
+
+    /**
+     * This Object contains some standard easing cubic bezier curves. Then can be used with their name in the `Rockiotchart.Svg.animate`. You can also extend the list and use your own name in the `animate` function. Click the show code button to see the available bezier functions.
+     *
+     * @memberof Rockiotchart.Svg
+     */
+    var easingCubicBeziers = {
+      easeInSine: [0.47, 0, 0.745, 0.715],
+      easeOutSine: [0.39, 0.575, 0.565, 1],
+      easeInOutSine: [0.445, 0.05, 0.55, 0.95],
+      easeInQuad: [0.55, 0.085, 0.68, 0.53],
+      easeOutQuad: [0.25, 0.46, 0.45, 0.94],
+      easeInOutQuad: [0.455, 0.03, 0.515, 0.955],
+      easeInCubic: [0.55, 0.055, 0.675, 0.19],
+      easeOutCubic: [0.215, 0.61, 0.355, 1],
+      easeInOutCubic: [0.645, 0.045, 0.355, 1],
+      easeInQuart: [0.895, 0.03, 0.685, 0.22],
+      easeOutQuart: [0.165, 0.84, 0.44, 1],
+      easeInOutQuart: [0.77, 0, 0.175, 1],
+      easeInQuint: [0.755, 0.05, 0.855, 0.06],
+      easeOutQuint: [0.23, 1, 0.32, 1],
+      easeInOutQuint: [0.86, 0, 0.07, 1],
+      easeInExpo: [0.95, 0.05, 0.795, 0.035],
+      easeOutExpo: [0.19, 1, 0.22, 1],
+      easeInOutExpo: [1, 0, 0, 1],
+      easeInCirc: [0.6, 0.04, 0.98, 0.335],
+      easeOutCirc: [0.075, 0.82, 0.165, 1],
+      easeInOutCirc: [0.785, 0.135, 0.15, 0.86],
+      easeInBack: [0.6, -0.28, 0.735, 0.045],
+      easeOutBack: [0.175, 0.885, 0.32, 1.275],
+      easeInOutBack: [0.68, -0.55, 0.265, 1.55]
+    };
+    Rockiotchart.Svg.Easing = easingCubicBeziers;
+
+    /**
+     * This helper class is to wrap multiple `Rockiotchart.Svg` elements into a list where you can call the `Rockiotchart.Svg` functions on all elements in the list with one call. This is helpful when you'd like to perform calls with `Rockiotchart.Svg` on multiple elements.
+     * An instance of this class is also returned by `Rockiotchart.Svg.querySelectorAll`.
+     *
+     * @memberof Rockiotchart.Svg
+     * @param {Array<Node>|NodeList} nodeList An Array of SVG DOM nodes or a SVG DOM NodeList (as returned by document.querySelectorAll)
+     * @constructor
+     */
+    function SvgList(nodeList) {
+      var list = this;
+      this.svgElements = [];
+      for (var i = 0; i < nodeList.length; i++) {
+        this.svgElements.push(new Rockiotchart.Svg(nodeList[i]));
+      }
+
+      // Add delegation methods for Rockiotchart.Svg
+      Object.keys(Rockiotchart.Svg.prototype).filter(function (prototypeProperty) {
+        return ['constructor', 'parent', 'querySelector', 'querySelectorAll', 'replace', 'append', 'classes', 'height', 'width'].indexOf(prototypeProperty) === -1;
+      }).forEach(function (prototypeProperty) {
+        list[prototypeProperty] = function () {
+          var args = Array.prototype.slice.call(arguments, 0);
+          list.svgElements.forEach(function (element) {
+            Rockiotchart.Svg.prototype[prototypeProperty].apply(element, args);
+          });
+          return list;
+        };
+      });
+    }
+    Rockiotchart.Svg.List = Rockiotchart.Class.extend({
+      constructor: SvgList
+    });
+  })(this || global, Rockiotchart) /**
+                                   * Rockiotchart SVG path module for SVG path description creation and modification.
+                                   *
+                                   * @module Rockiotchart.Svg.Path
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    /**
+     * Contains the descriptors of supported element types in a SVG path. Currently only move, line and curve are supported.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @type {Object}
+     */
+    var elementDescriptions = {
+      m: ['x', 'y'],
+      l: ['x', 'y'],
+      c: ['x1', 'y1', 'x2', 'y2', 'x', 'y'],
+      a: ['rx', 'ry', 'xAr', 'lAf', 'sf', 'x', 'y']
+    };
+
+    /**
+     * Default options for newly created SVG path objects.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @type {Object}
+     */
+    var defaultOptions = {
+      // The accuracy in digit count after the decimal point. This will be used to round numbers in the SVG path. If this option is set to false then no rounding will be performed.
+      accuracy: 3
+    };
+    function element(command, params, pathElements, pos, relative, data) {
+      var pathElement = Rockiotchart.extend({
+        command: relative ? command.toLowerCase() : command.toUpperCase()
+      }, params, data ? {
+        data: data
+      } : {});
+      pathElements.splice(pos, 0, pathElement);
+    }
+    function forEachParam(pathElements, cb) {
+      pathElements.forEach(function (pathElement, pathElementIndex) {
+        elementDescriptions[pathElement.command.toLowerCase()].forEach(function (paramName, paramIndex) {
+          cb(pathElement, paramName, pathElementIndex, paramIndex, pathElements);
+        });
+      });
+    }
+
+    /**
+     * Used to construct a new path object.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Boolean} close If set to true then this path will be closed when stringified (with a Z at the end)
+     * @param {Object} options Options object that overrides the default objects. See default options for more details.
+     * @constructor
+     */
+    function SvgPath(close, options) {
+      this.pathElements = [];
+      this.pos = 0;
+      this.close = close;
+      this.options = Rockiotchart.extend({}, defaultOptions, options);
+    }
+
+    /**
+     * Gets or sets the current position (cursor) inside of the path. You can move around the cursor freely but limited to 0 or the count of existing elements. All modifications with element functions will insert new elements at the position of this cursor.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} [pos] If a number is passed then the cursor is set to this position in the path element array.
+     * @return {Rockiotchart.Svg.Path|Number} If the position parameter was passed then the return value will be the path object for easy call chaining. If no position parameter was passed then the current position is returned.
+     */
+    function position(pos) {
+      if (pos !== undefined) {
+        this.pos = Math.max(0, Math.min(this.pathElements.length, pos));
+        return this;
+      } else {
+        return this.pos;
+      }
+    }
+
+    /**
+     * Removes elements from the path starting at the current position.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} count Number of path elements that should be removed from the current position.
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function remove(count) {
+      this.pathElements.splice(this.pos, count);
+      return this;
+    }
+
+    /**
+     * Use this function to add a new move SVG path element.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} x The x coordinate for the move element.
+     * @param {Number} y The y coordinate for the move element.
+     * @param {Boolean} [relative] If set to true the move element will be created with relative coordinates (lowercase letter)
+     * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function move(x, y, relative, data) {
+      element('M', {
+        x: +x,
+        y: +y
+      }, this.pathElements, this.pos++, relative, data);
+      return this;
+    }
+
+    /**
+     * Use this function to add a new line SVG path element.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} x The x coordinate for the line element.
+     * @param {Number} y The y coordinate for the line element.
+     * @param {Boolean} [relative] If set to true the line element will be created with relative coordinates (lowercase letter)
+     * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function line(x, y, relative, data) {
+      element('L', {
+        x: +x,
+        y: +y
+      }, this.pathElements, this.pos++, relative, data);
+      return this;
+    }
+
+    /**
+     * Use this function to add a new curve SVG path element.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} x1 The x coordinate for the first control point of the bezier curve.
+     * @param {Number} y1 The y coordinate for the first control point of the bezier curve.
+     * @param {Number} x2 The x coordinate for the second control point of the bezier curve.
+     * @param {Number} y2 The y coordinate for the second control point of the bezier curve.
+     * @param {Number} x The x coordinate for the target point of the curve element.
+     * @param {Number} y The y coordinate for the target point of the curve element.
+     * @param {Boolean} [relative] If set to true the curve element will be created with relative coordinates (lowercase letter)
+     * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function curve(x1, y1, x2, y2, x, y, relative, data) {
+      element('C', {
+        x1: +x1,
+        y1: +y1,
+        x2: +x2,
+        y2: +y2,
+        x: +x,
+        y: +y
+      }, this.pathElements, this.pos++, relative, data);
+      return this;
+    }
+
+    /**
+     * Use this function to add a new non-bezier curve SVG path element.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} rx The radius to be used for the x-axis of the arc.
+     * @param {Number} ry The radius to be used for the y-axis of the arc.
+     * @param {Number} xAr Defines the orientation of the arc
+     * @param {Number} lAf Large arc flag
+     * @param {Number} sf Sweep flag
+     * @param {Number} x The x coordinate for the target point of the curve element.
+     * @param {Number} y The y coordinate for the target point of the curve element.
+     * @param {Boolean} [relative] If set to true the curve element will be created with relative coordinates (lowercase letter)
+     * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function arc(rx, ry, xAr, lAf, sf, x, y, relative, data) {
+      element('A', {
+        rx: +rx,
+        ry: +ry,
+        xAr: +xAr,
+        lAf: +lAf,
+        sf: +sf,
+        x: +x,
+        y: +y
+      }, this.pathElements, this.pos++, relative, data);
+      return this;
+    }
+
+    /**
+     * Parses an SVG path seen in the d attribute of path elements, and inserts the parsed elements into the existing path object at the current cursor position. Any closing path indicators (Z at the end of the path) will be ignored by the parser as this is provided by the close option in the options of the path object.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {String} path Any SVG path that contains move (m), line (l) or curve (c) components.
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function parse(path) {
+      // Parsing the SVG path string into an array of arrays [['M', '10', '10'], ['L', '100', '100']]
+      var chunks = path.replace(/([A-Za-z])([0-9])/g, '$1 $2').replace(/([0-9])([A-Za-z])/g, '$1 $2').split(/[\s,]+/).reduce(function (result, element) {
+        if (element.match(/[A-Za-z]/)) {
+          result.push([]);
+        }
+        result[result.length - 1].push(element);
+        return result;
+      }, []);
+
+      // If this is a closed path we remove the Z at the end because this is determined by the close option
+      if (chunks[chunks.length - 1][0].toUpperCase() === 'Z') {
+        chunks.pop();
+      }
+
+      // Using svgPathElementDescriptions to map raw path arrays into objects that contain the command and the parameters
+      // For example {command: 'M', x: '10', y: '10'}
+      var elements = chunks.map(function (chunk) {
+        var command = chunk.shift(),
+          description = elementDescriptions[command.toLowerCase()];
+        return Rockiotchart.extend({
+          command: command
+        }, description.reduce(function (result, paramName, index) {
+          result[paramName] = +chunk[index];
+          return result;
+        }, {}));
+      });
+
+      // Preparing a splice call with the elements array as var arg params and insert the parsed elements at the current position
+      var spliceArgs = [this.pos, 0];
+      Array.prototype.push.apply(spliceArgs, elements);
+      Array.prototype.splice.apply(this.pathElements, spliceArgs);
+      // Increase the internal position by the element count
+      this.pos += elements.length;
+      return this;
+    }
+
+    /**
+     * This function renders to current SVG path object into a final SVG string that can be used in the d attribute of SVG path elements. It uses the accuracy option to round big decimals. If the close parameter was set in the constructor of this path object then a path closing Z will be appended to the output string.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @return {String}
+     */
+    function stringify() {
+      var accuracyMultiplier = Math.pow(10, this.options.accuracy);
+      return this.pathElements.reduce(function (path, pathElement) {
+        var params = elementDescriptions[pathElement.command.toLowerCase()].map(function (paramName) {
+          return this.options.accuracy ? Math.round(pathElement[paramName] * accuracyMultiplier) / accuracyMultiplier : pathElement[paramName];
+        }.bind(this));
+        return path + pathElement.command + params.join(',');
+      }.bind(this), '') + (this.close ? 'Z' : '');
+    }
+
+    /**
+     * Scales all elements in the current SVG path object. There is an individual parameter for each coordinate. Scaling will also be done for control points of curves, affecting the given coordinate.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} x The number which will be used to scale the x, x1 and x2 of all path elements.
+     * @param {Number} y The number which will be used to scale the y, y1 and y2 of all path elements.
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function scale(x, y) {
+      forEachParam(this.pathElements, function (pathElement, paramName) {
+        pathElement[paramName] *= paramName[0] === 'x' ? x : y;
+      });
+      return this;
+    }
+
+    /**
+     * Translates all elements in the current SVG path object. The translation is relative and there is an individual parameter for each coordinate. Translation will also be done for control points of curves, affecting the given coordinate.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Number} x The number which will be used to translate the x, x1 and x2 of all path elements.
+     * @param {Number} y The number which will be used to translate the y, y1 and y2 of all path elements.
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function translate(x, y) {
+      forEachParam(this.pathElements, function (pathElement, paramName) {
+        pathElement[paramName] += paramName[0] === 'x' ? x : y;
+      });
+      return this;
+    }
+
+    /**
+     * This function will run over all existing path elements and then loop over their attributes. The callback function will be called for every path element attribute that exists in the current path.
+     * The method signature of the callback function looks like this:
+     * ```javascript
+     * function(pathElement, paramName, pathElementIndex, paramIndex, pathElements)
+     * ```
+     * If something else than undefined is returned by the callback function, this value will be used to replace the old value. This allows you to build custom transformations of path objects that can't be achieved using the basic transformation functions scale and translate.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Function} transformFnc The callback function for the transformation. Check the signature in the function description.
+     * @return {Rockiotchart.Svg.Path} The current path object for easy call chaining.
+     */
+    function transform(transformFnc) {
+      forEachParam(this.pathElements, function (pathElement, paramName, pathElementIndex, paramIndex, pathElements) {
+        var transformed = transformFnc(pathElement, paramName, pathElementIndex, paramIndex, pathElements);
+        if (transformed || transformed === 0) {
+          pathElement[paramName] = transformed;
+        }
+      });
+      return this;
+    }
+
+    /**
+     * This function clones a whole path object with all its properties. This is a deep clone and path element objects will also be cloned.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Boolean} [close] Optional option to set the new cloned path to closed. If not specified or false, the original path close option will be used.
+     * @return {Rockiotchart.Svg.Path}
+     */
+    function clone(close) {
+      var c = new Rockiotchart.Svg.Path(close || this.close);
+      c.pos = this.pos;
+      c.pathElements = this.pathElements.slice().map(function cloneElements(pathElement) {
+        return Rockiotchart.extend({}, pathElement);
+      });
+      c.options = Rockiotchart.extend({}, this.options);
+      return c;
+    }
+
+    /**
+     * Split a Svg.Path object by a specific command in the path chain. The path chain will be split and an array of newly created paths objects will be returned. This is useful if you'd like to split an SVG path by it's move commands, for example, in order to isolate chunks of drawings.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {String} command The command you'd like to use to split the path
+     * @return {Array<Rockiotchart.Svg.Path>}
+     */
+    function splitByCommand(command) {
+      var split = [new Rockiotchart.Svg.Path()];
+      this.pathElements.forEach(function (pathElement) {
+        if (pathElement.command === command.toUpperCase() && split[split.length - 1].pathElements.length !== 0) {
+          split.push(new Rockiotchart.Svg.Path());
+        }
+        split[split.length - 1].pathElements.push(pathElement);
+      });
+      return split;
+    }
+
+    /**
+     * This static function on `Rockiotchart.Svg.Path` is joining multiple paths together into one paths.
+     *
+     * @memberof Rockiotchart.Svg.Path
+     * @param {Array<Rockiotchart.Svg.Path>} paths A list of paths to be joined together. The order is important.
+     * @param {boolean} close If the newly created path should be a closed path
+     * @param {Object} options Path options for the newly created path.
+     * @return {Rockiotchart.Svg.Path}
+     */
+
+    function join(paths, close, options) {
+      var joinedPath = new Rockiotchart.Svg.Path(close, options);
+      for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        for (var j = 0; j < path.pathElements.length; j++) {
+          joinedPath.pathElements.push(path.pathElements[j]);
+        }
+      }
+      return joinedPath;
+    }
+    Rockiotchart.Svg.Path = Rockiotchart.Class.extend({
+      constructor: SvgPath,
+      position: position,
+      remove: remove,
+      move: move,
+      line: line,
+      curve: curve,
+      arc: arc,
+      scale: scale,
+      translate: translate,
+      transform: transform,
+      parse: parse,
+      stringify: stringify,
+      clone: clone,
+      splitByCommand: splitByCommand
+    });
+    Rockiotchart.Svg.Path.elementDescriptions = elementDescriptions;
+    Rockiotchart.Svg.Path.join = join;
+  })(this || global, Rockiotchart) /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+    var axisUnits = {
+      x: {
+        pos: 'x',
+        len: 'width',
+        dir: 'horizontal',
+        rectStart: 'x1',
+        rectEnd: 'x2',
+        rectOffset: 'y2'
+      },
+      y: {
+        pos: 'y',
+        len: 'height',
+        dir: 'vertical',
+        rectStart: 'y2',
+        rectEnd: 'y1',
+        rectOffset: 'x1'
+      }
+    };
+    function Axis(units, chartRect, ticks, options) {
+      this.units = units;
+      this.counterUnits = units === axisUnits.x ? axisUnits.y : axisUnits.x;
+      this.chartRect = chartRect;
+      this.axisLength = chartRect[units.rectEnd] - chartRect[units.rectStart];
+      this.gridOffset = chartRect[units.rectOffset];
+      this.ticks = ticks;
+      this.options = options;
+    }
+    function createGridAndLabels(gridGroup, labelGroup, useForeignObject, chartOptions, eventEmitter) {
+      var axisOptions = chartOptions['axis' + this.units.pos.toUpperCase()];
+      var projectedValues = this.ticks.map(this.projectValue.bind(this));
+      var labelValues = this.ticks.map(axisOptions.labelInterpolationFnc);
+      projectedValues.forEach(function (projectedValue, index) {
+        var labelOffset = {
+          x: 0,
+          y: 0
+        };
+
+        // TODO: Find better solution for solving this problem
+        // Calculate how much space we have available for the label
+        var labelLength;
+        if (projectedValues[index + 1]) {
+          // If we still have one label ahead, we can calculate the distance to the next tick / label
+          labelLength = projectedValues[index + 1] - projectedValue;
+        } else {
+          // If we don't have a label ahead and we have only two labels in total, we just take the remaining distance to
+          // on the whole axis length. We limit that to a minimum of 30 pixel, so that labels close to the border will
+          // still be visible inside of the chart padding.
+          labelLength = Math.max(this.axisLength - projectedValue, 30);
+        }
+
+        // Skip grid lines and labels where interpolated label values are falsey (execpt for 0)
+        if (Rockiotchart.isFalseyButZero(labelValues[index]) && labelValues[index] !== '') {
+          return;
+        }
+
+        // Transform to global coordinates using the chartRect
+        // We also need to set the label offset for the createLabel function
+        if (this.units.pos === 'x') {
+          projectedValue = this.chartRect.x1 + projectedValue;
+          labelOffset.x = chartOptions.axisX.labelOffset.x;
+
+          // If the labels should be positioned in start position (top side for vertical axis) we need to set a
+          // different offset as for positioned with end (bottom)
+          if (chartOptions.axisX.position === 'start') {
+            labelOffset.y = this.chartRect.padding.top + chartOptions.axisX.labelOffset.y + (useForeignObject ? 5 : 20);
+          } else {
+            labelOffset.y = this.chartRect.y1 + chartOptions.axisX.labelOffset.y + (useForeignObject ? 5 : 20);
+          }
+        } else {
+          projectedValue = this.chartRect.y1 - projectedValue;
+          labelOffset.y = chartOptions.axisY.labelOffset.y - (useForeignObject ? labelLength : 0);
+
+          // If the labels should be positioned in start position (left side for horizontal axis) we need to set a
+          // different offset as for positioned with end (right side)
+          if (chartOptions.axisY.position === 'start') {
+            labelOffset.x = useForeignObject ? this.chartRect.padding.left + chartOptions.axisY.labelOffset.x : this.chartRect.x1 - 10;
+          } else {
+            labelOffset.x = this.chartRect.x2 + chartOptions.axisY.labelOffset.x + 10;
+          }
+        }
+        if (axisOptions.showGrid) {
+          Rockiotchart.createGrid(projectedValue, index, this, this.gridOffset, this.chartRect[this.counterUnits.len](), gridGroup, [chartOptions.classNames.grid, chartOptions.classNames[this.units.dir]], eventEmitter);
+        }
+        if (axisOptions.showLabel) {
+          Rockiotchart.createLabel(projectedValue, labelLength, index, labelValues, this, axisOptions.offset, labelOffset, labelGroup, [chartOptions.classNames.label, chartOptions.classNames[this.units.dir], axisOptions.position === 'start' ? chartOptions.classNames[axisOptions.position] : chartOptions.classNames['end']], useForeignObject, eventEmitter);
+        }
+      }.bind(this));
+    }
+    Rockiotchart.Axis = Rockiotchart.Class.extend({
+      constructor: Axis,
+      createGridAndLabels: createGridAndLabels,
+      projectValue: function projectValue(value, index, data) {
+        throw new Error("Base axis can't be instantiated!");
+      }
+    });
+    Rockiotchart.Axis.units = axisUnits;
+  })(this || global, Rockiotchart) /**
+                                   * The auto scale axis uses standard linear scale projection of values along an axis. It uses order of magnitude to find a scale automatically and evaluates the available space in order to find the perfect amount of ticks for your chart.
+                                   * **Options**
+                                   * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
+                                   * ```javascript
+                                   * var options = {
+                                   *   // If high is specified then the axis will display values explicitly up to this value and the computed maximum from the data is ignored
+                                   *   high: 100,
+                                   *   // If low is specified then the axis will display values explicitly down to this value and the computed minimum from the data is ignored
+                                   *   low: 0,
+                                   *   // This option will be used when finding the right scale division settings. The amount of ticks on the scale will be determined so that as many ticks as possible will be displayed, while not violating this minimum required space (in pixel).
+                                   *   scaleMinSpace: 20,
+                                   *   // Can be set to true or false. If set to true, the scale will be generated with whole numbers only.
+                                   *   onlyInteger: true,
+                                   *   // The reference value can be used to make sure that this value will always be on the chart. This is especially useful on bipolar charts where the bipolar center always needs to be part of the chart.
+                                   *   referenceValue: 5
+                                   * };
+                                   * ```
+                                   *
+                                   * @module Rockiotchart.AutoScaleAxis
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+    function AutoScaleAxis(axisUnit, data, chartRect, options) {
+      // Usually we calculate highLow based on the data but this can be overriden by a highLow object in the options
+      var highLow = options.highLow || Rockiotchart.getHighLow(data, options, axisUnit.pos);
+      this.bounds = Rockiotchart.getBounds(chartRect[axisUnit.rectEnd] - chartRect[axisUnit.rectStart], highLow, options.scaleMinSpace || 20, options.onlyInteger);
+      this.range = {
+        min: this.bounds.min,
+        max: this.bounds.max
+      };
+      Rockiotchart.AutoScaleAxis["super"].constructor.call(this, axisUnit, chartRect, this.bounds.values, options);
+    }
+    function projectValue(value) {
+      return this.axisLength * (+Rockiotchart.getMultiValue(value, this.units.pos) - this.bounds.min) / this.bounds.range;
+    }
+    Rockiotchart.AutoScaleAxis = Rockiotchart.Axis.extend({
+      constructor: AutoScaleAxis,
+      projectValue: projectValue
+    });
+  })(this || global, Rockiotchart) /**
+                                   * The fixed scale axis uses standard linear projection of values along an axis. It makes use of a divisor option to divide the range provided from the minimum and maximum value or the options high and low that will override the computed minimum and maximum.
+                                   * **Options**
+                                   * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
+                                   * ```javascript
+                                   * var options = {
+                                   *   // If high is specified then the axis will display values explicitly up to this value and the computed maximum from the data is ignored
+                                   *   high: 100,
+                                   *   // If low is specified then the axis will display values explicitly down to this value and the computed minimum from the data is ignored
+                                   *   low: 0,
+                                   *   // If specified then the value range determined from minimum to maximum (or low and high) will be divided by this number and ticks will be generated at those division points. The default divisor is 1.
+                                   *   divisor: 4,
+                                   *   // If ticks is explicitly set, then the axis will not compute the ticks with the divisor, but directly use the data in ticks to determine at what points on the axis a tick need to be generated.
+                                   *   ticks: [1, 10, 20, 30]
+                                   * };
+                                   * ```
+                                   *
+                                   * @module Rockiotchart.FixedScaleAxis
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+    function FixedScaleAxis(axisUnit, data, chartRect, options) {
+      var highLow = options.highLow || Rockiotchart.getHighLow(data, options, axisUnit.pos);
+      this.divisor = options.divisor || 1;
+      this.ticks = options.ticks || Rockiotchart.times(this.divisor).map(function (value, index) {
+        return highLow.low + (highLow.high - highLow.low) / this.divisor * index;
+      }.bind(this));
+      this.ticks.sort(function (a, b) {
+        return a - b;
+      });
+      this.range = {
+        min: highLow.low,
+        max: highLow.high
+      };
+      Rockiotchart.FixedScaleAxis["super"].constructor.call(this, axisUnit, chartRect, this.ticks, options);
+      this.stepLength = this.axisLength / this.divisor;
+    }
+    function projectValue(value) {
+      return this.axisLength * (+Rockiotchart.getMultiValue(value, this.units.pos) - this.range.min) / (this.range.max - this.range.min);
+    }
+    Rockiotchart.FixedScaleAxis = Rockiotchart.Axis.extend({
+      constructor: FixedScaleAxis,
+      projectValue: projectValue
+    });
+  })(this || global, Rockiotchart) /**
+                                   * The step axis for step based charts like bar chart or step based line charts. It uses a fixed amount of ticks that will be equally distributed across the whole axis length. The projection is done using the index of the data value rather than the value itself and therefore it's only useful for distribution purpose.
+                                   * **Options**
+                                   * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
+                                   * ```javascript
+                                   * var options = {
+                                   *   // Ticks to be used to distribute across the axis length. As this axis type relies on the index of the value rather than the value, arbitrary data that can be converted to a string can be used as ticks.
+                                   *   ticks: ['One', 'Two', 'Three'],
+                                   *   // If set to true the full width will be used to distribute the values where the last value will be at the maximum of the axis length. If false the spaces between the ticks will be evenly distributed instead.
+                                   *   stretch: true
+                                   * };
+                                   * ```
+                                   *
+                                   * @module Rockiotchart.StepAxis
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+    function StepAxis(axisUnit, data, chartRect, options) {
+      Rockiotchart.StepAxis["super"].constructor.call(this, axisUnit, chartRect, options.ticks, options);
+      var calc = Math.max(1, options.ticks.length - (options.stretch ? 1 : 0));
+      this.stepLength = this.axisLength / calc;
+    }
+    function projectValue(value, index) {
+      return this.stepLength * index;
+    }
+    Rockiotchart.StepAxis = Rockiotchart.Axis.extend({
+      constructor: StepAxis,
+      projectValue: projectValue
+    });
+  })(this || global, Rockiotchart) /**
+                                   * The Rockiotchart line chart can be used to draw Line or Scatter charts. If used in the browser you can access the global `Rockiotchart` namespace where you find the `Line` function as a main entry point.
+                                   *
+                                   * For examples on how to use the line chart please check the examples of the `Rockiotchart.Line` method.
+                                   *
+                                   * @module Rockiotchart.Line
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+
+    /**
+     * Default options in line charts. Expand the code view to see a detailed list of options with comments.
+     *
+     * @memberof Rockiotchart.Line
+     */
+    var defaultOptions = {
+      // Options for X-Axis
+      axisX: {
+        // The offset of the labels to the chart area
+        offset: 30,
+        // Position where labels are placed. Can be set to `start` or `end` where `start` is equivalent to left or top on vertical axis and `end` is equivalent to right or bottom on horizontal axis.
+        position: 'end',
+        // Allows you to correct label positioning on this axis by positive or negative x and y offset.
+        labelOffset: {
+          x: 0,
+          y: 0
+        },
+        // If labels should be shown or not
+        showLabel: true,
+        // If the axis grid should be drawn or not
+        showGrid: true,
+        // Interpolation function that allows you to intercept the value from the axis label
+        labelInterpolationFnc: Rockiotchart.noop,
+        // Set the axis type to be used to project values on this axis. If not defined, Rockiotchart.StepAxis will be used for the X-Axis, where the ticks option will be set to the labels in the data and the stretch option will be set to the global fullWidth option. This type can be changed to any axis constructor available (e.g. Rockiotchart.FixedScaleAxis), where all axis options should be present here.
+        type: undefined
+      },
+      // Options for Y-Axis
+      axisY: {
+        // The offset of the labels to the chart area
+        offset: 40,
+        // Position where labels are placed. Can be set to `start` or `end` where `start` is equivalent to left or top on vertical axis and `end` is equivalent to right or bottom on horizontal axis.
+        position: 'start',
+        // Allows you to correct label positioning on this axis by positive or negative x and y offset.
+        labelOffset: {
+          x: 0,
+          y: 0
+        },
+        // If labels should be shown or not
+        showLabel: true,
+        // If the axis grid should be drawn or not
+        showGrid: true,
+        // Interpolation function that allows you to intercept the value from the axis label
+        labelInterpolationFnc: Rockiotchart.noop,
+        // Set the axis type to be used to project values on this axis. If not defined, Rockiotchart.AutoScaleAxis will be used for the Y-Axis, where the high and low options will be set to the global high and low options. This type can be changed to any axis constructor available (e.g. Rockiotchart.FixedScaleAxis), where all axis options should be present here.
+        type: undefined,
+        // This value specifies the minimum height in pixel of the scale steps
+        scaleMinSpace: 20,
+        // Use only integer values (whole numbers) for the scale steps
+        onlyInteger: false
+      },
+      // Specify a fixed width for the chart as a string (i.e. '100px' or '50%')
+      width: undefined,
+      // Specify a fixed height for the chart as a string (i.e. '100px' or '50%')
+      height: undefined,
+      // If the line should be drawn or not
+      showLine: true,
+      // If dots should be drawn or not
+      showPoint: true,
+      // If the line chart should draw an area
+      showArea: false,
+      // The base for the area chart that will be used to close the area shape (is normally 0)
+      areaBase: 0,
+      // Specify if the lines should be smoothed. This value can be true or false where true will result in smoothing using the default smoothing interpolation function Rockiotchart.Interpolation.cardinal and false results in Rockiotchart.Interpolation.none. You can also choose other smoothing / interpolation functions available in the Rockiotchart.Interpolation module, or write your own interpolation function. Check the examples for a brief description.
+      lineSmooth: true,
+      // If the line chart should add a background fill to the .ct-grids group.
+      showGridBackground: false,
+      // Overriding the natural low of the chart allows you to zoom in or limit the charts lowest displayed value
+      low: undefined,
+      // Overriding the natural high of the chart allows you to zoom in or limit the charts highest displayed value
+      high: undefined,
+      // Padding of the chart drawing area to the container element and labels as a number or padding object {top: 5, right: 5, bottom: 5, left: 5}
+      chartPadding: {
+        top: 15,
+        right: 15,
+        bottom: 5,
+        left: 10
+      },
+      // When set to true, the last grid line on the x-axis is not drawn and the chart elements will expand to the full available width of the chart. For the last label to be drawn correctly you might need to add chart padding or offset the last label with a draw event handler.
+      fullWidth: false,
+      // If true the whole data is reversed including labels, the series order as well as the whole series data arrays.
+      reverseData: false,
+      // Override the class names that get used to generate the SVG structure of the chart
+      classNames: {
+        chart: 'ct-chart-line',
+        label: 'ct-label',
+        labelGroup: 'ct-labels',
+        series: 'ct-series',
+        line: 'ct-line',
+        point: 'ct-point',
+        area: 'ct-area',
+        grid: 'ct-grid',
+        gridGroup: 'ct-grids',
+        gridBackground: 'ct-grid-background',
+        vertical: 'ct-vertical',
+        horizontal: 'ct-horizontal',
+        start: 'ct-start',
+        end: 'ct-end'
+      }
+    };
+
+    /**
+     * Creates a new chart
+     *
+     */
+    function createChart(options) {
+      var data = Rockiotchart.normalizeData(this.data, options.reverseData, true);
+
+      // Create new svg object
+      this.svg = Rockiotchart.createSvg(this.container, options.width, options.height, options.classNames.chart);
+      // Create groups for labels, grid and series
+      var gridGroup = this.svg.elem('g').addClass(options.classNames.gridGroup);
+      var seriesGroup = this.svg.elem('g');
+      var labelGroup = this.svg.elem('g').addClass(options.classNames.labelGroup);
+      var chartRect = Rockiotchart.createChartRect(this.svg, options, defaultOptions.padding);
+      var axisX, axisY;
+      if (options.axisX.type === undefined) {
+        axisX = new Rockiotchart.StepAxis(Rockiotchart.Axis.units.x, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisX, {
+          ticks: data.normalized.labels,
+          stretch: options.fullWidth
+        }));
+      } else {
+        axisX = options.axisX.type.call(Rockiotchart, Rockiotchart.Axis.units.x, data.normalized.series, chartRect, options.axisX);
+      }
+      if (options.axisY.type === undefined) {
+        axisY = new Rockiotchart.AutoScaleAxis(Rockiotchart.Axis.units.y, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisY, {
+          high: Rockiotchart.isNumeric(options.high) ? options.high : options.axisY.high,
+          low: Rockiotchart.isNumeric(options.low) ? options.low : options.axisY.low
+        }));
+      } else {
+        axisY = options.axisY.type.call(Rockiotchart, Rockiotchart.Axis.units.y, data.normalized.series, chartRect, options.axisY);
+      }
+      axisX.createGridAndLabels(gridGroup, labelGroup, this.supportsForeignObject, options, this.eventEmitter);
+      axisY.createGridAndLabels(gridGroup, labelGroup, this.supportsForeignObject, options, this.eventEmitter);
+      if (options.showGridBackground) {
+        Rockiotchart.createGridBackground(gridGroup, chartRect, options.classNames.gridBackground, this.eventEmitter);
+      }
+
+      // Draw the series
+      data.raw.series.forEach(function (series, seriesIndex) {
+        var seriesElement = seriesGroup.elem('g');
+
+        // Write attributes to series group element. If series name or meta is undefined the attributes will not be written
+        seriesElement.attr({
+          'ct:series-name': series.name,
+          'ct:meta': Rockiotchart.serialize(series.meta)
+        });
+
+        // Use series class from series data or if not set generate one
+        seriesElement.addClass([options.classNames.series, series.className || options.classNames.series + '-' + Rockiotchart.alphaNumerate(seriesIndex)].join(' '));
+        var pathCoordinates = [],
+          pathData = [];
+        data.normalized.series[seriesIndex].forEach(function (value, valueIndex) {
+          var p = {
+            x: chartRect.x1 + axisX.projectValue(value, valueIndex, data.normalized.series[seriesIndex]),
+            y: chartRect.y1 - axisY.projectValue(value, valueIndex, data.normalized.series[seriesIndex])
+          };
+          pathCoordinates.push(p.x, p.y);
+          pathData.push({
+            value: value,
+            valueIndex: valueIndex,
+            meta: Rockiotchart.getMetaData(series, valueIndex)
+          });
+        }.bind(this));
+        var seriesOptions = {
+          lineSmooth: Rockiotchart.getSeriesOption(series, options, 'lineSmooth'),
+          showPoint: Rockiotchart.getSeriesOption(series, options, 'showPoint'),
+          showLine: Rockiotchart.getSeriesOption(series, options, 'showLine'),
+          showArea: Rockiotchart.getSeriesOption(series, options, 'showArea'),
+          areaBase: Rockiotchart.getSeriesOption(series, options, 'areaBase')
+        };
+        var smoothing = typeof seriesOptions.lineSmooth === 'function' ? seriesOptions.lineSmooth : seriesOptions.lineSmooth ? Rockiotchart.Interpolation.monotoneCubic() : Rockiotchart.Interpolation.none();
+        // Interpolating path where pathData will be used to annotate each path element so we can trace back the original
+        // index, value and meta data
+        var path = smoothing(pathCoordinates, pathData);
+
+        // If we should show points we need to create them now to avoid secondary loop
+        // Points are drawn from the pathElements returned by the interpolation function
+        // Small offset for Firefox to render squares correctly
+        if (seriesOptions.showPoint) {
+          path.pathElements.forEach(function (pathElement) {
+            var point = seriesElement.elem('line', {
+              x1: pathElement.x,
+              y1: pathElement.y,
+              x2: pathElement.x + 0.01,
+              y2: pathElement.y
+            }, options.classNames.point).attr({
+              'ct:value': [pathElement.data.value.x, pathElement.data.value.y].filter(Rockiotchart.isNumeric).join(','),
+              'ct:meta': Rockiotchart.serialize(pathElement.data.meta)
+            });
+            this.eventEmitter.emit('draw', {
+              type: 'point',
+              value: pathElement.data.value,
+              index: pathElement.data.valueIndex,
+              meta: pathElement.data.meta,
+              series: series,
+              seriesIndex: seriesIndex,
+              axisX: axisX,
+              axisY: axisY,
+              group: seriesElement,
+              element: point,
+              x: pathElement.x,
+              y: pathElement.y
+            });
+          }.bind(this));
+        }
+        if (seriesOptions.showLine) {
+          var line = seriesElement.elem('path', {
+            d: path.stringify()
+          }, options.classNames.line, true);
+          this.eventEmitter.emit('draw', {
+            type: 'line',
+            values: data.normalized.series[seriesIndex],
+            path: path.clone(),
+            chartRect: chartRect,
+            index: seriesIndex,
+            series: series,
+            seriesIndex: seriesIndex,
+            seriesMeta: series.meta,
+            axisX: axisX,
+            axisY: axisY,
+            group: seriesElement,
+            element: line
+          });
+        }
+
+        // Area currently only works with axes that support a range!
+        if (seriesOptions.showArea && axisY.range) {
+          // If areaBase is outside the chart area (< min or > max) we need to set it respectively so that
+          // the area is not drawn outside the chart area.
+          var areaBase = Math.max(Math.min(seriesOptions.areaBase, axisY.range.max), axisY.range.min);
+
+          // We project the areaBase value into screen coordinates
+          var areaBaseProjected = chartRect.y1 - axisY.projectValue(areaBase);
+
+          // In order to form the area we'll first split the path by move commands so we can chunk it up into segments
+          path.splitByCommand('M').filter(function onlySolidSegments(pathSegment) {
+            // We filter only "solid" segments that contain more than one point. Otherwise there's no need for an area
+            return pathSegment.pathElements.length > 1;
+          }).map(function convertToArea(solidPathSegments) {
+            // Receiving the filtered solid path segments we can now convert those segments into fill areas
+            var firstElement = solidPathSegments.pathElements[0];
+            var lastElement = solidPathSegments.pathElements[solidPathSegments.pathElements.length - 1];
+
+            // Cloning the solid path segment with closing option and removing the first move command from the clone
+            // We then insert a new move that should start at the area base and draw a straight line up or down
+            // at the end of the path we add an additional straight line to the projected area base value
+            // As the closing option is set our path will be automatically closed
+            return solidPathSegments.clone(true).position(0).remove(1).move(firstElement.x, areaBaseProjected).line(firstElement.x, firstElement.y).position(solidPathSegments.pathElements.length + 1).line(lastElement.x, areaBaseProjected);
+          }).forEach(function createArea(areaPath) {
+            // For each of our newly created area paths, we'll now create path elements by stringifying our path objects
+            // and adding the created DOM elements to the correct series group
+            var area = seriesElement.elem('path', {
+              d: areaPath.stringify()
+            }, options.classNames.area, true);
+
+            // Emit an event for each area that was drawn
+            this.eventEmitter.emit('draw', {
+              type: 'area',
+              values: data.normalized.series[seriesIndex],
+              path: areaPath.clone(),
+              series: series,
+              seriesIndex: seriesIndex,
+              axisX: axisX,
+              axisY: axisY,
+              chartRect: chartRect,
+              index: seriesIndex,
+              group: seriesElement,
+              element: area
+            });
+          }.bind(this));
+        }
+      }.bind(this));
+      this.eventEmitter.emit('created', {
+        bounds: axisY.bounds,
+        chartRect: chartRect,
+        axisX: axisX,
+        axisY: axisY,
+        svg: this.svg,
+        options: options
+      });
+    }
+
+    /**
+     * This method creates a new line chart.
+     *
+     * @memberof Rockiotchart.Line
+     * @param {String|Node} query A selector query string or directly a DOM element
+     * @param {Object} data The data object that needs to consist of a labels and a series array
+     * @param {Object} [options] The options object with options that override the default options. Check the examples for a detailed list.
+     * @param {Array} [responsiveOptions] Specify an array of responsive option arrays which are a media query and options object pair => [[mediaQueryString, optionsObject],[more...]]
+     * @return {Object} An object which exposes the API for the created chart
+     *
+     * @example
+     * // Create a simple line chart
+     * var data = {
+     *   // A labels array that can contain any sort of values
+     *   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+     *   // Our series array that contains series objects or in this case series data arrays
+     *   series: [
+     *     [5, 2, 4, 2, 0]
+     *   ]
+     * };
+     *
+     * // As options we currently only set a static size of 300x200 px
+     * var options = {
+     *   width: '300px',
+     *   height: '200px'
+     * };
+     *
+     * // In the global name space Rockiotchart we call the Line function to initialize a line chart. As a first parameter we pass in a selector where we would like to get our chart created. Second parameter is the actual data object and as a third parameter we pass in our options
+     * new Rockiotchart.Line('.ct-chart', data, options);
+     *
+     * @example
+     * // Use specific interpolation function with configuration from the Rockiotchart.Interpolation module
+     *
+     * var chart = new Rockiotchart.Line('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5],
+     *   series: [
+     *     [1, 1, 8, 1, 7]
+     *   ]
+     * }, {
+     *   lineSmooth: Rockiotchart.Interpolation.cardinal({
+     *     tension: 0.2
+     *   })
+     * });
+     *
+     * @example
+     * // Create a line chart with responsive options
+     *
+     * var data = {
+     *   // A labels array that can contain any sort of values
+     *   labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+     *   // Our series array that contains series objects or in this case series data arrays
+     *   series: [
+     *     [5, 2, 4, 2, 0]
+     *   ]
+     * };
+     *
+     * // In addition to the regular options we specify responsive option overrides that will override the default configutation based on the matching media queries.
+     * var responsiveOptions = [
+     *   ['screen and (min-width: 641px) and (max-width: 1024px)', {
+     *     showPoint: false,
+     *     axisX: {
+     *       labelInterpolationFnc: function(value) {
+     *         // Will return Mon, Tue, Wed etc. on medium screens
+     *         return value.slice(0, 3);
+     *       }
+     *     }
+     *   }],
+     *   ['screen and (max-width: 640px)', {
+     *     showLine: false,
+     *     axisX: {
+     *       labelInterpolationFnc: function(value) {
+     *         // Will return M, T, W etc. on small screens
+     *         return value[0];
+     *       }
+     *     }
+     *   }]
+     * ];
+     *
+     * new Rockiotchart.Line('.ct-chart', data, null, responsiveOptions);
+     *
+     */
+    function Line(query, data, options, responsiveOptions) {
+      Rockiotchart.Line["super"].constructor.call(this, query, data, defaultOptions, Rockiotchart.extend({}, defaultOptions, options), responsiveOptions);
+    }
+
+    // Creating line chart type in Rockiotchart namespace
+    Rockiotchart.Line = Rockiotchart.Base.extend({
+      constructor: Line,
+      createChart: createChart
+    });
+  })(this || global, Rockiotchart) /**
+                                   * The bar chart module of Rockiotchart that can be used to draw unipolar or bipolar bar and grouped bar charts.
+                                   *
+                                   * @module Rockiotchart.Bar
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+
+    /**
+     * Default options in bar charts. Expand the code view to see a detailed list of options with comments.
+     *
+     * @memberof Rockiotchart.Bar
+     */
+    var defaultOptions = {
+      // Options for X-Axis
+      axisX: {
+        // The offset of the chart drawing area to the border of the container
+        offset: 30,
+        // Position where labels are placed. Can be set to `start` or `end` where `start` is equivalent to left or top on vertical axis and `end` is equivalent to right or bottom on horizontal axis.
+        position: 'end',
+        // Allows you to correct label positioning on this axis by positive or negative x and y offset.
+        labelOffset: {
+          x: 0,
+          y: 0
+        },
+        // If labels should be shown or not
+        showLabel: true,
+        // If the axis grid should be drawn or not
+        showGrid: true,
+        // Interpolation function that allows you to intercept the value from the axis label
+        labelInterpolationFnc: Rockiotchart.noop,
+        // This value specifies the minimum width in pixel of the scale steps
+        scaleMinSpace: 30,
+        // Use only integer values (whole numbers) for the scale steps
+        onlyInteger: false
+      },
+      // Options for Y-Axis
+      axisY: {
+        // The offset of the chart drawing area to the border of the container
+        offset: 40,
+        // Position where labels are placed. Can be set to `start` or `end` where `start` is equivalent to left or top on vertical axis and `end` is equivalent to right or bottom on horizontal axis.
+        position: 'start',
+        // Allows you to correct label positioning on this axis by positive or negative x and y offset.
+        labelOffset: {
+          x: 0,
+          y: 0
+        },
+        // If labels should be shown or not
+        showLabel: true,
+        // If the axis grid should be drawn or not
+        showGrid: true,
+        // Interpolation function that allows you to intercept the value from the axis label
+        labelInterpolationFnc: Rockiotchart.noop,
+        // This value specifies the minimum height in pixel of the scale steps
+        scaleMinSpace: 20,
+        // Use only integer values (whole numbers) for the scale steps
+        onlyInteger: false
+      },
+      // Specify a fixed width for the chart as a string (i.e. '100px' or '50%')
+      width: undefined,
+      // Specify a fixed height for the chart as a string (i.e. '100px' or '50%')
+      height: undefined,
+      // Overriding the natural high of the chart allows you to zoom in or limit the charts highest displayed value
+      high: undefined,
+      // Overriding the natural low of the chart allows you to zoom in or limit the charts lowest displayed value
+      low: undefined,
+      // Unless low/high are explicitly set, bar chart will be centered at zero by default. Set referenceValue to null to auto scale.
+      referenceValue: 0,
+      // Padding of the chart drawing area to the container element and labels as a number or padding object {top: 5, right: 5, bottom: 5, left: 5}
+      chartPadding: {
+        top: 15,
+        right: 15,
+        bottom: 5,
+        left: 10
+      },
+      // Specify the distance in pixel of bars in a group
+      seriesBarDistance: 15,
+      // If set to true this property will cause the series bars to be stacked. Check the `stackMode` option for further stacking options.
+      stackBars: false,
+      // If set to 'overlap' this property will force the stacked bars to draw from the zero line.
+      // If set to 'accumulate' this property will form a total for each series point. This will also influence the y-axis and the overall bounds of the chart. In stacked mode the seriesBarDistance property will have no effect.
+      stackMode: 'accumulate',
+      // Inverts the axes of the bar chart in order to draw a horizontal bar chart. Be aware that you also need to invert your axis settings as the Y Axis will now display the labels and the X Axis the values.
+      horizontalBars: false,
+      // If set to true then each bar will represent a series and the data array is expected to be a one dimensional array of data values rather than a series array of series. This is useful if the bar chart should represent a profile rather than some data over time.
+      distributeSeries: false,
+      // If true the whole data is reversed including labels, the series order as well as the whole series data arrays.
+      reverseData: false,
+      // If the bar chart should add a background fill to the .ct-grids group.
+      showGridBackground: false,
+      // Override the class names that get used to generate the SVG structure of the chart
+      classNames: {
+        chart: 'ct-chart-bar',
+        horizontalBars: 'ct-horizontal-bars',
+        label: 'ct-label',
+        labelGroup: 'ct-labels',
+        series: 'ct-series',
+        bar: 'ct-bar',
+        grid: 'ct-grid',
+        gridGroup: 'ct-grids',
+        gridBackground: 'ct-grid-background',
+        vertical: 'ct-vertical',
+        horizontal: 'ct-horizontal',
+        start: 'ct-start',
+        end: 'ct-end'
+      }
+    };
+
+    /**
+     * Creates a new chart
+     *
+     */
+    function createChart(options) {
+      var data;
+      var highLow;
+      if (options.distributeSeries) {
+        data = Rockiotchart.normalizeData(this.data, options.reverseData, options.horizontalBars ? 'x' : 'y');
+        data.normalized.series = data.normalized.series.map(function (value) {
+          return [value];
+        });
+      } else {
+        data = Rockiotchart.normalizeData(this.data, options.reverseData, options.horizontalBars ? 'x' : 'y');
+      }
+
+      // Create new svg element
+      this.svg = Rockiotchart.createSvg(this.container, options.width, options.height, options.classNames.chart + (options.horizontalBars ? ' ' + options.classNames.horizontalBars : ''));
+
+      // Drawing groups in correct order
+      var gridGroup = this.svg.elem('g').addClass(options.classNames.gridGroup);
+      var seriesGroup = this.svg.elem('g');
+      var labelGroup = this.svg.elem('g').addClass(options.classNames.labelGroup);
+      if (options.stackBars && data.normalized.series.length !== 0) {
+        // If stacked bars we need to calculate the high low from stacked values from each series
+        var serialSums = Rockiotchart.serialMap(data.normalized.series, function serialSums() {
+          return Array.prototype.slice.call(arguments).map(function (value) {
+            return value;
+          }).reduce(function (prev, curr) {
+            return {
+              x: prev.x + (curr && curr.x) || 0,
+              y: prev.y + (curr && curr.y) || 0
+            };
+          }, {
+            x: 0,
+            y: 0
+          });
+        });
+        highLow = Rockiotchart.getHighLow([serialSums], options, options.horizontalBars ? 'x' : 'y');
+      } else {
+        highLow = Rockiotchart.getHighLow(data.normalized.series, options, options.horizontalBars ? 'x' : 'y');
+      }
+
+      // Overrides of high / low from settings
+      highLow.high = +options.high || (options.high === 0 ? 0 : highLow.high);
+      highLow.low = +options.low || (options.low === 0 ? 0 : highLow.low);
+      var chartRect = Rockiotchart.createChartRect(this.svg, options, defaultOptions.padding);
+      var valueAxis, labelAxisTicks, labelAxis, axisX, axisY;
+
+      // We need to set step count based on some options combinations
+      if (options.distributeSeries && options.stackBars) {
+        // If distributed series are enabled and bars need to be stacked, we'll only have one bar and therefore should
+        // use only the first label for the step axis
+        labelAxisTicks = data.normalized.labels.slice(0, 1);
+      } else {
+        // If distributed series are enabled but stacked bars aren't, we should use the series labels
+        // If we are drawing a regular bar chart with two dimensional series data, we just use the labels array
+        // as the bars are normalized
+        labelAxisTicks = data.normalized.labels;
+      }
+
+      // Set labelAxis and valueAxis based on the horizontalBars setting. This setting will flip the axes if necessary.
+      if (options.horizontalBars) {
+        if (options.axisX.type === undefined) {
+          valueAxis = axisX = new Rockiotchart.AutoScaleAxis(Rockiotchart.Axis.units.x, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisX, {
+            highLow: highLow,
+            referenceValue: 0
+          }));
+        } else {
+          valueAxis = axisX = options.axisX.type.call(Rockiotchart, Rockiotchart.Axis.units.x, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisX, {
+            highLow: highLow,
+            referenceValue: 0
+          }));
+        }
+        if (options.axisY.type === undefined) {
+          labelAxis = axisY = new Rockiotchart.StepAxis(Rockiotchart.Axis.units.y, data.normalized.series, chartRect, {
+            ticks: labelAxisTicks
+          });
+        } else {
+          labelAxis = axisY = options.axisY.type.call(Rockiotchart, Rockiotchart.Axis.units.y, data.normalized.series, chartRect, options.axisY);
+        }
+      } else {
+        if (options.axisX.type === undefined) {
+          labelAxis = axisX = new Rockiotchart.StepAxis(Rockiotchart.Axis.units.x, data.normalized.series, chartRect, {
+            ticks: labelAxisTicks
+          });
+        } else {
+          labelAxis = axisX = options.axisX.type.call(Rockiotchart, Rockiotchart.Axis.units.x, data.normalized.series, chartRect, options.axisX);
+        }
+        if (options.axisY.type === undefined) {
+          valueAxis = axisY = new Rockiotchart.AutoScaleAxis(Rockiotchart.Axis.units.y, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisY, {
+            highLow: highLow,
+            referenceValue: 0
+          }));
+        } else {
+          valueAxis = axisY = options.axisY.type.call(Rockiotchart, Rockiotchart.Axis.units.y, data.normalized.series, chartRect, Rockiotchart.extend({}, options.axisY, {
+            highLow: highLow,
+            referenceValue: 0
+          }));
+        }
+      }
+
+      // Projected 0 point
+      var zeroPoint = options.horizontalBars ? chartRect.x1 + valueAxis.projectValue(0) : chartRect.y1 - valueAxis.projectValue(0);
+      // Used to track the screen coordinates of stacked bars
+      var stackedBarValues = [];
+      labelAxis.createGridAndLabels(gridGroup, labelGroup, this.supportsForeignObject, options, this.eventEmitter);
+      valueAxis.createGridAndLabels(gridGroup, labelGroup, this.supportsForeignObject, options, this.eventEmitter);
+      if (options.showGridBackground) {
+        Rockiotchart.createGridBackground(gridGroup, chartRect, options.classNames.gridBackground, this.eventEmitter);
+      }
+
+      // Draw the series
+      data.raw.series.forEach(function (series, seriesIndex) {
+        // Calculating bi-polar value of index for seriesOffset. For i = 0..4 biPol will be -1.5, -0.5, 0.5, 1.5 etc.
+        var biPol = seriesIndex - (data.raw.series.length - 1) / 2;
+        // Half of the period width between vertical grid lines used to position bars
+        var periodHalfLength;
+        // Current series SVG element
+        var seriesElement;
+
+        // We need to set periodHalfLength based on some options combinations
+        if (options.distributeSeries && !options.stackBars) {
+          // If distributed series are enabled but stacked bars aren't, we need to use the length of the normaizedData array
+          // which is the series count and divide by 2
+          periodHalfLength = labelAxis.axisLength / data.normalized.series.length / 2;
+        } else if (options.distributeSeries && options.stackBars) {
+          // If distributed series and stacked bars are enabled we'll only get one bar so we should just divide the axis
+          // length by 2
+          periodHalfLength = labelAxis.axisLength / 2;
+        } else {
+          // On regular bar charts we should just use the series length
+          periodHalfLength = labelAxis.axisLength / data.normalized.series[seriesIndex].length / 2;
+        }
+
+        // Adding the series group to the series element
+        seriesElement = seriesGroup.elem('g');
+
+        // Write attributes to series group element. If series name or meta is undefined the attributes will not be written
+        seriesElement.attr({
+          'ct:series-name': series.name,
+          'ct:meta': Rockiotchart.serialize(series.meta)
+        });
+
+        // Use series class from series data or if not set generate one
+        seriesElement.addClass([options.classNames.series, series.className || options.classNames.series + '-' + Rockiotchart.alphaNumerate(seriesIndex)].join(' '));
+        data.normalized.series[seriesIndex].forEach(function (value, valueIndex) {
+          var projected, bar, previousStack, labelAxisValueIndex;
+
+          // We need to set labelAxisValueIndex based on some options combinations
+          if (options.distributeSeries && !options.stackBars) {
+            // If distributed series are enabled but stacked bars aren't, we can use the seriesIndex for later projection
+            // on the step axis for label positioning
+            labelAxisValueIndex = seriesIndex;
+          } else if (options.distributeSeries && options.stackBars) {
+            // If distributed series and stacked bars are enabled, we will only get one bar and therefore always use
+            // 0 for projection on the label step axis
+            labelAxisValueIndex = 0;
+          } else {
+            // On regular bar charts we just use the value index to project on the label step axis
+            labelAxisValueIndex = valueIndex;
+          }
+
+          // We need to transform coordinates differently based on the chart layout
+          if (options.horizontalBars) {
+            projected = {
+              x: chartRect.x1 + valueAxis.projectValue(value && value.x ? value.x : 0, valueIndex, data.normalized.series[seriesIndex]),
+              y: chartRect.y1 - labelAxis.projectValue(value && value.y ? value.y : 0, labelAxisValueIndex, data.normalized.series[seriesIndex])
+            };
+          } else {
+            projected = {
+              x: chartRect.x1 + labelAxis.projectValue(value && value.x ? value.x : 0, labelAxisValueIndex, data.normalized.series[seriesIndex]),
+              y: chartRect.y1 - valueAxis.projectValue(value && value.y ? value.y : 0, valueIndex, data.normalized.series[seriesIndex])
+            };
+          }
+
+          // If the label axis is a step based axis we will offset the bar into the middle of between two steps using
+          // the periodHalfLength value. Also we do arrange the different series so that they align up to each other using
+          // the seriesBarDistance. If we don't have a step axis, the bar positions can be chosen freely so we should not
+          // add any automated positioning.
+          if (labelAxis instanceof Rockiotchart.StepAxis) {
+            // Offset to center bar between grid lines, but only if the step axis is not stretched
+            if (!labelAxis.options.stretch) {
+              projected[labelAxis.units.pos] += periodHalfLength * (options.horizontalBars ? -1 : 1);
+            }
+            // Using bi-polar offset for multiple series if no stacked bars or series distribution is used
+            projected[labelAxis.units.pos] += options.stackBars || options.distributeSeries ? 0 : biPol * options.seriesBarDistance * (options.horizontalBars ? -1 : 1);
+          }
+
+          // Enter value in stacked bar values used to remember previous screen value for stacking up bars
+          previousStack = stackedBarValues[valueIndex] || zeroPoint;
+          stackedBarValues[valueIndex] = previousStack - (zeroPoint - projected[labelAxis.counterUnits.pos]);
+
+          // Skip if value is undefined
+          if (value === undefined) {
+            return;
+          }
+          var positions = {};
+          positions[labelAxis.units.pos + '1'] = projected[labelAxis.units.pos];
+          positions[labelAxis.units.pos + '2'] = projected[labelAxis.units.pos];
+          if (options.stackBars && (options.stackMode === 'accumulate' || !options.stackMode)) {
+            // Stack mode: accumulate (default)
+            // If bars are stacked we use the stackedBarValues reference and otherwise base all bars off the zero line
+            // We want backwards compatibility, so the expected fallback without the 'stackMode' option
+            // to be the original behaviour (accumulate)
+            positions[labelAxis.counterUnits.pos + '1'] = previousStack;
+            positions[labelAxis.counterUnits.pos + '2'] = stackedBarValues[valueIndex];
+          } else {
+            // Draw from the zero line normally
+            // This is also the same code for Stack mode: overlap
+            positions[labelAxis.counterUnits.pos + '1'] = zeroPoint;
+            positions[labelAxis.counterUnits.pos + '2'] = projected[labelAxis.counterUnits.pos];
+          }
+
+          // Limit x and y so that they are within the chart rect
+          positions.x1 = Math.min(Math.max(positions.x1, chartRect.x1), chartRect.x2);
+          positions.x2 = Math.min(Math.max(positions.x2, chartRect.x1), chartRect.x2);
+          positions.y1 = Math.min(Math.max(positions.y1, chartRect.y2), chartRect.y1);
+          positions.y2 = Math.min(Math.max(positions.y2, chartRect.y2), chartRect.y1);
+          var metaData = Rockiotchart.getMetaData(series, valueIndex);
+
+          // Create bar element
+          bar = seriesElement.elem('line', positions, options.classNames.bar).attr({
+            'ct:value': [value.x, value.y].filter(Rockiotchart.isNumeric).join(','),
+            'ct:meta': Rockiotchart.serialize(metaData)
+          });
+          this.eventEmitter.emit('draw', Rockiotchart.extend({
+            type: 'bar',
+            value: value,
+            index: valueIndex,
+            meta: metaData,
+            series: series,
+            seriesIndex: seriesIndex,
+            axisX: axisX,
+            axisY: axisY,
+            chartRect: chartRect,
+            group: seriesElement,
+            element: bar
+          }, positions));
+        }.bind(this));
+      }.bind(this));
+      this.eventEmitter.emit('created', {
+        bounds: valueAxis.bounds,
+        chartRect: chartRect,
+        axisX: axisX,
+        axisY: axisY,
+        svg: this.svg,
+        options: options
+      });
+    }
+
+    /**
+     * This method creates a new bar chart and returns API object that you can use for later changes.
+     *
+     * @memberof Rockiotchart.Bar
+     * @param {String|Node} query A selector query string or directly a DOM element
+     * @param {Object} data The data object that needs to consist of a labels and a series array
+     * @param {Object} [options] The options object with options that override the default options. Check the examples for a detailed list.
+     * @param {Array} [responsiveOptions] Specify an array of responsive option arrays which are a media query and options object pair => [[mediaQueryString, optionsObject],[more...]]
+     * @return {Object} An object which exposes the API for the created chart
+     *
+     * @example
+     * // Create a simple bar chart
+     * var data = {
+     *   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+     *   series: [
+     *     [5, 2, 4, 2, 0]
+     *   ]
+     * };
+     *
+     * // In the global name space Rockiotchart we call the Bar function to initialize a bar chart. As a first parameter we pass in a selector where we would like to get our chart created and as a second parameter we pass our data object.
+     * new Rockiotchart.Bar('.ct-chart', data);
+     *
+     * @example
+     * // This example creates a bipolar grouped bar chart where the boundaries are limitted to -10 and 10
+     * new Rockiotchart.Bar('.ct-chart', {
+     *   labels: [1, 2, 3, 4, 5, 6, 7],
+     *   series: [
+     *     [1, 3, 2, -5, -3, 1, -6],
+     *     [-5, -2, -4, -1, 2, -3, 1]
+     *   ]
+     * }, {
+     *   seriesBarDistance: 12,
+     *   low: -10,
+     *   high: 10
+     * });
+     *
+     */
+    function Bar(query, data, options, responsiveOptions) {
+      Rockiotchart.Bar["super"].constructor.call(this, query, data, defaultOptions, Rockiotchart.extend({}, defaultOptions, options), responsiveOptions);
+    }
+
+    // Creating bar chart type in Rockiotchart namespace
+    Rockiotchart.Bar = Rockiotchart.Base.extend({
+      constructor: Bar,
+      createChart: createChart
+    });
+  })(this || global, Rockiotchart) /**
+                                   * The pie chart module of Rockiotchart that can be used to draw pie, donut or gauge charts
+                                   *
+                                   * @module Rockiotchart.Pie
+                                   */
+  /* global Rockiotchart */;
+  (function (globalRoot, Rockiotchart) {
+    'use strict';
+
+    var window = globalRoot.window;
+    var document = globalRoot.document;
+
+    /**
+     * Default options in line charts. Expand the code view to see a detailed list of options with comments.
+     *
+     * @memberof Rockiotchart.Pie
+     */
+    var defaultOptions = {
+      // Specify a fixed width for the chart as a string (i.e. '100px' or '50%')
+      width: undefined,
+      // Specify a fixed height for the chart as a string (i.e. '100px' or '50%')
+      height: undefined,
+      // Padding of the chart drawing area to the container element and labels as a number or padding object {top: 5, right: 5, bottom: 5, left: 5}
+      chartPadding: 5,
+      // Override the class names that are used to generate the SVG structure of the chart
+      classNames: {
+        chartPie: 'ct-chart-pie',
+        chartDonut: 'ct-chart-donut',
+        series: 'ct-series',
+        slicePie: 'ct-slice-pie',
+        sliceDonut: 'ct-slice-donut',
+        sliceDonutSolid: 'ct-slice-donut-solid',
+        label: 'ct-label'
+      },
+      // The start angle of the pie chart in degrees where 0 points north. A higher value offsets the start angle clockwise.
+      startAngle: 0,
+      // An optional total you can specify. By specifying a total value, the sum of the values in the series must be this total in order to draw a full pie. You can use this parameter to draw only parts of a pie or gauge charts.
+      total: undefined,
+      // If specified the donut CSS classes will be used and strokes will be drawn instead of pie slices.
+      donut: false,
+      // If specified the donut segments will be drawn as shapes instead of strokes.
+      donutSolid: false,
+      // Specify the donut stroke width, currently done in javascript for convenience. May move to CSS styles in the future.
+      // This option can be set as number or string to specify a relative width (i.e. 100 or '30%').
+      donutWidth: 60,
+      // If a label should be shown or not
+      showLabel: true,
+      // Label position offset from the standard position which is half distance of the radius. This value can be either positive or negative. Positive values will position the label away from the center.
+      labelOffset: 0,
+      // This option can be set to 'inside', 'outside' or 'center'. Positioned with 'inside' the labels will be placed on half the distance of the radius to the border of the Pie by respecting the 'labelOffset'. The 'outside' option will place the labels at the border of the pie and 'center' will place the labels in the absolute center point of the chart. The 'center' option only makes sense in conjunction with the 'labelOffset' option.
+      labelPosition: 'inside',
+      // An interpolation function for the label value
+      labelInterpolationFnc: Rockiotchart.noop,
+      // Label direction can be 'neutral', 'explode' or 'implode'. The labels anchor will be positioned based on those settings as well as the fact if the labels are on the right or left side of the center of the chart. Usually explode is useful when labels are positioned far away from the center.
+      labelDirection: 'neutral',
+      // If true the whole data is reversed including labels, the series order as well as the whole series data arrays.
+      reverseData: false,
+      // If true empty values will be ignored to avoid drawing unncessary slices and labels
+      ignoreEmptyValues: false
+    };
+
+    /**
+     * Determines SVG anchor position based on direction and center parameter
+     *
+     * @param center
+     * @param label
+     * @param direction
+     * @return {string}
+     */
+    function determineAnchorPosition(center, label, direction) {
+      var toTheRight = label.x > center.x;
+      if (toTheRight && direction === 'explode' || !toTheRight && direction === 'implode') {
+        return 'start';
+      } else if (toTheRight && direction === 'implode' || !toTheRight && direction === 'explode') {
+        return 'end';
+      } else {
+        return 'middle';
+      }
+    }
+
+    /**
+     * Creates the pie chart
+     *
+     * @param options
+     */
+    function createChart(options) {
+      var data = Rockiotchart.normalizeData(this.data);
+      var seriesGroups = [],
+        labelsGroup,
+        chartRect,
+        radius,
+        labelRadius,
+        totalDataSum,
+        startAngle = options.startAngle;
+
+      // Create SVG.js draw
+      this.svg = Rockiotchart.createSvg(this.container, options.width, options.height, options.donut ? options.classNames.chartDonut : options.classNames.chartPie);
+      // Calculate charting rect
+      chartRect = Rockiotchart.createChartRect(this.svg, options, defaultOptions.padding);
+      // Get biggest circle radius possible within chartRect
+      radius = Math.min(chartRect.width() / 2, chartRect.height() / 2);
+      // Calculate total of all series to get reference value or use total reference from optional options
+      totalDataSum = options.total || data.normalized.series.reduce(function (previousValue, currentValue) {
+        return previousValue + currentValue;
+      }, 0);
+      var donutWidth = Rockiotchart.quantity(options.donutWidth);
+      if (donutWidth.unit === '%') {
+        donutWidth.value *= radius / 100;
+      }
+
+      // If this is a donut chart we need to adjust our radius to enable strokes to be drawn inside
+      // Unfortunately this is not possible with the current SVG Spec
+      // See this proposal for more details: http://lists.w3.org/Archives/Public/www-svg/2003Oct/0000.html
+      radius -= options.donut && !options.donutSolid ? donutWidth.value / 2 : 0;
+
+      // If labelPosition is set to `outside` or a donut chart is drawn then the label position is at the radius,
+      // if regular pie chart it's half of the radius
+      if (options.labelPosition === 'outside' || options.donut && !options.donutSolid) {
+        labelRadius = radius;
+      } else if (options.labelPosition === 'center') {
+        // If labelPosition is center we start with 0 and will later wait for the labelOffset
+        labelRadius = 0;
+      } else if (options.donutSolid) {
+        labelRadius = radius - donutWidth.value / 2;
+      } else {
+        // Default option is 'inside' where we use half the radius so the label will be placed in the center of the pie
+        // slice
+        labelRadius = radius / 2;
+      }
+      // Add the offset to the labelRadius where a negative offset means closed to the center of the chart
+      labelRadius += options.labelOffset;
+
+      // Calculate end angle based on total sum and current data value and offset with padding
+      var center = {
+        x: chartRect.x1 + chartRect.width() / 2,
+        y: chartRect.y2 + chartRect.height() / 2
+      };
+
+      // Check if there is only one non-zero value in the series array.
+      var hasSingleValInSeries = data.raw.series.filter(function (val) {
+        return val.hasOwnProperty('value') ? val.value !== 0 : val !== 0;
+      }).length === 1;
+
+      // Creating the series groups
+      data.raw.series.forEach(function (series, index) {
+        seriesGroups[index] = this.svg.elem('g', null, null);
+      }.bind(this));
+      //if we need to show labels we create the label group now
+      if (options.showLabel) {
+        labelsGroup = this.svg.elem('g', null, null);
+      }
+
+      // Draw the series
+      // initialize series groups
+      data.raw.series.forEach(function (series, index) {
+        // If current value is zero and we are ignoring empty values then skip to next value
+        if (data.normalized.series[index] === 0 && options.ignoreEmptyValues) return;
+
+        // If the series is an object and contains a name or meta data we add a custom attribute
+        seriesGroups[index].attr({
+          'ct:series-name': series.name
+        });
+
+        // Use series class from series data or if not set generate one
+        seriesGroups[index].addClass([options.classNames.series, series.className || options.classNames.series + '-' + Rockiotchart.alphaNumerate(index)].join(' '));
+
+        // If the whole dataset is 0 endAngle should be zero. Can't divide by 0.
+        var endAngle = totalDataSum > 0 ? startAngle + data.normalized.series[index] / totalDataSum * 360 : 0;
+
+        // Use slight offset so there are no transparent hairline issues
+        var overlappigStartAngle = Math.max(0, startAngle - (index === 0 || hasSingleValInSeries ? 0 : 0.2));
+
+        // If we need to draw the arc for all 360 degrees we need to add a hack where we close the circle
+        // with Z and use 359.99 degrees
+        if (endAngle - overlappigStartAngle >= 359.99) {
+          endAngle = overlappigStartAngle + 359.99;
+        }
+        var start = Rockiotchart.polarToCartesian(center.x, center.y, radius, overlappigStartAngle),
+          end = Rockiotchart.polarToCartesian(center.x, center.y, radius, endAngle);
+        var innerStart, innerEnd, donutSolidRadius;
+
+        // Create a new path element for the pie chart. If this isn't a donut chart we should close the path for a correct stroke
+        var path = new Rockiotchart.Svg.Path(!options.donut || options.donutSolid).move(end.x, end.y).arc(radius, radius, 0, endAngle - startAngle > 180, 0, start.x, start.y);
+
+        // If regular pie chart (no donut) we add a line to the center of the circle for completing the pie
+        if (!options.donut) {
+          path.line(center.x, center.y);
+        } else if (options.donutSolid) {
+          donutSolidRadius = radius - donutWidth.value;
+          innerStart = Rockiotchart.polarToCartesian(center.x, center.y, donutSolidRadius, startAngle - (index === 0 || hasSingleValInSeries ? 0 : 0.2));
+          innerEnd = Rockiotchart.polarToCartesian(center.x, center.y, donutSolidRadius, endAngle);
+          path.line(innerStart.x, innerStart.y);
+          path.arc(donutSolidRadius, donutSolidRadius, 0, endAngle - startAngle > 180, 1, innerEnd.x, innerEnd.y);
+        }
+
+        // Create the SVG path
+        // If this is a donut chart we add the donut class, otherwise just a regular slice
+        var pathClassName = options.classNames.slicePie;
+        if (options.donut) {
+          pathClassName = options.classNames.sliceDonut;
+          if (options.donutSolid) {
+            pathClassName = options.classNames.sliceDonutSolid;
+          }
+        }
+        var pathElement = seriesGroups[index].elem('path', {
+          d: path.stringify()
+        }, pathClassName);
+
+        // Adding the pie series value to the path
+        pathElement.attr({
+          'ct:value': data.normalized.series[index],
+          'ct:meta': Rockiotchart.serialize(series.meta)
+        });
+
+        // If this is a donut, we add the stroke-width as style attribute
+        if (options.donut && !options.donutSolid) {
+          pathElement._node.style.strokeWidth = donutWidth.value + 'px';
+        }
+
+        // Fire off draw event
+        this.eventEmitter.emit('draw', {
+          type: 'slice',
+          value: data.normalized.series[index],
+          totalDataSum: totalDataSum,
+          index: index,
+          meta: series.meta,
+          series: series,
+          group: seriesGroups[index],
+          element: pathElement,
+          path: path.clone(),
+          center: center,
+          radius: radius,
+          startAngle: startAngle,
+          endAngle: endAngle
+        });
+
+        // If we need to show labels we need to add the label for this slice now
+        if (options.showLabel) {
+          var labelPosition;
+          if (data.raw.series.length === 1) {
+            // If we have only 1 series, we can position the label in the center of the pie
+            labelPosition = {
+              x: center.x,
+              y: center.y
+            };
+          } else {
+            // Position at the labelRadius distance from center and between start and end angle
+            labelPosition = Rockiotchart.polarToCartesian(center.x, center.y, labelRadius, startAngle + (endAngle - startAngle) / 2);
+          }
+          var rawValue;
+          if (data.normalized.labels && !Rockiotchart.isFalseyButZero(data.normalized.labels[index])) {
+            rawValue = data.normalized.labels[index];
+          } else {
+            rawValue = data.normalized.series[index];
+          }
+          var interpolatedValue = options.labelInterpolationFnc(rawValue, index);
+          if (interpolatedValue || interpolatedValue === 0) {
+            var labelElement = labelsGroup.elem('text', {
+              dx: labelPosition.x,
+              dy: labelPosition.y,
+              'text-anchor': determineAnchorPosition(center, labelPosition, options.labelDirection)
+            }, options.classNames.label).text('' + interpolatedValue);
+
+            // Fire off draw event
+            this.eventEmitter.emit('draw', {
+              type: 'label',
+              index: index,
+              group: labelsGroup,
+              element: labelElement,
+              text: '' + interpolatedValue,
+              x: labelPosition.x,
+              y: labelPosition.y
+            });
+          }
+        }
+
+        // Set next startAngle to current endAngle.
+        // (except for last slice)
+        startAngle = endAngle;
+      }.bind(this));
+      this.eventEmitter.emit('created', {
+        chartRect: chartRect,
+        svg: this.svg,
+        options: options
+      });
+    }
+
+    /**
+     * This method creates a new pie chart and returns an object that can be used to redraw the chart.
+     *
+     * @memberof Rockiotchart.Pie
+     * @param {String|Node} query A selector query string or directly a DOM element
+     * @param {Object} data The data object in the pie chart needs to have a series property with a one dimensional data array. The values will be normalized against each other and don't necessarily need to be in percentage. The series property can also be an array of value objects that contain a value property and a className property to override the CSS class name for the series group.
+     * @param {Object} [options] The options object with options that override the default options. Check the examples for a detailed list.
+     * @param {Array} [responsiveOptions] Specify an array of responsive option arrays which are a media query and options object pair => [[mediaQueryString, optionsObject],[more...]]
+     * @return {Object} An object with a version and an update method to manually redraw the chart
+     *
+     * @example
+     * // Simple pie chart example with four series
+     * new Rockiotchart.Pie('.ct-chart', {
+     *   series: [10, 2, 4, 3]
+     * });
+     *
+     * @example
+     * // Drawing a donut chart
+     * new Rockiotchart.Pie('.ct-chart', {
+     *   series: [10, 2, 4, 3]
+     * }, {
+     *   donut: true
+     * });
+     *
+     * @example
+     * // Using donut, startAngle and total to draw a gauge chart
+     * new Rockiotchart.Pie('.ct-chart', {
+     *   series: [20, 10, 30, 40]
+     * }, {
+     *   donut: true,
+     *   donutWidth: 20,
+     *   startAngle: 270,
+     *   total: 200
+     * });
+     *
+     * @example
+     * // Drawing a pie chart with padding and labels that are outside the pie
+     * new Rockiotchart.Pie('.ct-chart', {
+     *   series: [20, 10, 30, 40]
+     * }, {
+     *   chartPadding: 30,
+     *   labelOffset: 50,
+     *   labelDirection: 'explode'
+     * });
+     *
+     * @example
+     * // Overriding the class names for individual series as well as a name and meta data.
+     * // The name will be written as ct:series-name attribute and the meta data will be serialized and written
+     * // to a ct:meta attribute.
+     * new Rockiotchart.Pie('.ct-chart', {
+     *   series: [{
+     *     value: 20,
+     *     name: 'Series 1',
+     *     className: 'my-custom-class-one',
+     *     meta: 'Meta One'
+     *   }, {
+     *     value: 10,
+     *     name: 'Series 2',
+     *     className: 'my-custom-class-two',
+     *     meta: 'Meta Two'
+     *   }, {
+     *     value: 70,
+     *     name: 'Series 3',
+     *     className: 'my-custom-class-three',
+     *     meta: 'Meta Three'
+     *   }]
+     * });
+     */
+    function Pie(query, data, options, responsiveOptions) {
+      Rockiotchart.Pie["super"].constructor.call(this, query, data, defaultOptions, Rockiotchart.extend({}, defaultOptions, options), responsiveOptions);
+    }
+
+    // Creating pie chart type in Rockiotchart namespace
+    Rockiotchart.Pie = Rockiotchart.Base.extend({
+      constructor: Pie,
+      createChart: createChart,
+      determineAnchorPosition: determineAnchorPosition
+    });
+  })(this || global, Rockiotchart);
+  return Rockiotchart;
+}));
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
+
+/***/ })
+
+}]);
