@@ -192,24 +192,19 @@
       tick(bars, data, svg)
     }
 
-    // --- Bar Area --------------------------
-    function areaChart(id, xDomain, tick) {
+    // --- Area Chart --------------------------
+    function areaChart(id, xDomain, interpolation, tick) {
       var data = d3.range(n).map(() => 0)
       var svg = createSvg(data, id, xDomain)
 
       var area = d3.svg
         .area()
+        .interpolate(interpolation)
         .x((d, i) => svg.x(i))
         .y0(svg.y(0))
         .y1((d) => svg.y(d))
 
-      var path = svg.baseSvg
-        .append('g')
-        .attr('clip-path', 'url(#clip)')
-        .append('path')
-        .datum(data)
-        .attr('class', 'area')
-        .attr('d', area)
+      var path = svg.baseSvg.append('g').attr('clip-path', 'url(#clip)').append('path').datum(data).attr('class', 'area').attr('d', area)
 
       tick(path, area, data, svg)
     }
@@ -223,7 +218,7 @@
           // push a new data point onto the back
           data.push(random())
 
-          $('chart1-data').innerText = JSON.stringify(data.slice(-8), null, 2)
+          showData('chart1-data', data)
 
           updateAxis(data, svg)
 
@@ -255,7 +250,7 @@
           // push a new data point onto the back
           data.push(random())
 
-          $('chart2-data').innerText = JSON.stringify(data.slice(-8), null, 2)
+          showData('chart2-data', data)
 
           updateAxis(data, svg)
 
@@ -286,7 +281,7 @@
         function each() {
           data.push(random())
 
-          $('chart3-data').innerText = JSON.stringify(data.slice(-8), null, 2)
+          showData('chart3-data', data)
 
           updateAxis(data, svg)
 
@@ -324,18 +319,61 @@
       function tick(path, area, data, svg) {
         function each() {
           data.push(random())
-          document.getElementById('chart4-data').innerText = JSON.stringify(data.slice(-8), null, 2)
+
+          showData('chart4-data', data)
+
           updateAxis(data, svg)
-          path.attr('d', area).attr('transform', null).transition().attr('transform', 'translate(' + svg.x(-1) + ')')
+
+          path
+            .attr('d', area)
+            .attr('transform', null)
+            .transition()
+            .attr('transform', 'translate(' + svg.x(-1) + ')')
+
           data.shift()
         }
+
         transition = transition
           .each(each)
           .transition()
           .each('start', () => tick(path, area, data, svg))
       }
 
-      areaChart('#chart4', [0, n - 1], tick)
+      areaChart('#chart4', [0, n - 1], 'linear', tick)
+    }
+
+    // --- Chart5 --------------------------
+    function Chart5() {
+      var transition = d3.select({}).transition().duration(duration).ease('linear')
+
+      function tick(path, area, data, svg) {
+        function each() {
+          data.push(random())
+
+          showData('chart5-data', data)
+
+          updateAxis(data, svg)
+
+          path
+            .attr('d', area)
+            .attr('transform', null)
+            .transition()
+            .attr('transform', 'translate(' + svg.x(-1) + ')')
+
+          data.shift()
+        }
+
+        transition = transition
+          .each(each)
+          .transition()
+          .each('start', () => tick(path, area, data, svg))
+      }
+
+      areaChart('#chart5', [0, n - 1], 'basis', tick)
+    }
+
+    function showData(id, data) {
+      $(id).innerText = JSON.stringify(data.slice(-8), null, 2)
     }
   </script>
   <h1>D3 Real-time Chart</h1>
@@ -349,6 +387,8 @@
       <pre id="chart3-data"></pre>
       Chart4 Data
       <pre id="chart4-data"></pre>
+      Chart5 Data
+      <pre id="chart5-data"></pre>
     </div>
     <div id="chart-container">
       <div id="chart1">
@@ -373,6 +413,12 @@
         Chart4 area
         <script>
           Chart4()
+        </script>
+      </div>
+      <div id="chart5">
+        Chart5 area
+        <script>
+          Chart5()
         </script>
       </div>
     </div>
