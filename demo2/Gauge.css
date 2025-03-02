@@ -37,6 +37,9 @@
 }
 
 .rockiot-title-text {
+  font-size: 0.28rem;
+}
+.rockiot-units-text {
   font-size: 0.22rem;
 }
 

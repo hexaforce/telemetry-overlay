@@ -207,19 +207,25 @@
         valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
         valueTextClass = 'rockiot-radial-value-text',
         valueColor = '#777',
+
+        name = 'Speed',
         titleTextClass = 'rockiot-title-text',
+        titleColor = '#333',
+
+        units = 'Km/h',
+        unitsTextClass = 'rockiot-units-text',
+        unitsColor = '#333',
+
         dialClass = `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
         gaugeClass = `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
         gaugeColor = null,
-        gaugeBarColor = '#00000060',
-        gaugeProgressColor = '#4ea5f1',
+        gaugeBarColor = '#4ea5f1',
+        gaugeProgressColor = '#e0e0e0',
+
         gaugeValueElem,
         gaugeValuePath,
         gaugeTitleElem,
         gaugeUnitsElem,
-        name = 'Speed',
-        titleColor = '#333',
-        units = 'Km/h',
         viewBox = undefined, //opts.viewBox,
         instance,
         gaugeScale,
@@ -273,9 +279,9 @@
 
         gaugeUnitsElem = svg('text', {
           x: 50,
-          y: 38,
-          fill: titleColor,
-          class: titleTextClass,
+          y: 40,
+          fill: unitsColor,
+          class: unitsTextClass,
           'text-anchor': 'middle',
           'alignment-baseline': 'middle',
           'dominant-baseline': 'central',
