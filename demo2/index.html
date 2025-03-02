@@ -1,65 +1,31 @@
-<!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gauge Example</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-    .gauge-container {
-      width: 300px;
-      height: 300px;
-    }
-  </style>
-  <link href="./Gauge.css" rel="preload" as="style">
+  <link rel="stylesheet" href="gauge.css">
 </head>
+
 <body>
-  <div class="gauge-container rockiot-value-gauge1" id="gauge"></div>
+  <div id="gauge" class="gauge-container"></div>
 
-  <!-- Gauge.js を読み込む -->
-  <script src="Gauge.js"></script>
+  <script src="gauge.js"></script>
   <script>
-    // DOMが完全にロードされた後にGaugeを初期化する
-    document.addEventListener('DOMContentLoaded', function () {
-      var options = {
-        dialRadius: 100, // ゲージの半径
-        dialStartAngle: 135, // ゲージの開始角度
-        dialEndAngle: 45, // ゲージの終了角度
-        value: 50, // 初期値
-        max: 100, // 最大値
-        min: 0, // 最小値
-        showValue: true, // 値を表示する
-        needle: true, // 針を表示する
-        progressColor: '#ff0000', // ゲージの進捗色
-        barColor: '#ddd', // ゲージの背景色
-        needleColor: '#333', // 針の色
-        titleTextClass: 'gauge-title', // タイトルのクラス
-        unitsTextClass: 'gauge-units', // 単位のクラス
-        name: 'Speed', // タイトル
-        units: 'km/h', // 単位
-        serial: 'gauge1', // ゲージの一意の識別子
-      };
-
-      // Gaugeを初期化
-      var gauge = new Gauge(document.getElementById('gauge'), options);
-
-      // 値の更新例
-      setTimeout(function () {
-        gauge.setValueAnimated(75, 2); // 2秒かけて75にアニメーション
-      }, 2000);
-
-      setTimeout(function () {
-        gauge.setValueAnimated(25, 1); // 1秒かけて25にアニメーション
-      }, 5000);
+    var gauge = new Gauge(document.getElementById('gauge'), {
+      dialRadius: 45,
+      offset: 10,
+      serial: "xxx01"
     });
+
+
+    setInterval(function () {
+      const range = gauge.getRange()
+      const randomValue = (Math.random() * range.limit).toFixed(2);
+      gauge.setValueAnimated(parseFloat(randomValue), 0.5);
+    }, 1000)
+
   </script>
 </body>
+
 </html>
