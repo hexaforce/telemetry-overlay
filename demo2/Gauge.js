@@ -25,6 +25,7 @@
     }
 
   const SVG_NS = 'http://www.w3.org/2000/svg'
+
   // EXPERIMENTAL!!
   /**
    * Simplistic animation function for animating the gauge. That's all!
@@ -119,27 +120,23 @@
       return (percentage * gaugeSpanAngle) / 100
     }
 
-    function normalize(value, min, limit) {
+    function normalize(value, _min, _max) {
       let val = Number(value)
       if (Number(value) < 0) {
-        val += min
+        val += _min
       }
-      //console.log ( 'normalize animated=>',val , min , limit + min)
-      if (val > limit) return limit
-      //if(val < min) return min;
+      if (val > _max) return _max
       return val
     }
 
-    function getValueInPercentage(value, min, max) {
+    function getValueInPercentage(value, _min, _max) {
       let mFactor = 1
-      if (min < 0) {
-        max -= min * -1
+      if (_min < 0) {
+        _max -= _min * -1
       }
-      let newMax = max - min * mFactor
-      let newVal = value - min * mFactor
+      let newMax = _max - _min * mFactor
+      let newVal = value - _min * mFactor
       return (100 * newVal) / newMax
-      // let absMin = Math.abs(min);
-      // return 100 * (absMin + value) / (max + absMin);
     }
 
     /**
@@ -192,7 +189,7 @@
       let serial = opts.serial
 
       let gaugeContainer = elem
-      let limit = 270
+      let max = 270
       let min = 0
       let precision = 2
       let radius = opts.dialRadius - offset
@@ -283,21 +280,21 @@
 
         if (displayScale) {
           gaugeScale = svg('g', {
-            class: 'rockiot-scale scale',
-            stroke: '#eee',
+            // class: 'rockiot-scale scale',
+            // stroke: '#ff0000',
           })
-          let tickEl
+          let tickLine
           let startTick = startAngle + 90
           let factor = (360 - (startAngle - endAngle)) / (ticks * 10)
           let scaleOffsetNumber = min
           if (opts.min < 0) {
-            limit = Math.abs(opts.min) + limit
+            max = Math.abs(opts.min) + max
             scaleOffsetNumber = opts.min
             min = 0
           }
           if (opts.min > 0) {
             scaleOffsetNumber = opts.min
-            limit -= Math.abs(min)
+            max -= Math.abs(min)
           }
           for (let n = 0; n < ticks * 10 + 1; n++) {
             let yT = 50 - opts.dialRadius + opts.dialRadius / 10
@@ -310,38 +307,34 @@
               dT = 5
             }
             if (n % 10 === 0 || displaySmallScale) {
-              tickEl = svg('line', {
-                // class: 'rockiot-scale scale',
+              tickLine = svg('line', {
                 x1: 50,
                 y1: yT,
                 x2: 50,
                 y2: yT + dT,
-                stroke: '#aaa',
-                'stroke-width': 0.4,
+                class: 'rockiot-radial-scale-tick',
                 transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
               })
 
               let numberOffset = 0
               if (n % 10 === 0) {
                 if (n === 0 && startAngle - endAngle === 1) {
-                  numberOffset = 2
+                  numberOffset =10
                 }
                 if (n === ticks * 10 && startAngle - endAngle === 1) {
                   numberOffset = -2
                 }
-                let tickNr = svg('text', {
+                let scaleText = svg('text', {
                   x: 50 + numberOffset,
                   y: yT - 1,
-                  class: 'scaleNumbers',
-                  fill: '#aaa',
+                  class: 'rockiot-radial-scale-text',
                   transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
                 })
-
-                tickNr.append(parseFloat(n * (limit / ticks / 10) + parseInt(scaleOffsetNumber)).toFixed(0))
-                gaugeScale.appendChild(tickNr)
+                scaleText.append(parseFloat(n * (max / ticks / 10) + parseInt(scaleOffsetNumber)).toFixed(0))
+                gaugeScale.appendChild(scaleText)
               }
 
-              gaugeScale.appendChild(tickEl)
+              gaugeScale.appendChild(tickLine)
               gaugeElement.appendChild(gaugeScale)
             }
           }
@@ -368,7 +361,7 @@
       }
 
       function updateGauge(theValue, frame) {
-        let lm = limit
+        let lm = max
         let mn = min
 
         if (opts.min > 0) {
@@ -392,22 +385,11 @@
       }
 
       function setGaugeColor(value, duration) {
-        let c = gaugeColor(value)
-        let dur = duration * 1000
-        let pathTransition = 'stroke ' + dur + 'ms ease'
-
-        gaugeValuePath.style.stroke = c
+        let pathTransition = 'stroke ' + (duration * 1000) + 'ms ease'
+        gaugeValuePath.style.stroke = gaugeColor(value)
         gaugeValuePath.style['-webkit-transition'] = pathTransition
         gaugeValuePath.style['-moz-transition'] = pathTransition
         gaugeValuePath.style.transition = pathTransition
-        /*
-        gaugeValueElem.style = [
-          "fill: " + c,
-          "-webkit-transition: " + textTransition,
-          "-moz-transition: " + textTransition,
-          "transition: " + textTransition,
-        ].join(";");
-        */
       }
 
       instance = {
@@ -415,7 +397,7 @@
           console.log(options)
         },
         setMaxValue: function (newMax) {
-          limit = newMax
+          max = newMax
         },
         setValue: function (val) {
           value = val
@@ -430,7 +412,7 @@
         setValueAnimated: function (val, duration) {
           let oldVal = value
           value = val
-          value = normalize(val, min, limit)
+          value = normalize(val, min, max)
           if (oldVal === value) {
             return
           }
@@ -450,7 +432,7 @@
           return value
         },
         getRange: function () {
-          return { min, limit }
+          return { min, max }
         },
       }
       initializeGauge(gaugeContainer)

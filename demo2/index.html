@@ -16,7 +16,7 @@
       })
       setInterval(function () {
         const range = gauge.getRange()
-        const randomValue = (Math.random() * range.limit).toFixed(2)
+        const randomValue = (Math.random() * range.max).toFixed(2)
         gauge.setValueAnimated(parseFloat(randomValue), 0.5)
       }, 1000)
     </script>
