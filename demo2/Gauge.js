@@ -188,9 +188,7 @@
      * @return a Gauge object
      */
     return function Gauge(elem, opts) {
-      // console.log("---2 defaultOptions:", defaultOptions)
       opts = shallowCopy({}, defaultOptions, opts)
-      console.log('---3 opts:', JSON.stringify(opts))
 
       var offset = opts.offset
       var serial = opts.serial
@@ -437,10 +435,10 @@
         var lm = limit
         var mn = min
 
-        //if ( opts.min < 0 ){
-        //  theValue += Math.abs(opts.min)
+        // if (opts.min < 0) {
+        //   theValue += Math.abs(opts.min)
+        // }
 
-        //}
         if (opts.min > 0) {
           mn = opts.min
           lm += opts.min
@@ -495,19 +493,19 @@
 
         setValue: function (val) {
           value = val
-          /*if ( min > 0 ){
-            var lm = opts.max-min
 
-            value = (lm*val)/100
-            console.log ('set value of % =>' , val, min , lm , ' = ' , value )
-          }
-          */
+          // if (min > 0) {
+          //   var lm = opts.max - min
+          //   value = (lm * val) / 100
+          //   console.log('set value of % =>', val, min, lm, ' = ', value)
+          // }
+
           if (value < 0) {
             value += min
           }
 
-          //console.log ( 'set value=> ', value , min , limit )
-          //value = normalize(val, min, limit);
+          // console.log('set value=> ', value, min, limit)
+          // value = normalize(val, min, limit)
           if (gaugeColor) {
             setGaugeColor(value, 0)
           }
@@ -517,11 +515,11 @@
         setValueAnimated: function (val, duration) {
           var oldVal = value
           value = val
-          //if ( value < 0 ){
-          //  value += min
-          //}
+          // if (value < 0) {
+          //   value += min
+          // }
 
-          value = normalize(val, min, limit) //limit);
+          value = normalize(val, min, limit)
           if (oldVal === value) {
             return
           }
