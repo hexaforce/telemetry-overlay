@@ -196,7 +196,6 @@
       var gaugeContainer = elem,
         limit = 270,
         min = 0,
-        value = 100,
         precision = 2,
         radius = opts.dialRadius - offset,
         displayValue = true,
@@ -204,9 +203,6 @@
         displaySmallScale = true,
         startAngle = 135,
         endAngle = 45,
-        valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
-        valueTextClass = 'rockiot-radial-value-text',
-        valueColor = '#777',
 
         title = 'Speed',
         titleTextClass = 'rockiot-title-text',
@@ -215,6 +211,15 @@
         units = 'Km/h',
         unitsTextClass = 'rockiot-units-text',
         unitsColor = '#333',
+
+
+        value = 100,
+        valueTextClass = 'rockiot-radial-value-text',
+        valueColor = '#707070',
+
+        valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
+
+
 
         dialClass = `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
         gaugeClass = `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
@@ -252,29 +257,13 @@
       }
 
       function initializeGauge(elem) {
-        gaugeValueElem = svg('text', {
-          x: 50,
-          y: 65,
-          fill: valueColor,
-          class: valueTextClass,
-          'font-size': '0.' + (opts.dialRadius + 10) + 'rem',
-          'font-family': 'sans-serif',
-          'font-weight': 'normal',
-          'text-anchor': 'middle',
-          'alignment-baseline': 'middle',
-          'dominant-baseline': 'central',
-        })
 
         gaugeTitleElem = svg('text', {
           x: 50,
           y: 35,
           fill: titleColor,
           class: titleTextClass,
-          'text-anchor': 'middle',
-          'alignment-baseline': 'middle',
-          'dominant-baseline': 'central',
         })
-
         gaugeTitleElem.append(title)
 
         gaugeUnitsElem = svg('text', {
@@ -282,12 +271,16 @@
           y: 40,
           fill: unitsColor,
           class: unitsTextClass,
-          'text-anchor': 'middle',
-          'alignment-baseline': 'middle',
-          'dominant-baseline': 'central',
         })
-
         gaugeUnitsElem.append(units)
+
+        gaugeValueElem = svg('text', {
+          x: 50,
+          y: 65,
+          fill: valueColor,
+          class: valueTextClass,
+          'font-size': '0.' + (opts.dialRadius + 10) + 'rem',
+        })
 
         gaugeValuePath = svg('path', {
           class: valueDialClass,
