@@ -207,12 +207,7 @@
         units = 'Km/h',
         // value ---------------------
         value = 100,
-        valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
-        dialClass = `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
-        gaugeClass = `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
         gaugeColor = null,
-        gaugeBarColor = '#4ea5f1',
-        gaugeProgressColor = '#e0e0e0',
         gaugeValueElem,
         gaugeValuePath,
         gaugeTitleElem,
@@ -221,9 +216,7 @@
         instance,
         gaugeScale,
         needle = true,
-        ticks = 9,
-        scaleClass = 'rockiot-scale scale',
-        scaleColor = '#aaa'
+        ticks = 9
 
       if (startAngle < endAngle) {
         console.log('WARN! startAngle < endAngle, Swapping')
@@ -261,9 +254,9 @@
         })
 
         gaugeValuePath = svg('path', {
-          class: valueDialClass,
+          class: `rockiot-value rockiot-value-md rockiot-value-${serial}`,
           fill: 'none',
-          stroke: gaugeBarColor,
+          stroke: '#4ea5f1',
           'stroke-width': 2.5,
           d: pathString(radius, startAngle, startAngle), // value of 0
         })
@@ -272,14 +265,17 @@
         let flag = angle <= 180 ? 0 : 1
 
         let gaugeDialEl = svg('path', {
-          class: dialClass,
+          class: `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
           fill: 'none',
-          stroke: gaugeProgressColor,
+          stroke: '#e0e0e0',
           'stroke-width': 2,
           d: pathString(radius, startAngle, endAngle, flag),
         })
 
-        let gaugeElement = svg('svg', { viewBox: viewBox || '0 0 100 100', class: gaugeClass }, [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem])
+        let gaugeElement = svg('svg', {
+           viewBox: viewBox || '0 0 100 100', class: `rockiot-svg rockiot-svg-${serial} gauge-${serial}` }, 
+          [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem],
+        )
 
         elem.appendChild(gaugeElement)
 
@@ -294,10 +290,10 @@
 
         if (displayScale) {
           gaugeScale = svg('g', {
-            class: scaleClass,
+            class: 'rockiot-scale scale',
             stroke: '#eee',
           })
-          var tickEl, tickText, textPath
+          var tickEl
 
           var startTick = startAngle + 90
           var factor = (360 - (startAngle - endAngle)) / (ticks * 10)
@@ -324,12 +320,12 @@
             }
             if (n % 10 === 0 || displaySmallScale) {
               tickEl = svg('line', {
-                class: scaleClass,
+                class: 'rockiot-scale scale',
                 x1: 50,
                 y1: yT,
                 x2: 50,
                 y2: yT + dT,
-                stroke: scaleColor,
+                stroke: '#aaa',
                 'stroke-width': 0.4,
                 transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
               })
@@ -346,7 +342,7 @@
                   x: 50 + numberOffset,
                   y: yT - 1,
                   class: 'scaleNumbers',
-                  fill: scaleColor,
+                  fill: '#aaa',
                   transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
                 })
 
