@@ -198,18 +198,19 @@
       let displaySmallScale = true
       let startAngle = 135
       let endAngle = 45
+      let barFilledPath
       // title ---------------------
       let title = 'Speed'
+      let titleText
       // units ---------------------
       let units = 'Km/h'
+      let unitsText
       // value ---------------------
       let value = 100
+      let valueText
+
       let gaugeColor = null
-      let gaugeValueElem
-      let gaugeValuePath
-      let gaugeTitleElem
-      let gaugeUnitsElem
-      let viewBox = undefined //opts.viewBox,
+
       let instance
       let gaugeScale
       let needle = true
@@ -229,40 +230,30 @@
       }
 
       function initializeGauge(elem) {
-        gaugeTitleElem = svg('text', { x: 50, y: 35, class: 'rockiot-title-text' })
-        gaugeTitleElem.append(title)
+        titleText = svg('text', { x: 50, y: 35, class: 'rockiot-title-text' })
+        titleText.append(title)
 
-        gaugeUnitsElem = svg('text', { x: 50, y: 40, class: 'rockiot-units-text' })
-        gaugeUnitsElem.append(units)
+        unitsText = svg('text', { x: 50, y: 40, class: 'rockiot-units-text' })
+        unitsText.append(units)
 
         let valueFontSize = '0.' + (opts.dialRadius + 10) + 'rem'
-        gaugeValueElem = svg('text', { x: 50, y: 65, class: 'rockiot-radial-value-text', 'font-size': valueFontSize })
+        valueText = svg('text', { x: 50, y: 65, class: 'rockiot-radial-value-text', 'font-size': valueFontSize })
 
-        gaugeValuePath = svg('path', {
-          class: `rockiot-bar-filled`,
-          d: pathString(radius, startAngle, startAngle), // value of 0
-        })
+        barFilledPath = svg('path', { class: `rockiot-bar-filled`, d: pathString(radius, startAngle, startAngle) })
 
         let angle = getAngle(100, 360 - Math.abs(startAngle - endAngle))
         let flag = angle <= 180 ? 0 : 1
+        let barPath = svg('path', { class: `rockiot-bar`, d: pathString(radius, startAngle, endAngle, flag) })
 
-        let gaugeDialEl = svg('path', {
-          class: `rockiot-bar`,
-          d: pathString(radius, startAngle, endAngle, flag),
-        })
-
-        let gaugeElement = svg(
+        let rootSvg = svg(
           'svg',
-          {
-            viewBox: viewBox || '0 0 100 100',
-            class: `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
-          },
-          [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem],
+          { viewBox: '0 0 100 100',  class: `rockiot-svg`},
+          [barPath, barFilledPath, valueText, titleText, unitsText],
         )
-        elem.appendChild(gaugeElement)
+        elem.appendChild(rootSvg)
 
         if (needle) {
-          gaugeElement.appendChild(
+          rootSvg.appendChild(
             svg('circle', {
               class: 'rockiot-needle-circle',
               cx: 50,
@@ -326,7 +317,7 @@
               }
 
               gaugeScale.appendChild(tickLine)
-              gaugeElement.appendChild(gaugeScale)
+              rootSvg.appendChild(gaugeScale)
             }
           }
         }
@@ -338,7 +329,7 @@
         if (document.querySelector('.rockiot-needle-' + serial)) {
           document.querySelector('.rockiot-needle-' + serial).remove()
         }
-        document.querySelector('.rockiot-svg-' + serial).appendChild(
+        document.querySelector('.rockiot-svg').appendChild(
           svg('line', {
             class: 'rockiot-needle rockiot-needle-' + serial,
             x1: 50,
@@ -364,21 +355,21 @@
         let angle = getAngle(val, 360 - Math.abs(startAngle - endAngle))
         // this is because we are using arc greater than 180deg
         let flag = angle <= 180 ? 0 : 1
-        gaugeValuePath.setAttribute('d', pathString(radius, startAngle, angle + startAngle, flag))
+        barFilledPath.setAttribute('d', pathString(radius, startAngle, angle + startAngle, flag))
         if (needle) {
           drawNeedle()
         }
         if (displayValue) {
-          gaugeValueElem.textContent = parseFloat(theValue).toFixed(precision)
+          valueText.textContent = parseFloat(theValue).toFixed(precision)
         }
       }
 
       function setGaugeColor(value, duration) {
         let pathTransition = 'stroke ' + duration * 1000 + 'ms ease'
-        gaugeValuePath.style.stroke = gaugeColor(value)
-        gaugeValuePath.style['-webkit-transition'] = pathTransition
-        gaugeValuePath.style['-moz-transition'] = pathTransition
-        gaugeValuePath.style.transition = pathTransition
+        barFilledPath.style.stroke = gaugeColor(value)
+        barFilledPath.style['-webkit-transition'] = pathTransition
+        barFilledPath.style['-moz-transition'] = pathTransition
+        barFilledPath.style.transition = pathTransition
       }
 
       instance = {
