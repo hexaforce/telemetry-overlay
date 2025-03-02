@@ -208,7 +208,7 @@
         valueTextClass = 'rockiot-radial-value-text',
         valueColor = '#777',
 
-        name = 'Speed',
+        title = 'Speed',
         titleTextClass = 'rockiot-title-text',
         titleColor = '#333',
 
@@ -275,7 +275,7 @@
           'dominant-baseline': 'central',
         })
 
-        gaugeTitleElem.append(name)
+        gaugeTitleElem.append(title)
 
         gaugeUnitsElem = svg('text', {
           x: 50,
