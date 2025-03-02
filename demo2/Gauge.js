@@ -186,9 +186,6 @@
       opts = shallowCopy({}, defaultOptions, opts)
 
       let offset = opts.offset
-      let serial = opts.serial
-
-      let precision = 2
       let radius = opts.dialRadius - offset
 
       // bar ---------------------
@@ -204,6 +201,9 @@
       let max = 270
       let ticks = 9
 
+      // needle ---------------------
+      let displayNeedle = true
+
       // title ---------------------
       let title = 'Speed'
       let titleText
@@ -214,14 +214,13 @@
 
       // value ---------------------
       let displayValue = true
+      let precision = 2
       let value = 100
       let valueText
 
       let gaugeColor = null
 
       let instance
-
-      let needle = true
 
       if (startAngle < endAngle) {
         console.log('WARN! startAngle < endAngle, Swapping')
@@ -259,13 +258,14 @@
         )
         elem.appendChild(rootSvg)
 
-        if (needle) {
+        if (displayNeedle) {
           rootSvg.appendChild(
             svg('circle', {
               class: 'rockiot-needle-circle',
               cx: 50,
               cy: 50,
               r: 2,
+              fill: 'red',
             }),
           )
         }
@@ -332,7 +332,6 @@
 
       function drawNeedle() {
         let needleCoord = document.querySelector('.rockiot-bar-filled').getAttribute('d').split(' ')
-        // console.log("needleCoord:",needleCoord)
         if (document.querySelector('.rockiot-needle')) {
           document.querySelector('.rockiot-needle').remove()
         }
@@ -363,7 +362,7 @@
         // this is because we are using arc greater than 180deg
         let flag = angle <= 180 ? 0 : 1
         barFilledPath.setAttribute('d', pathString(radius, startAngle, angle + startAngle, flag))
-        if (needle) {
+        if (displayNeedle) {
           drawNeedle()
         }
         if (displayValue) {
@@ -424,7 +423,7 @@
       }
       initializeGauge()
       instance.setValue(value)
-      if (needle) {
+      if (displayNeedle) {
         drawNeedle()
       }
       return instance
