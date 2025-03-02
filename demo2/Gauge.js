@@ -190,34 +190,38 @@
 
       let precision = 2
       let radius = opts.dialRadius - offset
-      let displayValue = true
-      let displayScale = true
-      let displaySmallScale = true
 
+      // bar ---------------------
       let startAngle = 135
       let endAngle = 45
+      let barPath
+      let barFilledPath
 
+      // scale ---------------------
+      let displayScale = true
+      let displaySmallScale = true
       let min = 0
       let max = 270
-
-      let barFilledPath
+      let ticks = 9
 
       // title ---------------------
       let title = 'Speed'
       let titleText
+      
       // units ---------------------
       let units = 'Km/h'
       let unitsText
+
       // value ---------------------
+      let displayValue = true
       let value = 100
       let valueText
 
       let gaugeColor = null
 
       let instance
-      let gaugeScale
+
       let needle = true
-      let ticks = 9
 
       if (startAngle < endAngle) {
         console.log('WARN! startAngle < endAngle, Swapping')
@@ -246,7 +250,7 @@
 
         let angle = getAngle(100, 360 - Math.abs(startAngle - endAngle))
         let flag = angle <= 180 ? 0 : 1
-        let barPath = svg('path', { class: `rockiot-bar`, d: pathString(radius, startAngle, endAngle, flag) })
+        barPath = svg('path', { class: `rockiot-bar`, d: pathString(radius, startAngle, endAngle, flag) })
 
         let rootSvg = svg(
           'svg',
@@ -267,7 +271,7 @@
         }
 
         if (displayScale) {
-          gaugeScale = svg('g', {})
+          let rootScale = svg('g', {})
           let tickLine
           let startTick = startAngle + 90
           let factor = (360 - (startAngle - endAngle)) / (ticks * 10)
@@ -316,11 +320,11 @@
                   transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
                 })
                 scaleText.append(parseFloat(n * (max / ticks / 10) + parseInt(scaleOffsetNumber)).toFixed(0))
-                gaugeScale.appendChild(scaleText)
+                rootScale.appendChild(scaleText)
               }
 
-              gaugeScale.appendChild(tickLine)
-              rootSvg.appendChild(gaugeScale)
+              rootScale.appendChild(tickLine)
+              rootSvg.appendChild(rootScale)
             }
           }
         }
@@ -329,12 +333,12 @@
       function drawNeedle() {
         let needleCoord = document.querySelector('.rockiot-bar-filled').getAttribute('d').split(' ')
         // console.log("needleCoord:",needleCoord)
-        if (document.querySelector('.rockiot-needle-' + serial)) {
-          document.querySelector('.rockiot-needle-' + serial).remove()
+        if (document.querySelector('.rockiot-needle')) {
+          document.querySelector('.rockiot-needle').remove()
         }
         document.querySelector('.rockiot-svg').appendChild(
           svg('line', {
-            class: 'rockiot-needle rockiot-needle-' + serial,
+            class: 'rockiot-needle',
             x1: 50,
             y1: 50,
             x2: needleCoord[needleCoord.length - 2],
