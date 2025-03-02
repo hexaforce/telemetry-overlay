@@ -13,17 +13,18 @@
     global.Gauge = Gauge
   }
 })(typeof window === 'undefined' ? this : window, function (global, undefined) {
-  var document = global.document,
-    slice = Array.prototype.slice,
-    requestAnimationFrame =
-      global.requestAnimationFrame ||
-      global.mozRequestAnimationFrame ||
-      global.webkitRequestAnimationFrame ||
-      global.msRequestAnimationFrame ||
-      function (cb) {
-        return setTimeout(cb, 1000 / 60)
-      }
+  let document = global.document
+  let slice = Array.prototype.slice
+  let requestAnimationFrame =
+    global.requestAnimationFrame ||
+    global.mozRequestAnimationFrame ||
+    global.webkitRequestAnimationFrame ||
+    global.msRequestAnimationFrame ||
+    function (cb) {
+      return setTimeout(cb, 1000 / 60)
+    }
 
+  const SVG_NS = 'http://www.w3.org/2000/svg'
   // EXPERIMENTAL!!
   /**
    * Simplistic animation function for animating the gauge. That's all!
@@ -37,51 +38,48 @@
    * }
    */
   function Animation(options) {
-    var duration = options.duration,
-      currentIteration = 1,
-      iterations = 60 * duration,
-      start = options.start || 0,
-      end = options.end,
-      change = end - start,
-      step = options.step,
-      easing =
-        options.easing ||
-        function easeInOutCubic(pos) {
-          // https://github.com/danro/easing-js/blob/master/easing.js
-          if ((pos /= 0.5) < 1) return 0.5 * Math.pow(pos, 3)
-          return 0.5 * (Math.pow(pos - 2, 3) + 2)
-        }
+    let duration = options.duration
+    let currentIteration = 1
+    let iterations = 60 * duration
+    let start = options.start || 0
+    let end = options.end
+    let change = end - start
+    let step = options.step
+    let easing =
+      options.easing ||
+      function easeInOutCubic(pos) {
+        // https://github.com/danro/easing-js/blob/master/easing.js
+        if ((pos /= 0.5) < 1) return 0.5 * Math.pow(pos, 3)
+        return 0.5 * (Math.pow(pos - 2, 3) + 2)
+      }
 
     function animate() {
-      var progress = currentIteration / iterations,
-        value = change * easing(progress) + start
+      let progress = currentIteration / iterations
+      let value = change * easing(progress) + start
       step(value, currentIteration)
       currentIteration += 1
-
       if (progress < 1) {
         requestAnimationFrame(animate)
       }
     }
-    // start!
+
     requestAnimationFrame(animate)
   }
 
   var Gauge = (function () {
-    var SVG_NS = 'http://www.w3.org/2000/svg'
-
-    var GaugeDefaults = {
+    let GaugeDefaults = {
       centerX: 50,
       centerY: 50,
     }
 
-    var defaultOptions = {
+    let defaultOptions = {
       dialRadius: 45,
       offset: 10,
     }
 
     function shallowCopy(/* source, ...targets*/) {
-      var target = arguments[0],
-        sources = slice.call(arguments, 1)
+      let target = arguments[0]
+      let sources = slice.call(arguments, 1)
       sources.forEach(function (s) {
         for (var k in s) {
           if (s.hasOwnProperty(k)) {
@@ -99,9 +97,9 @@
      * @param {Array} children An array of children (can be created by this same function)
      * @return The SVG element
      */
-    function svg(name, attrs, children) {
-      var elem = document.createElementNS(SVG_NS, name)
-      for (var attrName in attrs) {
+    function svg(label, attrs, children) {
+      let elem = document.createElementNS(SVG_NS, label)
+      for (let attrName in attrs) {
         elem.setAttribute(attrName, attrs[attrName])
       }
 
@@ -122,7 +120,7 @@
     }
 
     function normalize(value, min, limit) {
-      var val = Number(value)
+      let val = Number(value)
       if (Number(value) < 0) {
         val += min
       }
@@ -133,12 +131,12 @@
     }
 
     function getValueInPercentage(value, min, max) {
-      var mFactor = 1
+      let mFactor = 1
       if (min < 0) {
         max -= min * -1
       }
-      var newMax = max - min * mFactor,
-        newVal = value - min * mFactor
+      let newMax = max - min * mFactor
+      let newVal = value - min * mFactor
       return (100 * newVal) / newMax
       // var absMin = Math.abs(min);
       // return 100 * (absMin + value) / (max + absMin);
@@ -153,7 +151,7 @@
      * @return An object with x,y co-ordinates
      */
     function getCartesian(cx, cy, radius, angle) {
-      var rad = (angle * Math.PI) / 180
+      let rad = (angle * Math.PI) / 180
       return {
         x: Math.round((cx + radius * Math.cos(rad)) * 1000) / 1000,
         y: Math.round((cy + radius * Math.sin(rad)) * 1000) / 1000,
@@ -164,8 +162,8 @@
     // i.e. starts at 135deg ends at 45deg with large arc flag
     // REMEMBER!! angle=0 starts on X axis and then increases clockwise
     function getDialCoords(radius, startAngle, endAngle) {
-      var cx = GaugeDefaults.centerX,
-        cy = GaugeDefaults.centerY
+      let cx = GaugeDefaults.centerX
+      let cy = GaugeDefaults.centerY
       return {
         end: getCartesian(cx, cy, radius, endAngle),
         start: getCartesian(cx, cy, radius, startAngle),
@@ -190,8 +188,8 @@
     return function Gauge(elem, opts) {
       opts = shallowCopy({}, defaultOptions, opts)
 
-      var offset = opts.offset
-      var serial = opts.serial
+      let offset = opts.offset
+      let serial = opts.serial
 
       var gaugeContainer = elem,
         limit = 270,
@@ -203,30 +201,24 @@
         displaySmallScale = true,
         startAngle = 135,
         endAngle = 45,
-
+        // title ---------------------
         title = 'Speed',
         titleTextClass = 'rockiot-title-text',
         titleColor = '#333',
-
+        // units ---------------------
         units = 'Km/h',
         unitsTextClass = 'rockiot-units-text',
         unitsColor = '#333',
-
-
+        // value ---------------------
         value = 100,
         valueTextClass = 'rockiot-radial-value-text',
         valueColor = '#707070',
-
         valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
-
-
-
         dialClass = `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
         gaugeClass = `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
         gaugeColor = null,
         gaugeBarColor = '#4ea5f1',
         gaugeProgressColor = '#e0e0e0',
-
         gaugeValueElem,
         gaugeValuePath,
         gaugeTitleElem,
@@ -242,13 +234,13 @@
 
       if (startAngle < endAngle) {
         console.log('WARN! startAngle < endAngle, Swapping')
-        var tmp = startAngle
+        let tmp = startAngle
         startAngle = endAngle
         endAngle = tmp
       }
 
       function pathString(radius, startAngle, endAngle, largeArc) {
-        var coords = getDialCoords(radius, startAngle, endAngle),
+        let coords = getDialCoords(radius, startAngle, endAngle),
           start = coords.start,
           end = coords.end,
           largeArcFlag = typeof largeArc === 'undefined' ? 1 : largeArc
@@ -257,7 +249,6 @@
       }
 
       function initializeGauge(elem) {
-
         gaugeTitleElem = svg('text', {
           x: 50,
           y: 35,
@@ -290,10 +281,10 @@
           d: pathString(radius, startAngle, startAngle), // value of 0
         })
 
-        var angle = getAngle(100, 360 - Math.abs(startAngle - endAngle))
-        var flag = angle <= 180 ? 0 : 1
+        let angle = getAngle(100, 360 - Math.abs(startAngle - endAngle))
+        let flag = angle <= 180 ? 0 : 1
 
-        var gaugeDialEl = svg('path', {
+        let gaugeDialEl = svg('path', {
           class: dialClass,
           fill: 'none',
           stroke: gaugeProgressColor,
@@ -301,14 +292,14 @@
           d: pathString(radius, startAngle, endAngle, flag),
         })
 
-        var gaugeNeedle = svg('circle', {
+        let gaugeNeedle = svg('circle', {
           class: 'rockiot-scale scale rockiot-needle-circle needle-circle',
           cx: 50,
           cy: 50,
           r: 2,
         })
 
-        var gaugeElement = svg('svg', { viewBox: viewBox || '0 0 100 100', class: gaugeClass }, [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem])
+        let gaugeElement = svg('svg', { viewBox: viewBox || '0 0 100 100', class: gaugeClass }, [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem])
 
         elem.appendChild(gaugeElement)
 
@@ -386,48 +377,19 @@
       }
 
       function drawNeedle() {
-        var needleCoord = document
-          .querySelector('.rockiot-value-' + serial)
-          .getAttribute('d')
-          .split(' ')
+        var needleCoord = document.querySelector('.rockiot-value-' + serial).getAttribute('d').split(' ')
         if (document.querySelector('.rockiot-needle-' + serial)) {
           document.querySelector('.rockiot-needle-' + serial).remove()
         }
         document.querySelector('.rockiot-svg-' + serial).appendChild(
           svg('line', {
-            class: 'rockiot-scale rockiot-needle rockiot-needle-' + serial,
-            fill: 'unset',
-            'stroke-width': 0.4,
-            stroke: needleColor,
+            class: 'rockiot-needle rockiot-needle-' + serial,
             x1: 50,
             y1: 50,
             x2: needleCoord[needleCoord.length - 2],
             y2: needleCoord[needleCoord.length - 1],
           }),
         )
-      }
-
-      function drawNumbers() {
-        var rad = getAngle(100, 360 - Math.abs(startAngle - endAngle))
-        var fs = (360 - (startAngle + endAngle) / 2) / 100
-        var dg = startAngle + endAngle
-        var tick = dg / ((limit / ticks) * 10)
-        for (var i = 0; i <= 66; i++) {
-          if (i % 10 === 0) {
-            var s = startAngle + i * tick
-            var angle = (Math.PI / 33) * (i + tick)
-            //var angle = (Math.PI/(360/fs/2)) * i
-            //console.log ( 'x=>' , radius * Math.cos(angle) )
-            //console.log ( Math.PI , angle , radius )
-            var txtNumber = svg('text', {
-              x: (radius + offset) * Math.cos(angle) + 50,
-              y: (radius + offset) * Math.sin(angle) + 50,
-              class: 'scaleNumbers',
-            })
-            txtNumber.append(i - 50)
-            gaugeScale.appendChild(txtNumber)
-          }
-        }
       }
 
       function updateGauge(theValue, frame) {
@@ -486,25 +448,15 @@
           console.log(options)
         },
 
-        setMaxValue: function (max) {
-          limit = max
+        setMaxValue: function (newMax) {
+          limit = newMax
         },
 
         setValue: function (val) {
           value = val
-
-          // if (min > 0) {
-          //   var lm = opts.max - min
-          //   value = (lm * val) / 100
-          //   console.log('set value of % =>', val, min, lm, ' = ', value)
-          // }
-
           if (value < 0) {
             value += min
           }
-
-          // console.log('set value=> ', value, min, limit)
-          // value = normalize(val, min, limit)
           if (gaugeColor) {
             setGaugeColor(value, 0)
           }
@@ -514,15 +466,10 @@
         setValueAnimated: function (val, duration) {
           var oldVal = value
           value = val
-          // if (value < 0) {
-          //   value += min
-          // }
-
           value = normalize(val, min, limit)
           if (oldVal === value) {
             return
           }
-
           if (gaugeColor) {
             setGaugeColor(value, duration)
           }
