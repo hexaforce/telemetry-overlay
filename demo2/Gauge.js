@@ -203,16 +203,10 @@
         endAngle = 45,
         // title ---------------------
         title = 'Speed',
-        titleTextClass = 'rockiot-title-text',
-        titleColor = '#333',
         // units ---------------------
         units = 'Km/h',
-        unitsTextClass = 'rockiot-units-text',
-        unitsColor = '#333',
         // value ---------------------
         value = 100,
-        valueTextClass = 'rockiot-radial-value-text',
-        valueColor = '#707070',
         valueDialClass = `rockiot-value rockiot-value-md rockiot-value-${serial}`,
         dialClass = `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
         gaugeClass = `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
@@ -227,7 +221,6 @@
         instance,
         gaugeScale,
         needle = true,
-        needleColor = '#ff0000',
         ticks = 9,
         scaleClass = 'rockiot-scale scale',
         scaleColor = '#aaa'
@@ -240,11 +233,8 @@
       }
 
       function pathString(radius, startAngle, endAngle, largeArc) {
-        let coords = getDialCoords(radius, startAngle, endAngle),
-          start = coords.start,
-          end = coords.end,
-          largeArcFlag = typeof largeArc === 'undefined' ? 1 : largeArc
-
+        let { start, end } = getDialCoords(radius, startAngle, endAngle)
+        let largeArcFlag = typeof largeArc === 'undefined' ? 1 : largeArc
         return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 1, end.x, end.y].join(' ')
       }
 
@@ -252,24 +242,21 @@
         gaugeTitleElem = svg('text', {
           x: 50,
           y: 35,
-          fill: titleColor,
-          class: titleTextClass,
+          class: 'rockiot-title-text',
         })
         gaugeTitleElem.append(title)
 
         gaugeUnitsElem = svg('text', {
           x: 50,
           y: 40,
-          fill: unitsColor,
-          class: unitsTextClass,
+          class: 'rockiot-units-text',
         })
         gaugeUnitsElem.append(units)
 
         gaugeValueElem = svg('text', {
           x: 50,
           y: 65,
-          fill: valueColor,
-          class: valueTextClass,
+          class: 'rockiot-radial-value-text',
           'font-size': '0.' + (opts.dialRadius + 10) + 'rem',
         })
 
@@ -292,19 +279,17 @@
           d: pathString(radius, startAngle, endAngle, flag),
         })
 
-        let gaugeNeedle = svg('circle', {
-          class: 'rockiot-scale scale rockiot-needle-circle needle-circle',
-          cx: 50,
-          cy: 50,
-          r: 2,
-        })
-
         let gaugeElement = svg('svg', { viewBox: viewBox || '0 0 100 100', class: gaugeClass }, [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem])
 
         elem.appendChild(gaugeElement)
 
         if (needle) {
-          gaugeElement.appendChild(gaugeNeedle)
+          gaugeElement.appendChild(svg('circle', {
+            class: 'rockiot-needle-circle',
+            cx: 50,
+            cy: 50,
+            r: 2,
+          }))
         }
 
         if (displayScale) {
@@ -377,7 +362,10 @@
       }
 
       function drawNeedle() {
-        var needleCoord = document.querySelector('.rockiot-value-' + serial).getAttribute('d').split(' ')
+        var needleCoord = document
+          .querySelector('.rockiot-value-' + serial)
+          .getAttribute('d')
+          .split(' ')
         if (document.querySelector('.rockiot-needle-' + serial)) {
           document.querySelector('.rockiot-needle-' + serial).remove()
         }
