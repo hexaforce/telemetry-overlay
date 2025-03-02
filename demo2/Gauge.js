@@ -1,5 +1,5 @@
 ;(function (global, factory) {
-  var Gauge = factory(global)
+  let Gauge = factory(global)
   if (typeof define === 'function' && define.amd) {
     // AMD support
     define(function () {
@@ -66,7 +66,7 @@
     requestAnimationFrame(animate)
   }
 
-  var Gauge = (function () {
+  let Gauge = (function () {
     let GaugeDefaults = {
       centerX: 50,
       centerY: 50,
@@ -81,7 +81,7 @@
       let target = arguments[0]
       let sources = slice.call(arguments, 1)
       sources.forEach(function (s) {
-        for (var k in s) {
+        for (let k in s) {
           if (s.hasOwnProperty(k)) {
             target[k] = s[k]
           }
@@ -138,7 +138,7 @@
       let newMax = max - min * mFactor
       let newVal = value - min * mFactor
       return (100 * newVal) / newMax
-      // var absMin = Math.abs(min);
+      // let absMin = Math.abs(min);
       // return 100 * (absMin + value) / (max + absMin);
     }
 
@@ -191,32 +191,32 @@
       let offset = opts.offset
       let serial = opts.serial
 
-      var gaugeContainer = elem,
-        limit = 270,
-        min = 0,
-        precision = 2,
-        radius = opts.dialRadius - offset,
-        displayValue = true,
-        displayScale = true,
-        displaySmallScale = true,
-        startAngle = 135,
-        endAngle = 45,
-        // title ---------------------
-        title = 'Speed',
-        // units ---------------------
-        units = 'Km/h',
-        // value ---------------------
-        value = 100,
-        gaugeColor = null,
-        gaugeValueElem,
-        gaugeValuePath,
-        gaugeTitleElem,
-        gaugeUnitsElem,
-        viewBox = undefined, //opts.viewBox,
-        instance,
-        gaugeScale,
-        needle = true,
-        ticks = 9
+      let gaugeContainer = elem
+      let limit = 270
+      let min = 0
+      let precision = 2
+      let radius = opts.dialRadius - offset
+      let displayValue = true
+      let displayScale = true
+      let displaySmallScale = true
+      let startAngle = 135
+      let endAngle = 45
+      // title ---------------------
+      let title = 'Speed'
+      // units ---------------------
+      let units = 'Km/h'
+      // value ---------------------
+      let value = 100
+      let gaugeColor = null
+      let gaugeValueElem
+      let gaugeValuePath
+      let gaugeTitleElem
+      let gaugeUnitsElem
+      let viewBox = undefined //opts.viewBox,
+      let instance
+      let gaugeScale
+      let needle = true
+      let ticks = 9
 
       if (startAngle < endAngle) {
         console.log('WARN! startAngle < endAngle, Swapping')
@@ -232,26 +232,14 @@
       }
 
       function initializeGauge(elem) {
-        gaugeTitleElem = svg('text', {
-          x: 50,
-          y: 35,
-          class: 'rockiot-title-text',
-        })
+        gaugeTitleElem = svg('text', { x: 50, y: 35, class: 'rockiot-title-text' })
         gaugeTitleElem.append(title)
 
-        gaugeUnitsElem = svg('text', {
-          x: 50,
-          y: 40,
-          class: 'rockiot-units-text',
-        })
+        gaugeUnitsElem = svg('text', { x: 50, y: 40, class: 'rockiot-units-text' })
         gaugeUnitsElem.append(units)
 
-        gaugeValueElem = svg('text', {
-          x: 50,
-          y: 65,
-          class: 'rockiot-radial-value-text',
-          'font-size': '0.' + (opts.dialRadius + 10) + 'rem',
-        })
+        let valueFontSize = '0.' + (opts.dialRadius + 10) + 'rem'
+        gaugeValueElem = svg('text', { x: 50, y: 65, class: 'rockiot-radial-value-text', 'font-size': valueFontSize })
 
         gaugeValuePath = svg('path', {
           class: `rockiot-value rockiot-value-md rockiot-value-${serial}`,
@@ -265,27 +253,32 @@
         let flag = angle <= 180 ? 0 : 1
 
         let gaugeDialEl = svg('path', {
-          class: `rockiot-dial rockiot-dial-md rockiot-dial-${serial}`,
+          class: `rockiot-dial-md`,
           fill: 'none',
           stroke: '#e0e0e0',
           'stroke-width': 2,
           d: pathString(radius, startAngle, endAngle, flag),
         })
 
-        let gaugeElement = svg('svg', {
-           viewBox: viewBox || '0 0 100 100', class: `rockiot-svg rockiot-svg-${serial} gauge-${serial}` }, 
+        let gaugeElement = svg(
+          'svg',
+          {
+            viewBox: viewBox || '0 0 100 100',
+            class: `rockiot-svg rockiot-svg-${serial} gauge-${serial}`,
+          },
           [gaugeDialEl, gaugeValuePath, gaugeValueElem, gaugeTitleElem, gaugeUnitsElem],
         )
-
         elem.appendChild(gaugeElement)
 
         if (needle) {
-          gaugeElement.appendChild(svg('circle', {
-            class: 'rockiot-needle-circle',
-            cx: 50,
-            cy: 50,
-            r: 2,
-          }))
+          gaugeElement.appendChild(
+            svg('circle', {
+              class: 'rockiot-needle-circle',
+              cx: 50,
+              cy: 50,
+              r: 2,
+            }),
+          )
         }
 
         if (displayScale) {
@@ -293,11 +286,10 @@
             class: 'rockiot-scale scale',
             stroke: '#eee',
           })
-          var tickEl
-
-          var startTick = startAngle + 90
-          var factor = (360 - (startAngle - endAngle)) / (ticks * 10)
-          var scaleOffsetNumber = min
+          let tickEl
+          let startTick = startAngle + 90
+          let factor = (360 - (startAngle - endAngle)) / (ticks * 10)
+          let scaleOffsetNumber = min
           if (opts.min < 0) {
             limit = Math.abs(opts.min) + limit
             scaleOffsetNumber = opts.min
@@ -307,20 +299,19 @@
             scaleOffsetNumber = opts.min
             limit -= Math.abs(min)
           }
-          for (var n = 0; n < ticks * 10 + 1; n++) {
-            var yT = 50 - opts.dialRadius + opts.dialRadius / 10
-
+          for (let n = 0; n < ticks * 10 + 1; n++) {
+            let yT = 50 - opts.dialRadius + opts.dialRadius / 10
             if (opts.dialRadius > 40) {
               yT -= 2
             }
-            var dT = 2
+            let dT = 2
             if (n % 10 === 0) {
               yT -= 3
               dT = 5
             }
             if (n % 10 === 0 || displaySmallScale) {
               tickEl = svg('line', {
-                class: 'rockiot-scale scale',
+                // class: 'rockiot-scale scale',
                 x1: 50,
                 y1: yT,
                 x2: 50,
@@ -330,7 +321,7 @@
                 transform: 'rotate(' + (n * factor + startTick) + ' 50 50)',
               })
 
-              var numberOffset = 0
+              let numberOffset = 0
               if (n % 10 === 0) {
                 if (n === 0 && startAngle - endAngle === 1) {
                   numberOffset = 2
@@ -338,7 +329,7 @@
                 if (n === ticks * 10 && startAngle - endAngle === 1) {
                   numberOffset = -2
                 }
-                var tickNr = svg('text', {
+                let tickNr = svg('text', {
                   x: 50 + numberOffset,
                   y: yT - 1,
                   class: 'scaleNumbers',
@@ -358,7 +349,7 @@
       }
 
       function drawNeedle() {
-        var needleCoord = document
+        let needleCoord = document
           .querySelector('.rockiot-value-' + serial)
           .getAttribute('d')
           .split(' ')
@@ -377,12 +368,8 @@
       }
 
       function updateGauge(theValue, frame) {
-        var lm = limit
-        var mn = min
-
-        // if (opts.min < 0) {
-        //   theValue += Math.abs(opts.min)
-        // }
+        let lm = limit
+        let mn = min
 
         if (opts.min > 0) {
           mn = opts.min
@@ -391,14 +378,11 @@
         if (opts.min < 0) {
           mn = opts.min
         }
-
-        var val = getValueInPercentage(theValue, mn, lm),
-          // angle = getAngle(val, 360 - Math.abs(endAngle - startAngle)),
-          angle = getAngle(val, 360 - Math.abs(startAngle - endAngle)),
-          // this is because we are using arc greater than 180deg
-          flag = angle <= 180 ? 0 : 1
+        let val = getValueInPercentage(theValue, mn, lm)
+        let angle = getAngle(val, 360 - Math.abs(startAngle - endAngle))
+        // this is because we are using arc greater than 180deg
+        let flag = angle <= 180 ? 0 : 1
         gaugeValuePath.setAttribute('d', pathString(radius, startAngle, angle + startAngle, flag))
-        var parent = document.querySelector('.gauge-' + serial)
         if (needle) {
           drawNeedle()
         }
@@ -408,10 +392,9 @@
       }
 
       function setGaugeColor(value, duration) {
-        var c = gaugeColor(value),
-          dur = duration * 1000,
-          pathTransition = 'stroke ' + dur + 'ms ease'
-        // textTransition = "fill " + dur + "ms ease";
+        let c = gaugeColor(value)
+        let dur = duration * 1000
+        let pathTransition = 'stroke ' + dur + 'ms ease'
 
         gaugeValuePath.style.stroke = c
         gaugeValuePath.style['-webkit-transition'] = pathTransition
@@ -431,11 +414,9 @@
         setOptions: function (options) {
           console.log(options)
         },
-
         setMaxValue: function (newMax) {
           limit = newMax
         },
-
         setValue: function (val) {
           value = val
           if (value < 0) {
@@ -446,9 +427,8 @@
           }
           updateGauge(value)
         },
-
         setValueAnimated: function (val, duration) {
-          var oldVal = value
+          let oldVal = value
           value = val
           value = normalize(val, min, limit)
           if (oldVal === value) {
@@ -466,16 +446,13 @@
             },
           })
         },
-
         getValue: function () {
           return value
         },
-
         getRange: function () {
           return { min, limit }
         },
       }
-
       initializeGauge(gaugeContainer)
       instance.setValue(value)
       if (needle) {
