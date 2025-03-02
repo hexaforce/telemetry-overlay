@@ -15,25 +15,15 @@
   justify-content: center;
 }
 
-.rockiot-dial-md {
+.rockiot-bar {
+  fill: none;
+  stroke: #e0e0e0;
   stroke-width: 8;
 }
-.rockiot-value-md {
+.rockiot-bar-filled {
+  fill: none;
+  stroke: #4ea5f1;
   stroke-width: 8;
-}
-
-.rockiot-dial-lg {
-  stroke-width: 12;
-}
-.rockiot-value-lg {
-  stroke-width: 12;
-}
-
-.rockiot-dial-sm {
-  stroke-width: 4;
-}
-.rockiot-value-sm {
-  stroke-width: 4;
 }
 
 .rockiot-needle {

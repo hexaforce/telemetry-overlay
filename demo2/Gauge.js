@@ -239,10 +239,7 @@
         gaugeValueElem = svg('text', { x: 50, y: 65, class: 'rockiot-radial-value-text', 'font-size': valueFontSize })
 
         gaugeValuePath = svg('path', {
-          class: `rockiot-value rockiot-value-md rockiot-value-${serial}`,
-          fill: 'none',
-          stroke: '#4ea5f1',
-          'stroke-width': 2.5,
+          class: `rockiot-bar-filled`,
           d: pathString(radius, startAngle, startAngle), // value of 0
         })
 
@@ -250,10 +247,7 @@
         let flag = angle <= 180 ? 0 : 1
 
         let gaugeDialEl = svg('path', {
-          class: `rockiot-dial-md`,
-          fill: 'none',
-          stroke: '#e0e0e0',
-          'stroke-width': 2,
+          class: `rockiot-bar`,
           d: pathString(radius, startAngle, endAngle, flag),
         })
 
@@ -279,10 +273,7 @@
         }
 
         if (displayScale) {
-          gaugeScale = svg('g', {
-            // class: 'rockiot-scale scale',
-            // stroke: '#ff0000',
-          })
+          gaugeScale = svg('g', {})
           let tickLine
           let startTick = startAngle + 90
           let factor = (360 - (startAngle - endAngle)) / (ticks * 10)
@@ -319,7 +310,7 @@
               let numberOffset = 0
               if (n % 10 === 0) {
                 if (n === 0 && startAngle - endAngle === 1) {
-                  numberOffset =10
+                  numberOffset = 10
                 }
                 if (n === ticks * 10 && startAngle - endAngle === 1) {
                   numberOffset = -2
@@ -342,10 +333,8 @@
       }
 
       function drawNeedle() {
-        let needleCoord = document
-          .querySelector('.rockiot-value-' + serial)
-          .getAttribute('d')
-          .split(' ')
+        let needleCoord = document.querySelector('.rockiot-bar-filled').getAttribute('d').split(' ')
+        // console.log("needleCoord:",needleCoord)
         if (document.querySelector('.rockiot-needle-' + serial)) {
           document.querySelector('.rockiot-needle-' + serial).remove()
         }
@@ -385,7 +374,7 @@
       }
 
       function setGaugeColor(value, duration) {
-        let pathTransition = 'stroke ' + (duration * 1000) + 'ms ease'
+        let pathTransition = 'stroke ' + duration * 1000 + 'ms ease'
         gaugeValuePath.style.stroke = gaugeColor(value)
         gaugeValuePath.style['-webkit-transition'] = pathTransition
         gaugeValuePath.style['-moz-transition'] = pathTransition
