@@ -188,17 +188,20 @@
       let offset = opts.offset
       let serial = opts.serial
 
-      let gaugeContainer = elem
-      let max = 270
-      let min = 0
       let precision = 2
       let radius = opts.dialRadius - offset
       let displayValue = true
       let displayScale = true
       let displaySmallScale = true
+
       let startAngle = 135
       let endAngle = 45
+
+      let min = 0
+      let max = 270
+
       let barFilledPath
+
       // title ---------------------
       let title = 'Speed'
       let titleText
@@ -229,7 +232,7 @@
         return ['M', start.x, start.y, 'A', radius, radius, 0, largeArcFlag, 1, end.x, end.y].join(' ')
       }
 
-      function initializeGauge(elem) {
+      function initializeGauge() {
         titleText = svg('text', { x: 50, y: 35, class: 'rockiot-title-text' })
         titleText.append(title)
 
@@ -415,7 +418,7 @@
           return { min, max }
         },
       }
-      initializeGauge(gaugeContainer)
+      initializeGauge()
       instance.setValue(value)
       if (needle) {
         drawNeedle()
