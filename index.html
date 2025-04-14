@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Head-Up Display Canvas</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        background: rgba(50, 50, 50, 1);
+      }
+      canvas.head-up-display {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="head-up-display"></canvas>
+    <script type="module">
+      import TelemetryOverlay from './src/telemetry-overlay.js'
+
+      const canvas = document.querySelector('.head-up-display')
+      const hud = new TelemetryOverlay(canvas)
+
+      hud.update({
+        heading: 90,
+        pitch: 5,
+        roll: -10,
+        altitude: 1230,
+        speed: 1540,
+        level: 0.8,
+        charging: true,
+      })
+    </script>
+  </body>
+</html>

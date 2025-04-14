@@ -1,0 +1,43 @@
+{
+  "name": "telemetry-overlay",
+  "version": "1.0.1",
+  "description": "star compass",
+  "main": "dist/telemetry-overlay.js",
+  "module": "dist/telemetry-overlay.js",
+  "exports": {
+    "default": "./dist/telemetry-overlay.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "fmt": "prettier --write \"./**/*.{js,html}\"",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexaforce/telemetry-overlay.git"
+  },
+  "keywords": [
+    "star",
+    "compass"
+  ],
+  "author": "tomokazu tantaka",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hexaforce/telemetry-overlay/issues"
+  },
+  "homepage": "https://github.com/hexaforce/telemetry-overlay#readme",
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "rollup": "^2.79.2",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "printWidth": 512
+  }
+}
